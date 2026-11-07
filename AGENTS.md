@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: planning only
+## Current phase: application shell
 
-Create and maintain project guidance and architecture documentation only. Wait for further user instructions before implementing application functionality. Do not create UI pages, authentication, database tables, Supabase connections, deployments, or unnecessary dependencies in this phase.
+Implement project setup, the shared layout, History API routing, and placeholder pages only. Install the requested frontend dependencies and Supabase SDK without initializing a Supabase client. All placeholder routes are publicly accessible for shell verification; authentication and role guards belong to a later phase. Do not implement forms, advertisement cards, marketplace operations, database tables, Supabase connections, or deployments. Wait for further instructions after completing the shell.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

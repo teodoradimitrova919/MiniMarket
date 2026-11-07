@@ -1,11 +1,35 @@
 # MiniMarket
 
-A simple, responsive marketplace for second-hand and new products, planned with Vanilla JavaScript, Vite, Bootstrap, and a future Supabase backend.
+A lightweight marketplace shell built manually with Vite, Vanilla JavaScript ES modules, Bootstrap 5, and Bootstrap Icons.
 
-The project is currently in the planning phase. No application features, dependencies, database schema, Supabase connection, or deployment have been implemented.
+## Run locally
 
-- [Architecture plan and proposed folder structure](ARCHITECTURE.md)
-- [Agent instructions](AGENTS.md)
-- [Codex project instructions](.github/codex-instructions.md)
+Use Node.js 22.12+ (or a newer supported LTS).
 
-Implementation will begin after further instructions. There are no installation or run commands yet.
+```sh
+npm ci
+npm run dev
+```
+
+Open the local URL printed by Vite. On Windows PowerShell with script execution disabled, use `npm.cmd` in place of `npm`.
+
+- `npm run build`: build to `dist/`.
+- `npm run preview`: serve the production build locally.
+
+## Current scope
+
+One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page folders. All canonical routes in [.github/codex-instructions.md](.github/codex-instructions.md) render placeholders, including listing details, add/edit, and admin. Unknown routes render Not Found. Listing details can be previewed at `/listings/demo` and editing at `/listings/demo/edit`.
+
+The History API router supports internal navigation, Back/Forward, active links, page titles, focus movement, and mount/unmount cleanup. External links, modified clicks, downloads, and same-page fragments retain browser behavior. Vite handles direct URLs locally; `netlify.toml` supplies the future hosting fallback. No deployment has been performed.
+
+Authentication and role restrictions are deferred; placeholder routes are public. There are no forms, advertisement cards, database operations, or Supabase client connections. The Supabase SDK is installed for later work. Reserved service and utility folders contain no implementation yet; migrations are empty.
+
+## Environment
+
+Copy `.env.example` to `.env.local` when backend integration begins. The shell does not require environment values. Future configuration uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Vite client variables are public; never use service-role or secret keys. Local environment files are ignored by Git.
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md).
+
+Separate page modules with one `index.html` form a single-page application: JavaScript switches the content while the shell stays mounted. A true Vite multi-page build has multiple HTML entry files and loads a separate document on navigation.

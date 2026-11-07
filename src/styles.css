@@ -1,0 +1,16 @@
+:root { font-family: system-ui, sans-serif; color: #203d32; background: #f6f8f3; }
+body { min-height: 100vh; display: flex; flex-direction: column; background: #f6f8f3; color: #203d32; }
+main { flex: 1; }
+.btn-primary { --bs-btn-bg: #22664d; --bs-btn-border-color: #22664d; --bs-btn-hover-bg: #184d3a; --bs-btn-hover-border-color: #184d3a; --bs-btn-active-bg: #184d3a; --bs-btn-active-border-color: #184d3a; border-radius: .65rem; padding: .65rem 1.15rem; font-weight: 600; }
+.page-panel { padding: clamp(1.5rem, 5vw, 4.5rem); border: 1px solid #e0e7dc; border-radius: 1.5rem; background: #fff; min-height: 440px; position: relative; overflow: hidden; }
+.page-icon { display: inline-grid; place-items: center; width: 60px; height: 60px; border-radius: 18px; background: #edf3e8; color: var(--page-accent); font-size: 1.7rem; margin-bottom: 2rem; }
+.eyebrow { color: #677c6b; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 750; letter-spacing: -.05em; margin-bottom: 1rem; }
+.page-headline { font-size: clamp(1.15rem, 3vw, 1.6rem); font-weight: 500; }
+.page-description { color: #6b786e; max-width: 580px; line-height: 1.8; margin-top: 1rem; }
+.phase-badge { background: #f2f4ee; color: #67745e; font-weight: 500; padding: .7rem 1rem; margin-top: 1rem; white-space: normal; }
+.skip-link { position: fixed; top: -100px; left: 1rem; z-index: 2000; background: #fff; padding: .75rem; }
+.skip-link:focus { top: 1rem; }
+h1:focus, main:focus { outline: none; }
+:focus-visible { outline: 3px solid #b77935; outline-offset: 4px; }
+@media (max-width: 575px) { main.container { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; } }

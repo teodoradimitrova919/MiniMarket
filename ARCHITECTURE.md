@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. This phase establishes documentation only. The folders below are proposed; application code, dependencies, authentication, database tables, and deployment will be added only after further instructions.
+MiniMarket is a lightweight marketplace for classified advertisements. The current phase implements the application shell, shared components, placeholder pages, and History API routing. Authentication, marketplace operations, database tables, Supabase connections, and deployment remain deferred.
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
@@ -10,7 +10,7 @@ Core features are browsing and searching listings, account registration and logi
 
 - **Entry point:** `src/main.js` initializes the shared layout and router.
 - **Router:** one History API router resolves URLs, applies authentication and role guards, mounts pages, and calls their cleanup functions before navigation. Pages remove event listeners and unsubscribe from subscriptions on unmount.
-- **Pages:** each page has its own JavaScript module and, where useful, a separate HTML fragment. Fragments contain no `html`, `head`, or `body` elements.
+- **Pages:** each page has its own JavaScript module and separate CSS and HTML fragments. Fragments contain no `html`, `head`, or `body` elements.
 - **Shared components:** header, navigation, footer, listing cards, and reusable status feedback. Substantial components keep HTML, CSS, and JavaScript separate.
 - **Services:** asynchronous listing, category, favorites, authentication, profile, and storage operations isolate backend details from pages. A single Supabase client module will hold future client initialization.
 - **Utilities:** form validation, price formatting, and safe rendering. Prefer DOM text APIs for user content; never interpolate untrusted values into HTML.
@@ -51,8 +51,8 @@ MiniMarket/
 |   |-- components/            # Header, navigation, footer, listing cards
 |   |-- services/              # Auth, profiles, listings, categories, favorites, storage
 |   |-- utils/                 # Validation, price formatting, safe rendering
-|   |-- styles/                # Shared styles and design tokens
-|   |-- router/                # History API router and route definitions
+|   |-- styles.css             # Shared styles and design tokens
+|   |-- router.js              # History API router and route definitions
 |   `-- main.js
 |-- supabase/
 |   `-- migrations/            # Versioned SQL added in the backend phase
@@ -64,7 +64,7 @@ MiniMarket/
 `-- .gitignore
 ```
 
-Only the instruction and planning documents exist at this stage. Create runtime folders and configuration when implementation begins.
+The shell folders and configuration now exist. Empty service, utility, public, script, and migration folders are reserved using .gitkeep files. All routes currently render public placeholders; the Access column above describes future authorization requirements.
 
 ## Planned Supabase integration
 
@@ -91,4 +91,4 @@ Storage policies must enforce ownership and administrator permissions for image 
 
 Implement incrementally with Vanilla JavaScript ES modules, HTML5, CSS3, Vite, Bootstrap 5, and Bootstrap Icons. Add dependencies only when their implementation phase needs them. Develop locally in Visual Studio Code and maintain small, descriptive Git commits in GitHub.
 
-In the deployment phase, configure Netlify to run `npm run build` and publish Vite's `dist` folder. Add an SPA fallback rewrite to `/index.html` so direct links and refreshes resolve through the router. Configure public Supabase variables in Netlify and approved authentication redirect URLs in Supabase. Verify protected routes, unknown routes, and direct navigation before release. Do not deploy in this planning phase.
+In the deployment phase, configure Netlify to run `npm run build` and publish Vite's `dist` folder. Add an SPA fallback rewrite to `/index.html` so direct links and refreshes resolve through the router. Configure public Supabase variables in Netlify and approved authentication redirect URLs in Supabase. Verify protected routes, unknown routes, and direct navigation before release. Do not deploy in this shell phase.
