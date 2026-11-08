@@ -44,6 +44,7 @@ export function mountListingDetails(container, { listingId }) {
       attachments?.dispose();
       attachments = mountListingAttachments(container.querySelector('[data-listing-attachments]'), {
         listingId,
+        imageContainer: container.querySelector('[data-details-gallery]'),
         onImagesChange(hasImages) { container.querySelector('.listing-details-media').hidden = hasImages; },
       });
     } catch (error) {

@@ -8,3 +8,22 @@
 .listing-details-price { font-size: 1.5rem; font-weight: 750; color: #22664d; }
 .listing-details-description { white-space: pre-wrap; overflow-wrap: anywhere; color: #58685c; line-height: 1.8; }
 .listing-details-status { padding: 1rem 0; color: #58685c; }
+.listing-details-gallery:empty { display: none; }
+.listing-details-gallery [data-attachment-images] > .col { flex: 0 0 auto; width: 25%; }
+.listing-details-gallery [data-attachment-images] > .col:first-child { width: 100%; }
+.listing-details-gallery .attachment-tile { border-radius: 1rem; background: #f4f6f1; }
+.listing-details-gallery .attachment-tile img { aspect-ratio: 4 / 3; object-fit: contain; }
+.listing-details-gallery [data-attachment-images] > .col:first-child img { aspect-ratio: 16 / 9; max-height: 480px; }
+.listing-details-gallery .attachment-tile figcaption { padding: .65rem 1rem; background: #fff; }
+.listing-details-gallery .attachment-tile figcaption > div:first-child { display: none; }
+.listing-details-gallery .attachment-tile figcaption > .d-flex { margin-top: 0 !important; justify-content: flex-end; }
+.listing-details-component [data-details-category] { display: inline-block; padding: .35rem .75rem; border-radius: 2rem; background: #edf2e7; color: #22664d !important; }
+.listing-details-title { margin-top: .5rem; margin-bottom: .75rem; }
+.listing-details-price { font-size: 1.8rem; margin-bottom: 1.5rem; }
+.listing-details-description { border-top: 1px solid #e4eade; padding-top: 1.25rem; }
+.listing-attachments-documents > h3 { font-size: 1rem !important; }
+.listing-attachments-documents [data-attachment-status] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 575.98px) {
+  .listing-details-gallery [data-attachment-images] > .col { width: 50%; }
+  .listing-details-gallery [data-attachment-images] > .col:first-child img { aspect-ratio: 4 / 3; }
+}

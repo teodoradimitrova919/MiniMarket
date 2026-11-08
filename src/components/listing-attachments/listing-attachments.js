@@ -4,12 +4,17 @@ import {validateAttachmentFile,formatFileSize,MAX_LISTING_IMAGES,MAX_LISTING_DOC
 import {serviceError} from '../../utils/service-errors.js';
 import {showError} from '../../services/toast-service.js';
 
-export function mountListingAttachments(container,{listingId,editable=false,onPendingChange,onImagesChange,onBusyChange}={}){
+export function mountListingAttachments(container,{listingId,editable=false,imageContainer,onPendingChange,onImagesChange,onBusyChange}={}){
   container.innerHTML=html;
   const events=new AbortController();let renderEvents=new AbortController();
   const imageInput=container.querySelector('[data-select-images]'),documentInput=container.querySelector('[data-select-documents]');
   const fields=container.querySelector('fieldset'),status=container.querySelector('[data-attachment-status]'),error=container.querySelector('[data-attachment-error]');
   const gallery=container.querySelector('[data-attachment-images]'),documents=container.querySelector('[data-attachment-documents]'),pendingRegion=container.querySelector('[data-pending-attachments]');
+  if(imageContainer){
+    imageContainer.append(gallery);
+    container.querySelector('h3').textContent='Documents';
+    container.classList.add('listing-attachments-documents');
+  }
   const retry=container.querySelector('[data-attachment-retry]'),cleanupButton=container.querySelector('[data-attachment-cleanup]');
   const unique=crypto.randomUUID();imageInput.id=`attachment-images-${unique}`;documentInput.id=`attachment-documents-${unique}`;
   container.querySelector('[data-image-label]').htmlFor=imageInput.id;container.querySelector('[data-document-label]').htmlFor=documentInput.id;
@@ -90,6 +95,7 @@ export function mountListingAttachments(container,{listingId,editable=false,onPe
     if(!active||current!==revision)return;
     renderEvents.abort();renderEvents=new AbortController();gallery.replaceChildren();documents.replaceChildren();
     onImagesChange?.(images.length>0);
+    if(imageContainer)container.querySelector('h3').hidden=!records.some(row=>row.mime_type==='application/pdf');
     for(const row of records){
       const isImage=row.mime_type.startsWith('image/');const item=document.createElement(isImage?'figure':'li');item.className=isImage?'attachment-tile mb-0':'list-group-item';
       if(isImage){
@@ -135,6 +141,6 @@ export function mountListingAttachments(container,{listingId,editable=false,onPe
       try{for(const entry of queue){if(!active)throw new Error('The listing was saved. Return to its editor to finish uploading files.');status.textContent=`Uploading file ${completed+1} of ${queue.length}…`;const record=await(await api()).uploadAttachment(listingId,entry.file);if(!active)return;records.push(record);pending=pending.filter(item=>item!==entry);release(entry);completed++;onPendingChange?.();await render();}}
       finally{uploading=false;if(active){await render();controls();}}
     },
-    dispose(){active=false;events.abort();renderEvents.abort();for(const url of objectUrls)URL.revokeObjectURL(url);for(const timer of timers)clearTimeout(timer);for(const tab of blankWindows)tab.close();},
+    dispose(){active=false;events.abort();renderEvents.abort();if(imageContainer)gallery.remove();for(const url of objectUrls)URL.revokeObjectURL(url);for(const timer of timers)clearTimeout(timer);for(const tab of blankWindows)tab.close();},
   };
 }
