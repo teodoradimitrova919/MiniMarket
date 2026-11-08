@@ -23,13 +23,23 @@ export function createListingCard(listing, { signal, showDescription = false } =
     card.querySelector('.listing-card-arrow').hidden = true;
   }
   card.querySelector('[data-placeholder-icon]').classList.add(`bi-${categoryIcon(category)}`);
-  const url = safeImageUrl(listing.image_url);
+  const url = safeImageUrl(listing.attachment_image_url || listing.image_url);
   if (url) {
     const image = card.querySelector('[data-listing-image]');
     const placeholder = card.querySelector('[data-image-placeholder]');
     image.alt = listing.title;
     image.addEventListener('load', () => { placeholder.hidden = true; }, { once: true, signal });
-    image.addEventListener('error', () => { image.hidden = true; placeholder.hidden = false; }, { once: true, signal });
+    image.addEventListener('error', async () => {
+      const fallback = () => { image.hidden = true; placeholder.hidden = false; };
+      if (!listing.attachment_image_id) { fallback(); return; }
+      try {
+        const { getAttachmentUrl } = await import('../../services/attachment-service.js');
+        const refreshed = await getAttachmentUrl(listing.attachment_image_id, { force: true });
+        if (signal?.aborted) return;
+        image.addEventListener('error', fallback, { once: true, signal });
+        image.src = refreshed;
+      } catch { if (!signal?.aborted) fallback(); }
+    }, { once: true, signal });
     image.src = url;
     image.hidden = false;
   }

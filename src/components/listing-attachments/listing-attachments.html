@@ -1,0 +1,15 @@
+<section class="listing-attachments mt-4" aria-label="Listing images and documents">
+  <h3 class="fs-5 mb-3">Images and documents</h3>
+  <fieldset data-attachment-fields hidden>
+    <legend class="visually-hidden">Select listing attachments</legend>
+    <div class="mb-3"><label class="form-label" data-image-label>Listing images</label><input class="form-control" type="file" multiple accept="image/jpeg,image/png,image/webp" data-select-images><p class="form-text">Up to 5 JPG, PNG, or WebP images, 5 MB each. Selected files upload when you save the listing.</p></div>
+    <div class="mb-3"><label class="form-label" data-document-label>Optional PDF documents</label><input class="form-control" type="file" multiple accept="application/pdf" data-select-documents><p class="form-text">Up to 5 PDFs, 5 MB each. Filenames are preserved for downloads.</p></div>
+  </fieldset>
+  <p class="text-muted small" data-attachment-status role="status"></p>
+  <div class="alert alert-danger" data-attachment-error role="alert" hidden></div>
+  <button class="btn btn-sm btn-outline-success mb-3" type="button" data-attachment-retry hidden>Try again</button>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mb-3" data-pending-attachments></div>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3" data-attachment-images></div>
+  <ul class="list-group mt-3" data-attachment-documents></ul>
+  <button class="btn btn-sm btn-outline-secondary my-3" type="button" data-attachment-cleanup hidden>Retry file cleanup</button>
+</section>

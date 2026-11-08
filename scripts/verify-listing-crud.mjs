@@ -22,7 +22,7 @@ page.on('pageerror', (error) => browserErrors.push(error.message));
 page.on('dialog', async (dialog) => { dialogs.push(dialog.type()); await dialog[dialogPolicy](); });
 const check = (result, action) => { if (result.error) throw new Error(`${action} failed.`); return result.data; };
 const waitPath = (path) => page.waitForURL((url) => url.pathname === path);
-const formReady = () => page.locator('[data-listing-form]:not([hidden]) fieldset:not([disabled])').waitFor();
+const formReady = () => page.locator('[data-listing-form]:not([hidden]) [data-listing-fields]:not([disabled])').waitFor();
 const listReady = () => page.locator('[data-my-listings-table]:not([hidden])').waitFor();
 // Exercise the retained page routes independently of the new modal action links.
 async function openPage(href) {
@@ -90,7 +90,8 @@ try {
   assert.equal(dialogs.length, cleanDialogs, 'Pristine Cancel does not warn');
 
   await openPage('/listings/add'); await formReady();
-  assert.equal(await page.locator('select option').count(), 7);
+  const availableCategories = check(await admin.from('categories').select('id'), 'Reading categories');
+  assert.equal(await page.locator('#listing-category option').count(), availableCategories.length + 1);
   await fill({ title: ' ', price: '-1' });
   await page.locator('[data-save-listing]').click();
   assert.equal(await page.locator('.is-invalid').count(), 3);
@@ -153,7 +154,7 @@ try {
   assert.equal(await page.locator('#listing-title').inputValue(), initialTitle);
   const closingTab = await context.newPage();
   await closingTab.goto(base + `/listings/${listing.id}/edit`);
-  await closingTab.locator('[data-listing-form]:not([hidden]) fieldset:not([disabled])').waitFor();
+  await closingTab.locator('[data-listing-form]:not([hidden]) [data-listing-fields]:not([disabled])').waitFor();
   await closingTab.locator('#listing-title').click(); await closingTab.locator('#listing-title').fill('Unsaved closing tab');
   let closeDialog = closingTab.waitForEvent('dialog');
   await closingTab.close({ runBeforeUnload: true });

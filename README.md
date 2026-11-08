@@ -64,6 +64,10 @@ Verified with live public Supabase reads, eight-row ordering/limit, search encod
 
 See [server-side seed setup, dry run, execution, and verification](scripts/SEED.md). It creates three demo Auth users, six categories, eighteen listings, and twelve favorites using a local privileged server credential. Run `npm run test:seed` for the offline safety checks. No privileged configuration belongs in `VITE_` variables.
 
+## Listing attachments
+
+Owners can add up to five images and five PDFs per listing (5 MB per file), preview selected images, and manage saved files in the shared Add/Edit form. Visitors can view galleries and download PDFs through short-lived signed URLs. The private bucket, database policies, cleanup behavior, deployed functions and verification commands are documented in [supabase/ATTACHMENTS.md](supabase/ATTACHMENTS.md).
+
 ## Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md).

@@ -3,3 +3,8 @@ project_id = "MiniMarket"
 [functions.minimarket-admin]
 verify_jwt = true
 entrypoint = "./functions/minimarket-admin/index.ts"
+
+# Public attachment access is explicitly authorized through anonymous parent-listing RLS.
+[functions.listing-attachment-urls]
+verify_jwt = false
+entrypoint = "./functions/listing-attachment-urls/index.ts"

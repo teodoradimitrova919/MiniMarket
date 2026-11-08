@@ -21,7 +21,7 @@ let dialogCount = 0;
 page.on('dialog', async dialog => { dialogCount++; await dialog[acceptDiscard ? 'accept' : 'dismiss'](); });
 const check = (result, action) => { if (result.error) throw new Error(`${action} failed.`); return result.data; };
 const modal = () => page.locator('#listing-form-modal');
-const ready = () => modal().locator('[data-listing-form]:not([hidden]) fieldset:not([disabled])').waitFor();
+const ready = () => modal().locator('[data-listing-form]:not([hidden]) [data-listing-fields]:not([disabled])').waitFor();
 const tableReady = () => page.locator('[data-my-listings-table]:not([hidden])').waitFor();
 const writes = { POST:0, PATCH:0, DELETE:0 };
 let failWrite;

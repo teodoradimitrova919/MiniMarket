@@ -3,12 +3,14 @@ import './listing-details.css';
 import { formatPrice } from '../../utils/format-price.js';
 import { safeImageUrl } from '../../utils/image-url.js';
 import { showError } from '../../services/toast-service.js';
+import { mountListingAttachments } from '../listing-attachments/listing-attachments.js';
 
 export function mountListingDetails(container, { listingId }) {
   container.innerHTML = html;
   const events = new AbortController();
   let active = true;
   let loading = false;
+  let attachments;
   const status = container.querySelector('[data-details-status]');
   const content = container.querySelector('[data-details-content]');
   async function load() {
@@ -39,6 +41,11 @@ export function mountListingDetails(container, { listingId }) {
       }
       status.hidden = true;
       content.hidden = false;
+      attachments?.dispose();
+      attachments = mountListingAttachments(container.querySelector('[data-listing-attachments]'), {
+        listingId,
+        onImagesChange(hasImages) { container.querySelector('.listing-details-media').hidden = hasImages; },
+      });
     } catch (error) {
       if (!active) return;
       if (error.code === 'VALIDATION_ERROR') { status.textContent = 'This listing is no longer available.'; return; }
@@ -53,5 +60,5 @@ export function mountListingDetails(container, { listingId }) {
     } finally { loading = false; if (active) container.setAttribute('aria-busy', 'false'); }
   }
   void load();
-  return () => { active = false; events.abort(); };
+  return () => { active = false; events.abort(); attachments?.dispose(); };
 }

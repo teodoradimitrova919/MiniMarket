@@ -1,0 +1,9 @@
+.listing-attachments [hidden] { display: none !important; }
+.attachment-tile { height: 100%; border: 1px solid #dfe7da; border-radius: .8rem; overflow: hidden; background: #fff; }
+.attachment-tile img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: #edf2e7; }
+.attachment-tile figcaption { padding: .8rem; }
+.attachment-name { display: block; overflow-wrap: anywhere; font-size: .85rem; }
+.attachment-size { color: #647267; font-size: .75rem; }
+.listing-attachments .list-group-item { overflow-wrap: anywhere; }
+.attachment-preview-missing { display: grid; place-items: center; min-height: 100px; background: #edf2e7; color: #61735b; }
+.listing-attachments button { white-space: normal; }

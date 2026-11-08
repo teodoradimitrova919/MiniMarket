@@ -11,7 +11,7 @@
         <div class="col-md-7"><label class="form-label" for="listing-category">Category <span class="text-muted">(required)</span></label><select class="form-select" id="listing-category" name="category_id" required aria-describedby="listing-category-error"><option value="">Choose a category</option></select><div class="invalid-feedback" id="listing-category-error" data-error="category_id"></div></div>
       </div>
     </fieldset>
-    <p class="listing-image-note"><i class="bi bi-image me-2" aria-hidden="true"></i>Images can be added in a future update.</p>
+    <div data-listing-attachments></div>
     <div class="d-flex flex-wrap gap-2 pt-3 border-top"><button class="btn btn-primary" type="submit" data-save-listing>Save Listing</button><a class="btn btn-outline-secondary" href="/my-listings" data-cancel-listing>Cancel</a></div>
   </form>
   <a class="btn btn-outline-secondary mt-3" href="/my-listings" data-form-back>Back to My Listings</a>

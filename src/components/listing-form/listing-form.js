@@ -3,6 +3,7 @@ import './listing-form.css';
 import { validateText, validatePrice, validateId } from '../../utils/validation.js';
 import { createUnsavedChangesGuard } from '../../utils/unsaved-changes.js';
 import { showError } from '../../services/toast-service.js';
+import { mountListingAttachments } from '../listing-attachments/listing-attachments.js';
 
 export function mountListingForm(container, { navigate, auth, listingId, onSaved, onCancel, onReady } = {}) {
   container.innerHTML = html;
@@ -16,7 +17,9 @@ export function mountListingForm(container, { navigate, auth, listingId, onSaved
   const errorPanel = container.querySelector('[data-save-error]');
   const events = new AbortController();
   const controls = Object.fromEntries(['title', 'description', 'price', 'category_id'].map((name) => [name, form.elements.namedItem(name)]));
-  const readValues = () => Object.fromEntries(Object.entries(controls).map(([key, control]) => [key, control.value]));
+  let attachments;
+  const readValues = () => ({ ...Object.fromEntries(Object.entries(controls).map(([key, control]) => [key, control.value])), attachments: attachments?.pendingSignature() || [] });
+  let savedListingId = listingId;
   let active = true;
   let pending = false;
   let loading = false;
@@ -70,6 +73,12 @@ export function mountListingForm(container, { navigate, auth, listingId, onSaved
         controls.category_id.value = listing.category_id;
       }
       guard?.dispose();
+      attachments?.dispose();
+      attachments = mountListingAttachments(container.querySelector('[data-listing-attachments]'), {
+        listingId: savedListingId, editable: true,
+        onPendingChange: () => form.dispatchEvent(new Event('input', { bubbles: true })),
+        onBusyChange: (busy) => { save.disabled = pending || busy; },
+      });
       guard = createUnsavedChangesGuard(form, readValues);
       status.replaceChildren(); status.setAttribute('aria-busy', 'false');
       fields.disabled = false; form.hidden = false; back.hidden = true;
@@ -83,7 +92,7 @@ export function mountListingForm(container, { navigate, auth, listingId, onSaved
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (pending || loading || !isCurrent()) return;
+    if (pending || loading || attachments?.isBusy() || !isCurrent()) return;
     clearErrors();
     const values = readValues();
     const validators = { title: (value) => validateText(value, 'Title'), price: validatePrice,
@@ -94,12 +103,21 @@ export function mountListingForm(container, { navigate, auth, listingId, onSaved
       try { data[name] = validate(values[name]); } catch (error) { fieldError(name, error.message); firstInvalid ||= controls[name]; }
     }
     if (firstInvalid) { firstInvalid.focus(); return; }
+    try { attachments.validatePending(); } catch (error) { attachments.showError(error.message); return; }
     pending = true; save.disabled = true; fields.disabled = true;
+    attachments.setBusy(true);
     cancel.classList.add('disabled'); cancel.setAttribute('aria-disabled', 'true'); cancel.tabIndex = -1;
     save.textContent = 'Saving…'; form.setAttribute('aria-busy', 'true');
+    let listingSaved = false;
     try {
-      if (listingId) await service.updateListing(listingId, data);
-      else await service.createListing(data);
+      if (savedListingId) await service.updateListing(savedListingId, data);
+      else {
+        const created = await service.createListing(data);
+        savedListingId = created.id;
+        attachments.setListingId(savedListingId);
+      }
+      listingSaved = true;
+      await attachments.uploadPending();
       if (!isCurrent()) return;
       guard.markClean();
       // Services already publish the single success toast; both hosts share this form.
@@ -108,10 +126,13 @@ export function mountListingForm(container, { navigate, auth, listingId, onSaved
     } catch (error) {
       if (!isCurrent()) return;
       if (error.code === '23503') fieldError('category_id', 'This category is no longer available. Choose another category.');
-      errorPanel.textContent = error.message || 'Your listing could not be saved. Please try again.';
+      errorPanel.textContent = listingSaved
+        ? `Your listing is saved. ${error.message || 'File upload failed.'} Retry Save Listing to finish, or return to its editor later.`
+        : error.message || 'Your listing could not be saved. Please try again.';
       errorPanel.hidden = false; errorPanel.focus();
     } finally {
       pending = false;
+      attachments?.setBusy(false);
       if (isCurrent()) {
         save.disabled = false; fields.disabled = false; save.textContent = 'Save Listing'; form.setAttribute('aria-busy', 'false');
         cancel.classList.remove('disabled'); cancel.removeAttribute('aria-disabled'); cancel.removeAttribute('tabindex');
@@ -123,8 +144,8 @@ export function mountListingForm(container, { navigate, auth, listingId, onSaved
     if (!pending && onCancel) onCancel();
   }, { signal: events.signal });
   void load();
-  const cleanup = () => { active = false; events.abort(); guard?.dispose(); };
-  cleanup.isPending = () => pending;
+  const cleanup = () => { active = false; events.abort(); guard?.dispose(); attachments?.dispose(); };
+  cleanup.isPending = () => pending || attachments?.isBusy();
   cleanup.canLeave = () => {
     if (pending && guard?.isDirty()) return window.confirm('Your listing is being saved. Leaving will not cancel the request. Leave this page?');
     return guard?.canLeave() ?? true;

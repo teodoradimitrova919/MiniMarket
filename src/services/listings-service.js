@@ -3,6 +3,7 @@ import { getAllRows, requireUser } from './service-helpers.js';
 import { validateId, validateListing } from '../utils/validation.js';
 import { requireRecord, runQuery } from '../utils/service-errors.js';
 import { notifyMutation } from '../utils/operation-feedback.js';
+import { decorateAttachmentThumbnails } from './attachment-service.js';
 
 function listingsQuery(columns = '*') {
   return supabase.from('listings').select(columns)
@@ -10,11 +11,13 @@ function listingsQuery(columns = '*') {
 }
 
 export async function getListings() {
-  return getAllRows(() => listingsQuery('*, category:categories(name)'), 'Unable to load listings');
+  const rows=await getAllRows(() => listingsQuery('*, category:categories(name)'), 'Unable to load listings');
+  return decorateAttachmentThumbnails(rows);
 }
 
 export async function getLatestListings() {
-  return runQuery(listingsQuery('*, category:categories(name)').limit(8), 'Unable to load latest listings');
+  const rows=await runQuery(listingsQuery('*, category:categories(name)').limit(8), 'Unable to load latest listings');
+  return decorateAttachmentThumbnails(rows);
 }
 
 export async function getListingById(id) {

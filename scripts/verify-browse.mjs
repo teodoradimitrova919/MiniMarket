@@ -146,7 +146,7 @@ try {
   assert.deepEqual(await titles(), live.map(row => row.title), 'Signed-in users still see all public owners');
   // Regress the router leave guard without submitting or changing any database record.
   await page.locator('header').getByRole('link', { name:'Add Listing', exact:true }).click();
-  await page.locator('[data-listing-form] fieldset:not([disabled])').waitFor();
+  await page.locator('[data-listing-form] [data-listing-fields]:not([disabled])').waitFor();
   await page.locator('#listing-title').fill('Unsaved browser verification');
   page.once('dialog', dialog => dialog.dismiss());
   await page.locator('header').getByRole('link', { name:'Browse Listings', exact:true }).click();

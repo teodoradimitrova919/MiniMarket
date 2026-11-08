@@ -133,10 +133,11 @@ try{
   await page.goto(`${base}/admin/categories`);await page.waitForURL(url=>url.pathname==='/my-listings');
   await loginUI({email:'admin@admin.com',password:'pass123'});
   await page.getByRole('link',{name:'Admin Panel',exact:true}).click();await page.locator('[data-admin-stats]:not([hidden])').waitFor();
-  assert.equal(Number(await page.locator('[data-total-listings]').textContent()),22);
+  const actualListingTotal=check(await privileged.from('listings').select('id'),'Counting verification listings').length;
+  assert.equal(Number(await page.locator('[data-total-listings]').textContent()),actualListingTotal);
   await page.locator('.admin-nav a[href="/admin/listings"]').click();await ready();
   assert.equal(await page.locator('tbody tr').count(),20);
-  await page.getByRole('button',{name:'Next',exact:true}).click();await ready();assert.equal(await page.locator('tbody tr').count(),2);
+  await page.getByRole('button',{name:'Next',exact:true}).click();await ready();assert.equal(await page.locator('tbody tr').count(),Math.min(20,actualListingTotal-20));
   await page.getByLabel('Search by title',{exact:true}).fill(prefix);await page.locator('form').getByRole('button',{name:'Search',exact:true}).click();await ready();assert.equal(await page.locator('tbody tr').count(),4);
   const chosen=listingRows[0],row=()=>page.locator(`tr[data-admin-listing-id="${chosen.id}"]`);
   await row().getByRole('button',{name:'View',exact:true}).click();await page.locator('[data-details-content]:not([hidden])').waitFor();await page.keyboard.press('Escape');

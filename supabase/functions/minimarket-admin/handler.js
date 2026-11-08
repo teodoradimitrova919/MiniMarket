@@ -13,19 +13,19 @@ async function result(query, message='The operation failed. Please try again.') 
 }
 export function createAdminHandler({ admin, caller, url, origins }) {
   const bucket='listing-images';
-  async function files(client, prefix) {
+  async function files(client, prefix, storageBucket=bucket) {
     const rows=[];
     for (let offset=0;;offset+=100) {
-      const page=await result(client.storage.from(bucket).list(prefix,{ limit:100,offset,sortBy:{column:'name',order:'asc'} }), 'Image cleanup failed. Retry this operation.');
+      const page=await result(client.storage.from(storageBucket).list(prefix,{ limit:100,offset,sortBy:{column:'name',order:'asc'} }), 'File cleanup failed. Retry this operation.');
       for (const item of page) {
         if (item.id) rows.push(`${prefix}/${item.name}`);
-        else rows.push(...await files(client,`${prefix}/${item.name}`));
+        else rows.push(...await files(client,`${prefix}/${item.name}`,storageBucket));
       }
       if(page.length<100) return rows;
     }
   }
-  async function removeFiles(client, paths) {
-    for(let i=0;i<paths.length;i+=100) await result(client.storage.from(bucket).remove(paths.slice(i,i+100)), 'Image cleanup failed. Retry this operation before deleting the account or listing.');
+  async function removeFiles(client, paths, storageBucket=bucket) {
+    for(let i=0;i<paths.length;i+=100) await result(client.storage.from(storageBucket).remove(paths.slice(i,i+100)), 'File cleanup failed. Retry this operation before deleting the account or listing.');
   }
   async function summaries(client, users) {
     const details=users.length ? await result(client.rpc('admin_user_summaries',{ids:users.map(user=>user.id)})) : [];
@@ -68,6 +68,7 @@ export function createAdminHandler({ admin, caller, url, origins }) {
         if(body.confirm!==id) fail(400,'Explicit listing deletion confirmation is required.');
         const item=await result(client.rpc('begin_listing_deletion',{target:id}),'The listing cannot be deleted or is unavailable.');
         await removeFiles(admin,await files(admin,`${item.owner_id}/${id}`));
+        await removeFiles(admin,await files(admin,id,'listing-attachments'),'listing-attachments');
         await result(admin.from('listings').delete().eq('id',id),'Cleanup completed but listing deletion failed. Retry deletion.');
         return respond({deleted:true});
       }
@@ -135,6 +136,11 @@ export function createAdminHandler({ admin, caller, url, origins }) {
         // A persisted reservation already denies app writes, even if Auth banning fails.
         await result(admin.auth.admin.updateUserById(id,{ban_duration:'876000h'}),'Account deletion is pending. Retry to complete the account freeze.');
         await removeFiles(admin,await files(admin,id));
+        for(let offset=0;;offset+=100){
+          const owned=await result(admin.from('listings').select('id').eq('owner_id',id).order('id').range(offset,offset+99),'Owned listing cleanup could not be inspected. Retry deletion.');
+          for(const listing of owned)await removeFiles(admin,await files(admin,listing.id,'listing-attachments'),'listing-attachments');
+          if(owned.length<100)break;
+        }
         await result(admin.from('listings').delete().eq('owner_id',id),'Image cleanup completed, but listing cleanup failed. Retry deletion.');
         await result(admin.from('favorites').delete().eq('user_id',id),'Listing cleanup completed, but favorite cleanup failed. Retry deletion.');
         await result(admin.auth.admin.deleteUser(id),'Dependent cleanup completed, but Auth deletion failed. Retry deletion.');
