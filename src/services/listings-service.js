@@ -3,13 +3,17 @@ import { getAllRows, requireUser } from './service-helpers.js';
 import { validateId, validateListing } from '../utils/validation.js';
 import { requireRecord, runQuery } from '../utils/service-errors.js';
 
-function listingsQuery() {
-  return supabase.from('listings').select('*')
+function listingsQuery(columns = '*') {
+  return supabase.from('listings').select(columns)
     .order('created_at', { ascending: false }).order('id', { ascending: false });
 }
 
 export async function getListings() {
   return getAllRows(listingsQuery, 'Unable to load listings');
+}
+
+export async function getLatestListings() {
+  return runQuery(listingsQuery('*, category:categories(name)').limit(8), 'Unable to load latest listings');
 }
 
 export async function getListingById(id) {

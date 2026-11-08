@@ -53,7 +53,7 @@ const mock = {
         return (response instanceof Error ? Promise.reject(response) : Promise.resolve(response)).then(resolve, reject);
       },
     };
-    for (const method of ['select', 'order', 'eq', 'range', 'maybeSingle', 'single', 'insert', 'update', 'delete']) {
+    for (const method of ['select', 'order', 'eq', 'range', 'limit', 'maybeSingle', 'single', 'insert', 'update', 'delete']) {
       query[method] = (...args) => { steps.push([method, ...args]); return query; };
     }
     return query;
@@ -74,6 +74,9 @@ assert.deepEqual(await listings.getListings(), [listing]);
 assert.equal(last().table, 'listings');
 assert.deepEqual(last().steps.filter(([m]) => m === 'order'), [['order', 'created_at', { ascending: false }], ['order', 'id', { ascending: false }]]);
 assert.deepEqual(step('range'), ['range', 0, 99]);
+reply([listing]); assert.deepEqual(await listings.getLatestListings(), [listing]);
+assert.deepEqual(step('select'), ['select', '*, category:categories(name)']);
+assert.deepEqual(step('limit'), ['limit', 8]);
 // Ensure the API row cap does not silently truncate results.
 reply(Array.from({ length: 100 }, () => listing)); reply([listing]);
 assert.equal((await listings.getListings()).length, 101);

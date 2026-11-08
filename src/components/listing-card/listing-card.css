@@ -1,0 +1,16 @@
+.listing-card { border: 1px solid #e2e8df; border-radius: 1rem; overflow: hidden; background: #fff; transition: transform .18s ease, box-shadow .18s ease; }
+.listing-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px #203d320c; }
+.listing-card-link { display: flex; flex-direction: column; height: 100%; color: inherit; text-decoration: none; }
+.listing-card-link:focus-visible { outline-offset: -4px; border-radius: 1rem; }
+.listing-card-media { aspect-ratio: 4 / 3; position: relative; background: #eef1e8; }
+.listing-card-placeholder { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: .7rem; color: #68785e; background: radial-gradient(ellipse at 30% 20%, #fff7e8, transparent 75%), #ecf0e5; }
+.listing-card-placeholder i { font-size: 3.3rem; opacity: .75; }
+.listing-card-placeholder span { font-size: .7rem; letter-spacing: .06em; }
+.listing-card-placeholder[hidden] { display: none; }
+.listing-card-image { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.listing-card .card-body { display: flex; flex-direction: column; padding: 1.2rem; }
+.listing-card-category { color: #65755f; font-size: .72rem; margin-bottom: .45rem; }
+.listing-card-title { font-size: 1rem; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; margin-bottom: auto; }
+.listing-card-price { color: #22664d; font-weight: 750; font-size: 1.15rem; }
+.listing-card-arrow { display: grid; place-items: center; height: 28px; width: 28px; background: #f1f5ed; border-radius: 50%; color: #22664d; }
+@media (prefers-reduced-motion: reduce) { .listing-card { transition: none; } .listing-card:hover { transform: none; } }

@@ -2,17 +2,17 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, initial database, RLS policies, migration history, and shared client are complete. The current phase adds listings, categories, and favorites services with shared validation and controlled tests. Frontend authentication, forms, image uploads, Storage, and deployment remain deferred. See [database design and verification](supabase/README.md) and [service contracts and test limitations](src/services/README.md); database sections below describe the original plan, with the linked document recording final choices.
+MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, and demo seed are complete. The current phase implements Home with live categories, eight recent listings, a reusable listing card, search navigation, How It Works, and account links. Other pages remain placeholders. Authentication, listing management forms, filtering, image uploads, Storage, and deployment remain deferred. See [database design](supabase/README.md), [service contracts](src/services/README.md), and [Home behavior and verification](README.md); database sections below describe the original plan, with the linked document recording final choices.
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
 ## Application modules
 
 - **Entry point:** `src/main.js` initializes the shared layout and router.
-- **Router:** one History API router resolves URLs, applies authentication and role guards, mounts pages, and calls their cleanup functions before navigation. Pages remove event listeners and unsubscribe from subscriptions on unmount.
+- **Router:** one History API router resolves URLs, passes a shared navigate function to page mounts, and calls cleanup before navigation. Pages remove event listeners and ignore late responses on unmount. Authentication/role guards remain deferred.
 - **Pages:** each page has its own JavaScript module and separate CSS and HTML fragments. Fragments contain no `html`, `head`, or `body` elements.
 - **Shared components:** header, navigation, footer, listing cards, and reusable status feedback. Substantial components keep HTML, CSS, and JavaScript separate.
-- **Services:** asynchronous listing, category, favorites, authentication, profile, and storage operations isolate backend details from pages. A single Supabase client module will hold future client initialization.
+- **Services:** implemented listing, category, and favorite services share one Supabase client and isolate backend details from pages. Home reads categories and eight newest listings through these services. Authentication/profile flows and storage operations remain deferred.
 - **Utilities:** form validation, price formatting, and safe rendering. Prefer DOM text APIs for user content; never interpolate untrusted values into HTML.
 - **Styles:** Bootstrap 5 and Bootstrap Icons, with a small shared stylesheet for consistent colors, typography, spacing, and responsive behavior.
 

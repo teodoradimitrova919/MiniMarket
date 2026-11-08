@@ -1,8 +1,60 @@
-<section class="page-home page-panel" aria-labelledby="page-title">
-  <span class="page-icon"><i class="bi bi-shop" aria-hidden="true"></i></span>
-  <p class="eyebrow">Your community marketplace</p>
-  <h1 id="page-title" tabindex="-1">Home</h1>
-  <h2 class="page-headline">A little space for your next great find.</h2>
-  <p class="page-description">Discover local finds and give everyday things a new chapter. MiniMarket is taking shape ? browsing and selling will arrive in a future update.</p>
-  <a class="btn btn-primary mt-3" href="/listings">Explore listings <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></a>
-</section>
+<div class="home-page">
+  <section class="home-hero" aria-labelledby="page-title">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7 home-hero-copy">
+        <p class="eyebrow"><span class="home-dot" aria-hidden="true"></span> Your next find starts here</p>
+        <h1 id="page-title" tabindex="-1">Good finds.<br><span>New beginnings.</span></h1>
+        <p class="home-hero-description">Welcome to MiniMarket. Discover everyday treasures, find something you love, and give the things you no longer need a new home.</p>
+        <form class="home-search" action="/listings" method="get" role="search" data-home-search>
+          <label for="home-search-input" class="visually-hidden">Search advertisements</label>
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input id="home-search-input" class="form-control" type="search" name="q" placeholder="What are you looking for?" maxlength="200">
+          <button type="submit" class="btn btn-primary">Search<span class="visually-hidden"> advertisements</span></button>
+        </form>
+        <div class="d-flex flex-wrap align-items-center gap-3 mt-4">
+          <a class="btn btn-outline-success" href="/listings">Browse Listings <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+          <a class="btn btn-light" href="/listings/add"><i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Post an Ad</a>
+        </div>
+      </div>
+      <div class="col-lg-5" aria-hidden="true">
+        <div class="home-hero-art">
+          <div class="home-art-caption"><i class="bi bi-stars"></i> A little discovery, every day.</div>
+          <div class="home-art-grid">
+            <div class="home-art-tile home-art-chair"><i class="bi bi-house-heart"></i><span>Make it yours.</span></div>
+            <div class="home-art-tile home-art-music"><i class="bi bi-headphones"></i></div>
+            <div class="home-art-tile home-art-bike"><i class="bi bi-bicycle"></i></div>
+            <div class="home-art-tile home-art-book"><i class="bi bi-book"></i><span>Find your next chapter.</span></div>
+          </div>
+          <span class="home-art-sticker"><i class="bi bi-arrow-repeat"></i> Good things deserve<br>a second chapter.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="home-section" aria-labelledby="categories-title">
+    <div class="home-section-heading">
+      <div><p class="eyebrow">A place for everything</p><h2 id="categories-title">Explore by category</h2></div>
+      <a class="home-text-link" href="/listings">Explore all <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+    </div>
+    <div data-home-categories aria-live="polite" aria-busy="true"></div>
+  </section>
+  <section class="home-section" aria-labelledby="latest-title">
+    <div class="home-section-heading">
+      <div><p class="eyebrow">Fresh on the market</p><h2 id="latest-title">Your next great find</h2><p class="home-section-description">Take a look at the latest listings from our community.</p></div>
+      <a class="home-text-link" href="/listings">View all listings <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i></a>
+    </div>
+    <div data-home-listings aria-live="polite" aria-busy="true"></div>
+  </section>
+  <section class="home-how home-section" aria-labelledby="how-title">
+    <p class="eyebrow">Small steps. Great discoveries.</p>
+    <h2 id="how-title">A simpler way to find your next favorite</h2>
+    <div class="row g-4 mt-2">
+      <div class="col-md-4"><div class="home-step"><span class="home-step-number">01</span><i class="bi bi-search" aria-hidden="true"></i><h3>Browse advertisements</h3><p>Explore the categories and see what’s new in the marketplace.</p></div></div>
+      <div class="col-md-4"><div class="home-step"><span class="home-step-number">02</span><i class="bi bi-bag-heart" aria-hidden="true"></i><h3>Find a product you like</h3><p>Discover something useful, something special, or something just for you.</p></div></div>
+      <div class="col-md-4"><div class="home-step"><span class="home-step-number">03</span><i class="bi bi-person-plus" aria-hidden="true"></i><h3>Join and post your own</h3><p>Register to give your unused things a chance at a new beginning.</p></div></div>
+    </div>
+  </section>
+  <section class="home-join" aria-labelledby="join-title">
+    <div><p class="eyebrow">There’s a place for you here</p><h2 id="join-title">Good things start with a hello.</h2><p>Join MiniMarket and become part of the community.</p></div>
+    <div class="d-flex flex-wrap gap-2"><a class="btn btn-light" href="/register">Join MiniMarket <i class="bi bi-arrow-right ms-2" aria-hidden="true"></i></a><a class="btn home-login-button" href="/login">Log in</a></div>
+  </section>
+</div>

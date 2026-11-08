@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: demo data seeding
+## Current phase: Home page
 
-The shell, database/RLS setup, and service layer are complete. This phase adds a server-only Node.js demo seed using the Auth Admin API and the existing four tables. Pin execution to the confirmed MiniMarket project, keep privileged credentials in ignored local environment configuration, support dry runs and safe reruns, and verify actual created/skipped counts. Do not change schema/RLS, overwrite unrelated data, or implement frontend functionality, uploads, Storage, additional features, or deployment. Wait for further instructions after seeding and verification.
+The shell, database/RLS setup, services, and demo seed are complete. Implement only Home at `/`: a responsive hero/search, live categories, eight latest listings with a reusable card, How It Works, and registration/login links. Use existing services and the shared router; search/category links pass query parameters to the Listings placeholder without filtering. Include loading, empty, error, retry, and unmount cleanup behavior. Do not change schema/RLS or implement other pages, authentication/guards, listing mutations, favorites/admin UI, uploads, Storage, or deployment. Wait for further instructions after Home verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

@@ -7,6 +7,7 @@ All three services import the shared Supabase client. Configure `.env.local` fro
 | Function | Result |
 | --- | --- |
 | `getListings()` | All listing rows, newest first; ID breaks timestamp ties |
+| `getLatestListings()` | Up to eight newest rows with nested `category.name`, for Home |
 | `getListingById(id)` | Listing row, or `null` if absent |
 | `getMyListings()` | Current user's rows, newest first |
 | `createListing(data)` | Created row |

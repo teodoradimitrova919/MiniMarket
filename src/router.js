@@ -20,12 +20,18 @@ const routes = [
 
 export function createRouter(container, onNavigate) {
   let cleanup;
+  function navigate(to) {
+    const url = new URL(to, window.location.href);
+    if (url.origin !== window.location.origin) return;
+    if (url.href !== location.href) history.pushState(null, '', url.pathname + url.search + url.hash);
+    render();
+  }
   function render() {
     cleanup?.();
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     const match = routes.find(([pattern]) => pattern.test(path));
     const page = match?.[1] ?? page10;
-    cleanup = page.mount(container);
+    cleanup = page.mount(container, { navigate });
     document.title = page.title + ' | MiniMarket';
     onNavigate(path);
     const hashTarget = document.getElementById(window.location.hash.slice(1));
@@ -44,8 +50,7 @@ export function createRouter(container, onNavigate) {
     // Let native fragment links (including the skip link) keep normal behavior.
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
     event.preventDefault();
-    if (url.href !== location.href) history.pushState(null, '', url.pathname + url.search + url.hash);
-    render();
+    navigate(url);
   }
 
   document.addEventListener('click', handleClick);
