@@ -4,7 +4,7 @@ import { validateText, validatePrice, validateId } from '../../utils/validation.
 import { createUnsavedChangesGuard } from '../../utils/unsaved-changes.js';
 import { showError } from '../../services/toast-service.js';
 
-export function mountListingForm(container, { navigate, auth, listingId } = {}) {
+export function mountListingForm(container, { navigate, auth, listingId, onSaved, onCancel, onReady } = {}) {
   container.innerHTML = html;
   const userId = auth.getState().user.id;
   const form = container.querySelector('form');
@@ -73,6 +73,7 @@ export function mountListingForm(container, { navigate, auth, listingId } = {}) 
       guard = createUnsavedChangesGuard(form, readValues);
       status.replaceChildren(); status.setAttribute('aria-busy', 'false');
       fields.disabled = false; form.hidden = false; back.hidden = true;
+      onReady?.();
     } catch (error) {
       if (!isCurrent()) return;
       if (error.code === 'VALIDATION_ERROR') feedback('This listing is unavailable or you do not have permission to edit it.');
@@ -101,7 +102,9 @@ export function mountListingForm(container, { navigate, auth, listingId } = {}) 
       else await service.createListing(data);
       if (!isCurrent()) return;
       guard.markClean();
-      navigate('/my-listings'); // Services already publish the single success toast.
+      // Services already publish the single success toast; both hosts share this form.
+      if (onSaved) await onSaved();
+      else navigate('/my-listings');
     } catch (error) {
       if (!isCurrent()) return;
       if (error.code === '23503') fieldError('category_id', 'This category is no longer available. Choose another category.');
@@ -115,9 +118,13 @@ export function mountListingForm(container, { navigate, auth, listingId } = {}) 
       }
     }
   }, { signal: events.signal });
-  cancel.addEventListener('click', (event) => { if (pending) event.preventDefault(); }, { signal: events.signal });
+  for (const link of [cancel, back]) link.addEventListener('click', (event) => {
+    if (pending || onCancel) event.preventDefault();
+    if (!pending && onCancel) onCancel();
+  }, { signal: events.signal });
   void load();
   const cleanup = () => { active = false; events.abort(); guard?.dispose(); };
+  cleanup.isPending = () => pending;
   cleanup.canLeave = () => {
     if (pending && guard?.isDirty()) return window.confirm('Your listing is being saved. Leaving will not cancel the request. Leave this page?');
     return guard?.canLeave() ?? true;

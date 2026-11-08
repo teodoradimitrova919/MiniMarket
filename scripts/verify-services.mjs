@@ -87,6 +87,7 @@ reply(Array.from({ length: 100 }, () => listing)); reply([listing]);
 assert.equal((await listings.getListings()).length, 101);
 assert.deepEqual(step('range'), ['range', 100, 199]);
 reply(listing); assert.deepEqual(await listings.getListingById(listingId), listing);
+assert.deepEqual(step('select'), ['select', '*, category:categories(name)']);
 assert.ok(hasFilter('id', listingId));
 reply(null); assert.equal(await listings.getListingById(listingId), null);
 reply([listing]); assert.deepEqual(await listings.getMyListings(), [listing]);

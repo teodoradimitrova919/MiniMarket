@@ -1,0 +1,10 @@
+.listing-details-component [hidden] { display: none !important; }
+.listing-details-media { background: #edf2e7; border-radius: .9rem; overflow: hidden; }
+.listing-details-media img { display: block; width: 100%; max-height: 350px; object-fit: contain; }
+.listing-details-placeholder { min-height: 190px; display: flex; flex-direction: column; gap: .7rem; justify-content: center; align-items: center; color: #6d7e63; }
+.listing-details-placeholder i { font-size: 3rem; }
+.listing-details-placeholder span { font-size: .85rem; }
+.listing-details-title { font-size: clamp(1.4rem, 3vw, 2rem); overflow-wrap: anywhere; }
+.listing-details-price { font-size: 1.5rem; font-weight: 750; color: #22664d; }
+.listing-details-description { white-space: pre-wrap; overflow-wrap: anywhere; color: #58685c; line-height: 1.8; }
+.listing-details-status { padding: 1rem 0; color: #58685c; }

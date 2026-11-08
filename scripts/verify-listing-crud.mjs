@@ -24,6 +24,13 @@ const check = (result, action) => { if (result.error) throw new Error(`${action}
 const waitPath = (path) => page.waitForURL((url) => url.pathname === path);
 const formReady = () => page.locator('[data-listing-form]:not([hidden]) fieldset:not([disabled])').waitFor();
 const listReady = () => page.locator('[data-my-listings-table]:not([hidden])').waitFor();
+// Exercise the retained page routes independently of the new modal action links.
+async function openPage(href) {
+  await page.evaluate(href => {
+    const link = document.createElement('a'); link.href = href;
+    document.body.append(link); link.click(); link.remove();
+  }, href);
+}
 async function login(email, password) {
   await page.goto(base + '/login'); await page.locator('form').waitFor();
   await page.locator('form').getByLabel('Email', { exact: true }).fill(email);
@@ -78,11 +85,11 @@ try {
   await page.locator('header a[href="/my-listings"]').click();
   await page.getByText('You haven’t posted any listings yet.', { exact: false }).waitFor();
   const cleanDialogs = dialogs.length;
-  await page.locator('[data-add-listing]').click(); await formReady();
+  await openPage('/listings/add'); await formReady();
   await page.locator('[data-cancel-listing]').click(); await waitPath('/my-listings');
   assert.equal(dialogs.length, cleanDialogs, 'Pristine Cancel does not warn');
 
-  await page.locator('[data-add-listing]').click(); await formReady();
+  await openPage('/listings/add'); await formReady();
   assert.equal(await page.locator('select option').count(), 7);
   await fill({ title: ' ', price: '-1' });
   await page.locator('[data-save-listing]').click();
@@ -110,13 +117,13 @@ try {
   assert.equal(await row().locator('.my-listing-title b').count(), 0);
   assert.equal(await row().locator('.my-listing-title').evaluate((element) => element.scrollWidth > element.clientWidth), true);
   assert.equal(await row().getByRole('link', { name: 'View' }).getAttribute('href'), `/listings/${listing.id}`);
-  await row().getByRole('link', { name: 'View' }).click(); assert.equal(await page.locator('h1').textContent(), 'Listing Details');
+  await openPage(`/listings/${listing.id}`); assert.equal(await page.locator('h1').textContent(), 'Listing Details');
   await page.goBack(); await listReady();
 
-  await row().getByRole('link', { name: 'Edit' }).click(); await formReady();
+  await openPage(`/listings/${listing.id}/edit`); await formReady();
   assert.equal(await page.locator('#listing-title').inputValue(), initialTitle);
   await page.locator('[data-cancel-listing]').click(); await listReady();
-  await row().getByRole('link', { name: 'Edit' }).click(); await formReady();
+  await openPage(`/listings/${listing.id}/edit`); await formReady();
   await fill({ title: 'Unsaved desk title' });
   await page.locator('[data-logout]').click();
   assert.equal(await page.locator('[data-logout]').isVisible(), true, 'Canceling an unsaved logout retains the session');
@@ -205,7 +212,7 @@ try {
   assert.equal(check(await admin.from('favorites').select('id').eq('listing_id', listing.id), 'Checking favorites cascade').length, 0);
   assert.equal(await page.locator('.modal-backdrop').count(), 0); assert.equal(await page.locator('body.modal-open').count(), 0);
 
-  categoryMode = 'empty'; await page.locator('[data-add-listing]').click(); await page.getByText('No categories are available', { exact: false }).waitFor();
+  categoryMode = 'empty'; await openPage('/listings/add'); await page.getByText('No categories are available', { exact: false }).waitFor();
   categoryMode = 'error'; await page.locator('[data-listing-form-status]').getByRole('button').click(); await page.getByText('The form could not be loaded', { exact: false }).waitFor();
   categoryMode = 'normal'; await page.locator('[data-listing-form-status]').getByRole('button').click(); await formReady();
   await page.locator('[data-cancel-listing]').click();
@@ -224,7 +231,7 @@ try {
   assert.equal(await page.locator('.table-responsive').evaluate((element) => element.scrollWidth > element.clientWidth), true);
   await page.screenshot({ path: 'node_modules/.crud-verification/my-listings-mobile.png', fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.locator('[data-add-listing]').click(); await formReady();
+  await openPage('/listings/add'); await formReady();
   await page.screenshot({ path: 'node_modules/.crud-verification/form-desktop.png', fullPage: true });
   for (const width of [768, 375, 320]) {
     await page.setViewportSize({ width, height: 900 });

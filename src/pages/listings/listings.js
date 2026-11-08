@@ -3,10 +3,11 @@ import './listings.css';
 import { createListingCard } from '../../components/listing-card/listing-card.js';
 import { readListingFilters, resolveCategory, filterListings } from '../../utils/listing-filters.js';
 import { showError } from '../../services/toast-service.js';
+import { createListingModals, isPlainLinkClick } from '../../components/listing-modals/listing-modals.js';
 
 export const title = 'Browse Listings';
 
-export function mount(container, { navigate }) {
+export function mount(container, { navigate, auth }) {
   container.innerHTML = html;
   const events = new AbortController();
   let cards = new AbortController();
@@ -22,8 +23,17 @@ export function mount(container, { navigate }) {
   const count = container.querySelector('[data-browse-count]');
   const clear = container.querySelector('[data-clear-filters]');
   const feedback = container.querySelector('[data-browse-feedback]');
+  const modals = createListingModals({ auth, focusFallback: () => container.querySelector('h1') });
+  grid.addEventListener('click', event => {
+    const link = event.target.closest('[data-listing-link]');
+    if (!link || !isPlainLinkClick(event, link)) return;
+    event.preventDefault();
+    modals.openView(link.dataset.listingId, link);
+  }, { signal: events.signal });
 
   function updateLocation() {
+    // Query-only history updates keep this page mounted, but close its old details.
+    if (modals.closeView()) container.querySelector('h1').focus({ preventScroll: true });
     const filters = readListingFilters(location.search);
     search.value = filters.search;
     sort.value = filters.sort;
@@ -45,7 +55,9 @@ export function mount(container, { navigate }) {
     for (const listing of matches) {
       const column = document.createElement('div');
       column.className = 'col';
-      column.append(createListingCard(listing, { signal: cards.signal, showDescription: true }));
+      const card = createListingCard(listing, { signal: cards.signal, showDescription: true });
+      card.querySelector('[data-listing-link]').dataset.listingId = listing.id;
+      column.append(card);
       content.append(column);
     }
     grid.replaceChildren(content);
@@ -108,7 +120,7 @@ export function mount(container, { navigate }) {
   sort.addEventListener('change', applyFilters, { signal: events.signal });
   updateLocation();
   load();
-  const cleanup = () => { active = false; events.abort(); cards.abort(); };
+  const cleanup = () => { active = false; events.abort(); cards.abort(); modals.dispose(); };
   cleanup.updateLocation = updateLocation;
   return cleanup;
 }

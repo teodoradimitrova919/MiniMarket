@@ -12,7 +12,7 @@ URL parameters:
 
 Unknown categories produce no matches and can be cleared. Filter submissions retain unrelated query parameters; Clear filters resets to `/listings`. The router calls the page's optional `cleanup.updateLocation()` on query-only navigation, synchronizing controls/results without remounting. Normal navigation and auth-state changes still clean up listeners and image callbacks; late reads cannot render or notify after unmount.
 
-Cards reuse the Home component with a Browse-only description excerpt and visible View Details affordance. Dynamic text uses `textContent`, titles/descriptions are clamped, prices use the EUR formatter, and unsafe/broken image URLs retain placeholders. Details still lead to the existing placeholder page.
+Cards reuse the Home component with a Browse-only description excerpt and visible View Details affordance. Dynamic text uses `textContent`, titles/descriptions are clamped, prices use the EUR formatter, and unsafe/broken image URLs retain placeholders. Ordinary card clicks open the reusable read-only View modal without changing filter URLs. Modified clicks retain the direct details route; the modal also offers Open details page. See [listing modals](../../components/listing-modals/README.md).
 
 Loading, no data, no matches, and retryable errors have inline states. Unexpected read errors also use the existing error toast. Retry retains successful reads and requests only missing data; no load/search success toasts are shown.
 

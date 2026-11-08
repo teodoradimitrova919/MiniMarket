@@ -1,10 +1,10 @@
 import html from './listing-details.html?raw';
 import './listing-details.css';
+import { mountListingDetails } from '../../components/listing-details/listing-details.js';
 
 export const title = 'Listing Details';
 
-export function mount(container) {
+export function mount(container, { params }) {
   container.innerHTML = html;
-  // Return cleanup here when this page gains listeners or subscriptions.
-  return () => {};
+  return mountListingDetails(container.querySelector('[data-details-host]'), { listingId: params.id });
 }

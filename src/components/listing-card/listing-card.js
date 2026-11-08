@@ -2,6 +2,7 @@ import html from './listing-card.html?raw';
 import './listing-card.css';
 import { categoryIcon } from '../../utils/category-icons.js';
 import { formatPrice } from '../../utils/format-price.js';
+import { safeImageUrl } from '../../utils/image-url.js';
 
 const template = document.createElement('template');
 template.innerHTML = html;
@@ -22,15 +23,14 @@ export function createListingCard(listing, { signal, showDescription = false } =
     card.querySelector('.listing-card-arrow').hidden = true;
   }
   card.querySelector('[data-placeholder-icon]').classList.add(`bi-${categoryIcon(category)}`);
-  let url;
-  try { url = new URL(listing.image_url); } catch { /* Keep the placeholder. */ }
-  if (url && ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password) {
+  const url = safeImageUrl(listing.image_url);
+  if (url) {
     const image = card.querySelector('[data-listing-image]');
     const placeholder = card.querySelector('[data-image-placeholder]');
     image.alt = listing.title;
     image.addEventListener('load', () => { placeholder.hidden = true; }, { once: true, signal });
     image.addEventListener('error', () => { image.hidden = true; placeholder.hidden = false; }, { once: true, signal });
-    image.src = url.href;
+    image.src = url;
     image.hidden = false;
   }
   return card;

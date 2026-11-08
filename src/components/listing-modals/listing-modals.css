@@ -1,0 +1,7 @@
+.listing-modal .modal-content { border: 1px solid #dfe6dc; border-radius: 1rem; }
+.listing-modal .modal-header { background: #f4f7ef; border-radius: 1rem 1rem 0 0; }
+.listing-modal .modal-body { padding: clamp(1rem, 3vw, 1.5rem); }
+.listing-modal .listing-form-panel { padding: 0; border: 0; border-radius: 0; }
+.listing-modal .listing-form-component { max-width: none; }
+.listing-modal [data-delete-title] { overflow-wrap: anywhere; }
+.listing-modal [hidden] { display: none !important; }

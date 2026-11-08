@@ -1,5 +1,7 @@
 # My Listings and listing CRUD
 
+My Listings now opens Add/View/Edit/Delete through [reusable listing modals](../../components/listing-modals/README.md). The direct Add/Edit pages remain functional with the same shared form and guards. Browse also offers public View modals, and direct Details uses the same read-only component. The page-route verification script explicitly navigates to the retained routes; `scripts/verify-listing-modals.mjs` checks the modal UI and cleanup.
+
 `/my-listings` loads the authenticated user's listings through `getMyListings()`, including joined category names, ordered by created_at then ID descending. It displays all returned pages in a responsive Bootstrap table with visually truncated titles, EUR prices, formatted creation dates, and View/Edit/Delete actions. On small screens the focusable table region scrolls horizontally. Loading, empty, and retryable error states remain visible without showing stale rows.
 
 `/listings/add` and `/listings/:id/edit` keep separate HTML/CSS/JS page files and share `components/listing-form/`. The form loads categories and, for editing, the existing listing. Non-owners see an unavailable/permission message before any listing values are populated; verified admins may edit under the existing policy. Invalid/missing IDs are handled without displaying record details.

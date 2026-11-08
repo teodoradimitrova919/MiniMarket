@@ -18,7 +18,7 @@ export async function getLatestListings() {
 }
 
 export async function getListingById(id) {
-  return runQuery(supabase.from('listings').select('*').eq('id', validateId(id, 'Listing ID')).maybeSingle(),
+  return runQuery(supabase.from('listings').select('*, category:categories(name)').eq('id', validateId(id, 'Listing ID')).maybeSingle(),
     'Unable to load listing');
 }
 
