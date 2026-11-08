@@ -28,7 +28,7 @@ try {
   await go('/');
   await page.locator('[data-guest-only]:not([hidden])').waitFor();
   assert.equal(await page.locator('header a[href="/my-listings"]').isVisible(), false);
-  for (const path of ['/my-listings', '/favorites', '/listings/add', '/listings/example/edit', '/admin']) {
+  for (const path of ['/dashboard', '/my-listings', '/favorites', '/listings/add', '/listings/example/edit', '/admin']) {
     await go(path); await waitPath('/login');
     assert.equal(new URL(page.url()).searchParams.get('returnTo'), path);
     await page.locator('form').waitFor();
@@ -46,8 +46,8 @@ try {
   assert.equal(await page.locator('header a[href="/admin"]').isVisible(), false);
   await page.reload(); await page.locator('h1').filter({ hasText: 'Add Listing' }).waitFor();
   await go('/admin'); await waitPath('/my-listings');
-  await go('/login'); await waitPath('/my-listings');
-  await go('/register'); await waitPath('/my-listings');
+  await go('/login'); await waitPath('/dashboard');
+  await go('/register'); await waitPath('/dashboard');
   await page.locator('header a.nav-link[href="/"]').click(); await waitPath('/');
   await page.locator('header a[href="/favorites"]').click(); await waitPath('/favorites');
   await page.goBack(); await waitPath('/');
@@ -79,10 +79,10 @@ try {
   await login('test@test.com', 'pass123'); await waitPath('/favorites');
   await logout();
   await go('/login?returnTo=https%3A%2F%2Fevil.example');
-  await login('test@test.com', 'pass123'); await waitPath('/my-listings');
+  await login('test@test.com', 'pass123'); await waitPath('/dashboard');
   assert.equal(new URL(page.url()).origin, new URL(base).origin);
   await logout();
-  await go('/login'); await login('admin@admin.com', 'pass123'); await waitPath('/my-listings');
+  await go('/login'); await login('admin@admin.com', 'pass123'); await waitPath('/dashboard');
   await page.locator('header a[href="/admin"]').waitFor();
   await page.locator('header a[href="/admin"]').click(); await waitPath('/admin');
   assert.equal(await page.locator('h1').textContent(), 'Admin Dashboard');
@@ -141,7 +141,7 @@ try {
       }
     };
     page.on('response', captureSignup);
-    await page.locator('form').getByRole('button').click(); await waitPath('/my-listings');
+    await page.locator('form').getByRole('button').click(); await waitPath('/dashboard');
     const profile = await page.evaluate(async () => {
       const service = await import('/src/services/auth-service.js');
       const user = await service.getCurrentUser();

@@ -1,0 +1,29 @@
+<div class="dashboard-page">
+  <section class="dashboard-welcome" aria-labelledby="page-title">
+    <div><p class="eyebrow">Your MiniMarket</p><h1 id="page-title" tabindex="-1">Dashboard</h1><p class="dashboard-greeting" data-dashboard-greeting></p><p class="dashboard-intro">Your listings, saved finds, and next steps. All in one place.</p></div>
+    <span class="dashboard-welcome-icon" aria-hidden="true"><i class="bi bi-grid-1x2"></i></span>
+  </section>
+
+  <section class="dashboard-overview" aria-labelledby="overview-title">
+    <h2 id="overview-title">At a glance</h2>
+    <div data-dashboard-status aria-live="polite"></div>
+    <div data-dashboard-content hidden>
+      <div class="row row-cols-1 row-cols-md-3 g-3">
+        <div class="col"><div class="dashboard-stat h-100"><span class="dashboard-stat-icon"><i class="bi bi-collection" aria-hidden="true"></i></span><p>Total Listings</p><strong data-stat-listings></strong><span class="dashboard-stat-note">Advertisements you’ve posted</span></div></div>
+        <div class="col"><div class="dashboard-stat h-100"><span class="dashboard-stat-icon dashboard-icon-favorites"><i class="bi bi-heart" aria-hidden="true"></i></span><p>Total Favorites</p><strong data-stat-favorites></strong><span class="dashboard-stat-note">Finds you’ve saved</span></div></div>
+        <div class="col"><div class="dashboard-stat h-100"><span class="dashboard-stat-icon dashboard-icon-categories"><i class="bi bi-tags" aria-hidden="true"></i></span><p>Total Categories Used</p><strong data-stat-categories></strong><span class="dashboard-stat-note">Distinct categories in your listings</span></div></div>
+      </div>
+      <div class="dashboard-empty" data-dashboard-empty hidden><i class="bi bi-stars" aria-hidden="true"></i><div><h3 data-empty-title></h3><p data-empty-message></p></div></div>
+    </div>
+  </section>
+
+  <section class="dashboard-actions" aria-labelledby="actions-title">
+    <div class="dashboard-section-heading"><p class="eyebrow">Make your next move</p><h2 id="actions-title">Where would you like to go?</h2></div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+      <div class="col"><a class="dashboard-action h-100" href="/my-listings"><i class="bi bi-collection" aria-hidden="true"></i><h3>My Listings</h3><p>See your advertisements in one place.</p><span>View listings <i class="bi bi-arrow-right" aria-hidden="true"></i></span></a></div>
+      <div class="col"><a class="dashboard-action h-100" href="/listings/add"><i class="bi bi-plus-circle" aria-hidden="true"></i><h3>Add Listing</h3><p>Give something a new beginning.</p><span>Post an ad <i class="bi bi-arrow-right" aria-hidden="true"></i></span></a></div>
+      <div class="col"><a class="dashboard-action h-100" href="/favorites"><i class="bi bi-heart" aria-hidden="true"></i><h3>My Favorites</h3><p>Come back to the finds you love.</p><span>View favorites <i class="bi bi-arrow-right" aria-hidden="true"></i></span></a></div>
+      <div class="col"><a class="dashboard-action h-100" href="/listings"><i class="bi bi-search" aria-hidden="true"></i><h3>Browse Listings</h3><p>Discover something worth keeping.</p><span>Explore the marketplace <i class="bi bi-arrow-right" aria-hidden="true"></i></span></a></div>
+    </div>
+  </section>
+</div>

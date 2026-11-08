@@ -4,6 +4,8 @@ The database services import the shared Supabase client. Configure the public va
 
 For the implemented registration/login/logout, session state, and protected routes, see [Authentication](AUTH.md). Home now reads categories and the latest listings through these services; other marketplace pages remain placeholders.
 
+`dashboard-service.js` exposes `getDashboardStats()` returning `{ totalListings, totalFavorites, totalCategoriesUsed }`. It verifies the current user, applies explicit owner/user filters to every query, uses exact HEAD counts, and paginates all category IDs with a stable ID order before using a Set. Administrators see their own statistics. See [Dashboard verification](../pages/dashboard/README.md).
+
 ## Listings
 
 | Function | Result |

@@ -9,6 +9,7 @@ import * as page7 from './pages/my-listings/my-listings.js';
 import * as page8 from './pages/favorites/favorites.js';
 import * as page9 from './pages/admin/admin.js';
 import * as page10 from './pages/not-found/not-found.js';
+import * as dashboard from './pages/dashboard/dashboard.js';
 import { safeReturnUrl } from './utils/auth-validation.js';
 import { showError } from './services/toast-service.js';
 
@@ -18,6 +19,7 @@ const routes = [
   [/^\/listings$/, page3], [/^\/listings\/add$/, page5],
   [/^\/listings\/([^/]+)\/edit$/, page6], [/^\/listings\/([^/]+)$/, page4],
   [/^\/my-listings$/, page7], [/^\/favorites$/, page8], [/^\/admin$/, page9],
+  [/^\/dashboard$/, dashboard],
 ];
 
 export function createRouter(container, onNavigate, { auth }) {
@@ -35,7 +37,7 @@ export function createRouter(container, onNavigate, { auth }) {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     const state = auth.getState();
     const accountPage = ['/login', '/register'].includes(path);
-    const protectedPage = ['/my-listings', '/favorites', '/listings/add', '/admin'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
+    const protectedPage = ['/dashboard', '/my-listings', '/favorites', '/listings/add', '/admin'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
     if (!state.ready && (accountPage || protectedPage)) {
       container.innerHTML = '<div class="home-feedback" role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Restoring your session…</div>';
       document.title = 'Loading | MiniMarket';

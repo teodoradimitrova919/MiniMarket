@@ -121,7 +121,7 @@ try {
   await page.locator('form').getByLabel('Email', { exact: true }).fill('test@test.com');
   await page.locator('form').getByLabel('Password', { exact: true }).fill('pass123');
   await page.locator('form').getByRole('button').click();
-  await page.waitForURL((url) => url.pathname === '/my-listings');
+  await page.waitForURL((url) => url.pathname === '/dashboard');
   assert.equal(await page.locator('.minimarket-toast').count(), 0, 'Successful login remains quiet');
   await page.goto(base + '/admin');
   await page.waitForURL((url) => url.pathname === '/my-listings');

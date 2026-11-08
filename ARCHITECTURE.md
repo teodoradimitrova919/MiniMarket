@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, and authentication are complete. The current phase adds reusable Bootstrap toasts in one shell container, fed by existing operation outcomes and page errors. Auth rules and schema remain unchanged. Listing management forms, filtering, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [database design](supabase/README.md), [authentication](src/services/AUTH.md), and [toast architecture and verification](src/components/toast/README.md).
+MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, and toasts are complete. The current phase adds the protected user Dashboard and exact personal statistics, with Dashboard as the default signed-in landing page. Listing management forms, filtering, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [Dashboard design and verification](src/pages/dashboard/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
@@ -26,6 +26,7 @@ Pages call services rather than Supabase directly. Use simple modules and functi
 | `/` | Home with advertisements | Public |
 | `/login` | Login | Public |
 | `/register` | Registration | Public |
+| `/dashboard` | Personal statistics and navigation | Authenticated |
 | `/listings` | Browse, search, and filter | Public |
 | `/listings/add` | Create advertisement | Authenticated |
 | `/listings/:id` | Advertisement details | Public |

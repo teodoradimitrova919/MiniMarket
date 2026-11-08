@@ -45,6 +45,7 @@ Use the following canonical routes:
 - / – Home page with advertisements.
 - /login – User login.
 - /register – User registration.
+- /dashboard – Authenticated user overview and statistics.
 - /listings – Browse and search advertisements.
 - /listings/:id – Advertisement details.
 - /listings/add – Create a new advertisement.
@@ -97,9 +98,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: toast notifications
+## Current phase: user Dashboard
 
-The shell, database/RLS, services, seed, Home, and authentication are complete. Add reusable Bootstrap success/error/info toasts with one shell container, safe text, accessible live regions, auto/manual dismissal, deduplication, and cleanup. Integrate only existing operations; keep validation/auth errors inline and routine reads/navigation/auth successes quiet. Do not change auth/authorization logic or schema, add missing marketplace/UI/upload functionality, dependencies, or deployment. Wait for further instructions after toast verification.
+The shell, database/RLS, services, seed, Home, authentication, and toasts are complete. Add only the authenticated `/dashboard` overview: exact user-scoped listing/favorite counts, distinct categories across all listing pages, responsive statistics/navigation cards, loading/empty/error states, and stale-response cleanup. Dashboard is the default signed-in landing page; safe internal return URLs take priority. Keep `/my-listings` unchanged. Do not add listing CRUD forms, Favorites/Admin functionality, uploads, dependencies, schema changes, or deployment. Wait for further instructions after Dashboard verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

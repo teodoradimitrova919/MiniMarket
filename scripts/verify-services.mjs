@@ -25,7 +25,7 @@ async function loadServices(client) {
     return modules.get(url);
   }
   const services = {};
-  for (const name of ['listings', 'categories', 'favorites']) {
+  for (const name of ['listings', 'categories', 'favorites', 'dashboard']) {
     const module = await load(new URL(`../src/services/${name}-service.js`, import.meta.url).href);
     await module.evaluate();
     services[name] = module.namespace;
@@ -63,7 +63,7 @@ const mock = {
     return query;
   },
 };
-const { listings, categories, favorites } = await loadServices(mock);
+const { listings, categories, favorites, dashboard } = await loadServices(mock);
 const listing = { id: listingId, owner_id: userId, title: 'Desk', category_id: categoryId, price: 12.5 };
 const input = { title: ' Desk ', category_id: categoryId, price: '12.50' };
 const reply = (data) => responses.push({ data, error: null });
@@ -171,8 +171,35 @@ authThrows = true; await rejectsCode(listings.getMyListings(), 'REQUEST_FAILED')
 authError = { code: 'refresh_token_not_found' };
 await rejectsCode(listings.getMyListings(), 'refresh_token_not_found'); authError = null;
 
+const beforeDashboard = requests.length;
+const beforeDashboardFeedback = feedback.length;
+responses.push({ count: 1205, error: null }, { count: 2500, error: null });
+for (let offset = 0; offset < 1205; offset += 100) {
+  reply(Array.from({ length: Math.min(100, 1205 - offset) }, (_, index) => ({
+    id: `listing-${offset + index}`, category_id: offset + index === 1204 ? 'last-page-category' : categoryId,
+  })));
+}
+assert.deepEqual(await dashboard.getDashboardStats(), { totalListings: 1205, totalFavorites: 2500, totalCategoriesUsed: 2 });
+const dashboardRequests = requests.slice(beforeDashboard);
+assert.equal(dashboardRequests.length, 15, 'Two exact counts and every category page');
+for (const request of dashboardRequests) {
+  assert.ok(request.steps.some(([method, field, value]) => method === 'eq' && field === (request.table === 'favorites' ? 'user_id' : 'owner_id') && value === userId));
+}
+for (const request of dashboardRequests.slice(0, 2)) {
+  assert.deepEqual(request.steps.find(([method]) => method === 'select'), ['select', 'id', { count: 'exact', head: true }]);
+}
+assert.deepEqual(step('range'), ['range', 1200, 1299]);
+responses.push({ count: 0, error: null }, { count: 0, error: null }); reply([]);
+assert.deepEqual(await dashboard.getDashboardStats(), { totalListings: 0, totalFavorites: 0, totalCategoriesUsed: 0 });
+responses.push({ count: null, error: null }, { count: 0, error: null }); reply([]);
+await rejectsCode(dashboard.getDashboardStats(), 'REQUEST_FAILED');
+fail('42501'); responses.push({ count: 0, error: null }); reply([]);
+await rejectsCode(dashboard.getDashboardStats(), '42501');
+assert.equal(feedback.length, beforeDashboardFeedback, 'Dashboard service reads do not publish notifications');
+
 user = null;
 const protectedOperations = [
+  () => dashboard.getDashboardStats(),
   () => listings.getMyListings(), () => listings.createListing(input),
   () => listings.updateListing(listingId, input), () => listings.deleteListing(listingId),
   () => categories.createCategory('Home'), () => categories.updateCategory(categoryId, 'Home'), () => categories.deleteCategory(categoryId),

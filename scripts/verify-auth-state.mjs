@@ -5,7 +5,7 @@ import { safeReturnUrl, validateEmail, validatePassword, validateUsername } from
 
 globalThis.window = { location: { origin: 'https://minimarket.example' } };
 for (const value of ['https://evil.example', '//evil.example', '/\\evil.example', '/login', '/register?returnTo=/admin', 'javascript:alert(1)', '/\n/evil.example']) {
-  assert.equal(safeReturnUrl(value), '/my-listings');
+  assert.equal(safeReturnUrl(value), '/dashboard');
 }
 assert.equal(safeReturnUrl('/favorites?from=home'), '/favorites?from=home');
 assert.equal(validateEmail(' alex@example.com '), 'alex@example.com');

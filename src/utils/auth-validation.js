@@ -17,7 +17,7 @@ export function validateUsername(value) {
   return value.trim();
 }
 
-export function safeReturnUrl(value, fallback = '/my-listings') {
+export function safeReturnUrl(value, fallback = '/dashboard') {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || /[\\\x00-\x20]/.test(value)) return fallback;
   try {
     const url = new URL(value, window.location.origin);

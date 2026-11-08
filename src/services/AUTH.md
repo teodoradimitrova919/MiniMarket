@@ -16,7 +16,7 @@ Auth errors have friendly messages and codes; raw request details, tokens, and p
 
 `auth-state.js` keeps a small in-memory view of the verified user/profile. It initializes from the SDK session before protected/auth routes render, reloads identity/profile after auth events, and clears old state on sign-out or failed verification. Revision checks ignore stale profile requests. It schedules async work outside the SDK auth callback, and disposes subscriptions/timers. Same-user token refresh does not remount the current page unnecessarily.
 
-The router unmounts pages on account changes, guards `/my-listings`, `/favorites`, `/listings/add`, and `/listings/:id/edit`, and restricts `/admin` to administrators. Visitors go to `/login?returnTo=...`. Valid same-origin return URLs are preserved; external/protocol-relative/backslash/control-character URLs and auth loops are rejected. A successful login or active-session registration goes to the safe return URL or `/my-listings`. Signed-in users opening Login/Register are redirected. Logout returns Home. Existing RLS remains the security boundary.
+The router unmounts pages on account changes, guards `/dashboard`, `/my-listings`, `/favorites`, `/listings/add`, and `/listings/:id/edit`, and restricts `/admin` to administrators. Visitors go to `/login?returnTo=...`. Valid same-origin return URLs are preserved; external/protocol-relative/backslash/control-character URLs and auth loops are rejected. A successful login or active-session registration goes to the safe return URL or `/dashboard`. Signed-in users opening Login/Register are redirected to that default or their safe return URL. Logout returns Home. Existing RLS remains the security boundary.
 
 ## Email confirmation
 
