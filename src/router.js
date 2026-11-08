@@ -30,6 +30,8 @@ export function createRouter(container, onNavigate, { auth }) {
   let cleanup;
   let mountedPath;
   let accessKey;
+  let previousRole;
+  let previousUserId;
   let currentIndex = Number.isInteger(history.state?.minimarketIndex) ? history.state.minimarketIndex : 0;
   let currentUrl = location.href;
   let restoringPop = false;
@@ -46,7 +48,7 @@ export function createRouter(container, onNavigate, { auth }) {
     render({ preservePage: true });
     return true;
   }
-  function render({ preservePage = false } = {}) {
+  function render({ preservePage = false, permissionsChanged = false } = {}) {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
     // Opt-in pages update query-driven views without losing loaded data or focus.
     if (preservePage && mountedPath === path && cleanup?.updateLocation) {
@@ -72,7 +74,7 @@ export function createRouter(container, onNavigate, { auth }) {
       return;
     }
     if (adminPage && state.profile?.role !== 'admin') {
-      showError('You do not have permission to open the Admin Dashboard.');
+      if (!permissionsChanged) showError('You do not have permission to open the Admin Dashboard.');
       navigate('/my-listings', { replace: true });
       return;
     }
@@ -128,8 +130,11 @@ export function createRouter(container, onNavigate, { auth }) {
   document.addEventListener('click', handleClick);
   window.addEventListener('popstate', handlePopState);
   const unsubscribe = auth.subscribe((state) => {
+    const adminRevoked = previousRole === 'admin' && previousUserId === state.user?.id && state.profile?.role !== 'admin';
+    previousRole = state.profile?.role;
+    previousUserId = state.user?.id;
     const nextKey = `${state.ready}:${state.user?.id || ''}:${state.profile?.role || ''}:${state.error || ''}`;
-    if (nextKey !== accessKey) { accessKey = nextKey; render(); }
+    if (nextKey !== accessKey) { accessKey = nextKey; render({ permissionsChanged: adminRevoked }); }
   });
   render();
   return {

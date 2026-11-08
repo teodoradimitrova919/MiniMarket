@@ -18,10 +18,13 @@ export function mount(container,{auth}){
   }
   function edit(user,trigger){
     actionRevision++;
-    dialog.open({title:'Edit User',nodes:[field('Display name','username',{value:user.username,maxLength:80}),field('Email address','email',{value:user.email,type:'email',maxLength:254,help:'Administrator email changes take effect directly, without a confirmation email.'})],dirty:true,onSave:async form=>{
-      await service.updateAdminUser(user.id,{username:form.elements.username.value,email:form.elements.email.value});
+    dialog.open({title:'Edit User',nodes:[field('Display name','username',{value:user.username,maxLength:80}),field('Email address','email',{value:user.email,type:'email',maxLength:254,help:'Administrator email changes take effect directly, without a confirmation email.'}),field('Role','role',{value:user.role,options:[{label:'User',value:'user'},{label:'Administrator',value:'admin'}],help:'Administrators can manage all listings, categories, and users. At least one administrator must remain.'})],dirty:true,onSave:async form=>{
+      const patch={};
+      for(const name of ['username','email','role'])if(form.elements[name].value!==user[name])patch[name]=form.elements[name].value;
+      if(!Object.keys(patch).length)return;
+      await service.updateAdminUser(user.id,patch);
       if(user.id===auth.getState().user?.id)await auth.refresh();
-      await load();
+      if(shell.isCurrent())await load();
     }},trigger);
   }
   async function remove(user,trigger){

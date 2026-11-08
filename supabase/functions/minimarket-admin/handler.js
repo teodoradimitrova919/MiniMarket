@@ -104,20 +104,29 @@ export function createAdminHandler({ admin, caller, url, origins }) {
         return respond({user,impact});
       }
       if(body.action==='users.update') {
-        allowed(body.patch,['username','email']);
-        if(!Object.keys(body.patch).length) fail(400,'Provide a display name or email.');
-        await userById(id);
+        allowed(body.patch,['username','email','role']);
+        if(!Object.keys(body.patch).length) fail(400,'Provide a display name, email, or role.');
+        if(body.patch.role!==undefined && !['user','admin'].includes(body.patch.role)) fail(400,'Choose either the user or admin role.');
+        const target=await userById(id);
         const targetSummary=(await result(client.rpc('admin_user_summaries',{ids:[id]})))[0];
         if(targetSummary?.deletionPending) fail(409,'This account is pending deletion. Retry deletion instead of editing it.');
         if(body.patch.username!==undefined) text(body.patch.username,'Display name',80);
+        let identityChanged=false;
         if(body.patch.email!==undefined) {
           const email=text(body.patch.email,'Email',254).toLowerCase();
           if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail(400,'Enter a valid email address.');
           // Auth Admin changes email directly, without a confirmation email flow.
-          await result(admin.auth.admin.updateUserById(id,{email}), 'The email could not be updated. It may already be in use.');
+          if(email!==target.email){await result(admin.auth.admin.updateUserById(id,{email}), 'The email could not be updated. It may already be in use.');identityChanged=true;}
         }
-        if(body.patch.username!==undefined) await result(admin.from('profiles').update({username:body.patch.username.trim()}).eq('id',id), 'The display name could not be updated. An email change may already be saved; retry to complete the update.');
-        return respond({user:(await summaries(client,[await userById(id)]))[0]});
+        if(body.patch.username!==undefined && body.patch.username.trim()!==targetSummary.username){await result(admin.from('profiles').update({username:body.patch.username.trim()}).eq('id',id), 'The display name could not be updated. An email change may already be saved; retry to complete the update.');identityChanged=true;}
+        // Read the safe response before a possible self-demotion removes admin access.
+        const updated=(await summaries(client,[await userById(id)]))[0];
+        if(body.patch.role!==undefined && body.patch.role!==targetSummary.role){
+          await result(client.rpc('admin_set_role',{target:id,desired:body.patch.role}),
+            'Role change blocked. Keep at least one administrator; users pending deletion cannot change roles.'+(identityChanged?' Name or email changes have already been saved.':''));
+          updated.role=body.patch.role;
+        }
+        return respond({user:updated});
       }
       if(body.action==='users.delete') {
         const user=await userById(id);

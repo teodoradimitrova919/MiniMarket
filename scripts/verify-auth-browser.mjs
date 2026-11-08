@@ -15,6 +15,7 @@ const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
 let newUserId;
 let adminClient;
+let ordinary;
 const go = async (path) => { await page.goto(base + path); };
 const waitPath = (path) => page.waitForURL((url) => url.pathname === path);
 const login = async (email, password) => {
@@ -25,6 +26,12 @@ const login = async (email, password) => {
 const logout = async () => { await page.locator('[data-logout]').click(); await waitPath('/'); await page.locator('[data-guest-only]:not([hidden])').waitFor(); };
 
 try {
+  const config=readConfig(parseEnv(await readFile('.env.seed.local','utf8')));
+  adminClient=createClient(config.url,config.key,{auth:{persistSession:false,autoRefreshToken:false}});
+  ordinary={email:`minimarket-auth-guard-${randomUUID()}@test.com`,password:randomUUID()};
+  const created=await adminClient.auth.admin.createUser({email:ordinary.email,password:ordinary.password,email_confirm:true,user_metadata:{username:'Auth guard verification'},app_metadata:{minimarket_auth_guard_test:true}});
+  if(created.error)throw new Error('Creating the temporary ordinary-user fixture failed.');
+  ordinary.id=created.data.user.id;
   await go('/');
   await page.locator('[data-guest-only]:not([hidden])').waitFor();
   assert.equal(await page.locator('header a[href="/my-listings"]').isVisible(), false);
@@ -36,10 +43,10 @@ try {
   await go('/login');
   await page.locator('form').getByRole('button').click();
   await page.getByRole('alert').filter({ hasText: 'valid email' }).waitFor();
-  await login('test@test.com', 'intentionally-wrong-password');
+  await login(ordinary.email, 'intentionally-wrong-password');
   await page.getByRole('alert').filter({ hasText: 'Email or password is incorrect' }).waitFor();
   await go('/listings/add'); await waitPath('/login');
-  await login('test@test.com', 'pass123'); await waitPath('/listings/add');
+  await login(ordinary.email, ordinary.password); await waitPath('/listings/add');
   assert.equal(await page.locator('h1').textContent(), 'Add Listing');
   assert.equal(await page.locator('[data-logout]').isVisible(), true);
   assert.equal(await page.locator('header a[href="/login"]').isVisible(), false);
@@ -59,7 +66,7 @@ try {
   await secondTab.locator('[data-logout]').click();
   await waitPath('/login');
   await secondTab.close();
-  await login('test@test.com', 'pass123'); await waitPath('/favorites');
+  await login(ordinary.email, ordinary.password); await waitPath('/favorites');
   // An expired refresh token is a controlled response, not a demo-user change.
   await page.route('**/auth/v1/token*', (route) => {
     if (new URL(route.request().url()).searchParams.get('grant_type') === 'refresh_token') {
@@ -76,10 +83,10 @@ try {
   await page.reload(); await waitPath('/login');
   assert.equal(await page.locator('header a[href="/my-listings"]').isVisible(), false);
   await page.unroute('**/auth/v1/token*');
-  await login('test@test.com', 'pass123'); await waitPath('/favorites');
+  await login(ordinary.email, ordinary.password); await waitPath('/favorites');
   await logout();
   await go('/login?returnTo=https%3A%2F%2Fevil.example');
-  await login('test@test.com', 'pass123'); await waitPath('/dashboard');
+  await login(ordinary.email, ordinary.password); await waitPath('/dashboard');
   assert.equal(new URL(page.url()).origin, new URL(base).origin);
   await logout();
   await go('/login'); await login('admin@admin.com', 'pass123'); await waitPath('/dashboard');
@@ -179,6 +186,13 @@ try {
   console.log('PASS: login, invalid credentials, logout, persisted sessions, visitor/user/admin navigation and guards, safe return URLs, history, responsive forms, and mocked confirmation/duplicate-submit flow.');
 } finally {
   await browser.close();
+  if(ordinary?.id&&adminClient){
+    const lookup=await adminClient.auth.admin.getUserById(ordinary.id);
+    if(lookup.error||lookup.data.user.app_metadata?.minimarket_auth_guard_test!==true)throw new Error('Ordinary fixture cleanup refused: marker mismatch.');
+    const removed=await adminClient.auth.admin.deleteUser(ordinary.id);
+    if(removed.error)throw new Error('Ordinary verification account cleanup failed.');
+    console.log('PASS: temporary ordinary-user fixture removed; current demo roles preserved.');
+  }
   if (newUserId && adminClient) {
     const { data, error: lookupError } = await adminClient.auth.admin.getUserById(newUserId);
     if (lookupError || !/^minimarket-auth-[a-f0-9-]+@test.com$/.test(data.user.email || '') || data.user.user_metadata?.username !== 'Auth verification') {

@@ -52,7 +52,8 @@ try{
   assert.ok(check(await anon.from('listings').select('id').limit(1),'Public listings').length);
   assert.ok(check(await anon.from('categories').select('id').limit(1),'Public categories').length);
   await denied(anon,'users.list');await denied(owner.client,'users.list');
-  assert.ok((await admin.rpc('admin_set_role',{target:adminId,desired:'user'})).error,'Last admin cannot be demoted');
+  // Never demote a real account to test a single-admin assumption. The dedicated
+  // verify-last-admin-role.sql checks that guard inside a rollback-only transaction.
   await denied(admin,'users.delete',{id:adminId,confirm:'admin@admin.com'});
   const forbidden=await fetch(endpoint,{method:'POST',headers:{origin:'https://untrusted.example',authorization:`Bearer ${adminSession.access_token}`,apikey:env.VITE_SUPABASE_PUBLISHABLE_KEY,'content-type':'application/json'},body:JSON.stringify({action:'users.list'})});
   assert.equal(forbidden.status,403);
@@ -63,9 +64,9 @@ try{
   assert.equal(users.total,check(await privileged.auth.admin.listUsers({page:1,perPage:1000}),'Counting current Auth users').users.length);
   assert.deepEqual(Object.keys(users.users[0]).sort(),['created_at','deletionPending','email','id','listingCount','role','username'].sort());
   const search=await invoke(admin,'users.list',{page:1,pageSize:20,search:other.email});assert.equal(search.total,1);
-  await denied(admin,'users.update',{id:other.id,patch:{role:'admin'}});
+  await denied(admin,'users.update',{id:other.id,patch:{role:'superadmin'}});
   await denied(admin,'users.update',{id:other.id,patch:{email:'invalid'}});
-  console.log('PASS: default/backfilled roles, signup-metadata rejection, direct escalation denial, private-data guards, last-admin protection, CORS, user pagination/search, and response allowlist.');
+  console.log('PASS: default/backfilled roles, signup-metadata rejection, direct escalation denial, private-data guards, self-deletion denial, CORS, user pagination/search, and response allowlist.');
 
   category=check(await admin.from('categories').insert({name:prefix}).select('*').single(),'Creating temporary category');
   assert.ok((await owner.client.from('categories').insert({name:`${prefix} forbidden`})).error);
