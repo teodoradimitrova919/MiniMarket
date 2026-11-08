@@ -28,6 +28,10 @@ Frontend authentication and route guards are deferred; placeholder routes are pu
 
 Copy `.env.example` to `.env.local` before using the Supabase client, then restart Vite. The placeholder shell does not import the client and does not require environment values. Client configuration uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Vite client variables are public; never use service-role or secret keys. Local environment files are ignored by Git.
 
+## Demo data seed
+
+See [server-side seed setup, dry run, execution, and verification](scripts/SEED.md). It creates three demo Auth users, six categories, eighteen listings, and twelve favorites using a local privileged server credential. Run `npm run test:seed` for the offline safety checks. No privileged configuration belongs in `VITE_` variables.
+
 ## Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md).

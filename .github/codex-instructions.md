@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: database services
+## Current phase: demo data seeding
 
-The shell and initial database/RLS setup are complete. This phase adds listings, categories, and favorites service modules with shared validation, clear errors, and controlled tests. Use the existing client and schema; RLS remains the authorization boundary. All UI routes remain placeholders. Do not implement forms, login/registration flows, image uploads, Storage, additional marketplace features, or deployment. Wait for further instructions after completing the service layer.
+The shell, database/RLS setup, and service layer are complete. This phase adds a server-only Node.js demo seed using the Auth Admin API and the existing four tables. Pin execution to the confirmed MiniMarket project, keep privileged credentials in ignored local environment configuration, support dry runs and safe reruns, and verify actual created/skipped counts. Do not change schema/RLS, overwrite unrelated data, or implement frontend functionality, uploads, Storage, additional features, or deployment. Wait for further instructions after seeding and verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 
