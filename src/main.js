@@ -4,14 +4,25 @@ import './styles.css';
 import { mountHeader } from './components/header/header.js';
 import { mountFooter } from './components/footer/footer.js';
 import { createRouter } from './router.js';
+import { createAuthState } from './services/auth-state.js';
 
-const header = mountHeader(document.querySelector('#site-header'));
+const auth = createAuthState();
+const header = mountHeader(document.querySelector('#site-header'), {
+  async onLogout() {
+    const { logout } = await import('./services/auth-service.js');
+    await logout();
+    await auth.refresh();
+    router.navigate('/', { replace: true });
+  },
+});
 const unmountFooter = mountFooter(document.querySelector('#site-footer'));
-const stopRouter = createRouter(document.querySelector('#main-content'), header.update);
+const router = createRouter(document.querySelector('#main-content'), header.update, { auth });
+void auth.initialize();
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    stopRouter();
+    auth.dispose();
+    router.dispose();
     header.unmount();
     unmountFooter();
   });

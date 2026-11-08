@@ -14,3 +14,20 @@ h1 { font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 750; letter-spacing: -.05
 h1:focus, main:focus { outline: none; }
 :focus-visible { outline: 3px solid #b77935; outline-offset: 4px; }
 @media (max-width: 575px) { main.container { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; } }
+
+.auth-layout { display: grid; grid-template-columns: .9fr 1.1fr; max-width: 940px; margin: 1rem auto; background: white; border: 1px solid #dde6d8; border-radius: 1.5rem; overflow: hidden; }
+.auth-aside { padding: clamp(1.5rem, 4vw, 3rem); display: flex; flex-direction: column; justify-content: center; }
+.auth-brand-icon { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 18px; background: #ffffff70; font-size: 1.8rem; margin-bottom: 2rem; color: #386146; }
+.auth-aside h2 { font-size: clamp(1.8rem, 3vw, 2.7rem); font-weight: 750; letter-spacing: -.05em; line-height: 1.15; }
+.auth-aside > p:not(.eyebrow) { font-size: .95rem; line-height: 1.8; color: #5a6c55; margin: 1rem 0 1.5rem; }
+.auth-form-panel { padding: clamp(1.5rem, 4vw, 3rem); }
+.auth-form-panel h1 { font-size: 2.3rem; margin-bottom: .5rem; }
+.auth-intro { color: #6b786e; font-size: .95rem; margin-bottom: 1.75rem; }
+.auth-page .form-label { font-size: .9rem; font-weight: 600; }
+.auth-page .form-control { border-radius: .6rem; padding: .7rem .8rem; border-color: #cdd8c8; }
+.auth-page .form-control:focus { border-color: #22664d; box-shadow: 0 0 0 .2rem #22664d22; }
+.auth-switch { font-size: .85rem; color: #61725e; margin: 1.5rem 0 0; }
+.auth-switch a { color: #22664d; font-weight: 650; text-underline-offset: 3px; }
+.auth-page [data-auth-message]:focus { outline: 2px solid #b77935; outline-offset: 2px; }
+@media (max-width: 767px) { .auth-layout { grid-template-columns: 1fr; margin: 0; } .auth-aside { padding: 1.5rem; } .auth-brand-icon { margin-bottom: 1rem; width: 45px; height: 45px; font-size: 1.4rem; } .auth-aside > p:not(.eyebrow) { margin: .6rem 0; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }

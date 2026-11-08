@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: Home page
+## Current phase: authentication
 
-The shell, database/RLS setup, services, and demo seed are complete. Implement only Home at `/`: a responsive hero/search, live categories, eight latest listings with a reusable card, How It Works, and registration/login links. Use existing services and the shared router; search/category links pass query parameters to the Listings placeholder without filtering. Include loading, empty, error, retry, and unmount cleanup behavior. Do not change schema/RLS or implement other pages, authentication/guards, listing mutations, favorites/admin UI, uploads, Storage, or deployment. Wait for further instructions after Home verification.
+The shell, database/RLS, services, seed, and Home are complete. Implement registration/login/logout, SDK session restoration, session-aware navigation, and authentication/admin route guards only. Registration uses the existing profile trigger and always defaults to user; roles come from profiles, not editable metadata. Preserve safe internal return URLs and clean up stale state/listeners on account changes. Keep listing CRUD forms, Favorites/Admin functionality, uploads, Storage, and deployment deferred. Do not reset demo passwords or change schema/RLS unnecessarily. Wait for further instructions after authentication verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

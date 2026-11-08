@@ -1,6 +1,8 @@
 # Database services
 
-All three services import the shared Supabase client. Configure `.env.local` from `.env.example` and restart Vite before importing them into future pages. The placeholder UI does not call these services yet.
+The database services import the shared Supabase client. Configure the public variables in `.env.local` from `.env.example` and restart Vite. Home calls read services; other marketplace pages remain placeholders.
+
+For the implemented registration/login/logout, session state, and protected routes, see [Authentication](AUTH.md). Home now reads categories and the latest listings through these services; other marketplace pages remain placeholders.
 
 ## Listings
 

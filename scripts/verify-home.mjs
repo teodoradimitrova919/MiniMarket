@@ -71,7 +71,7 @@ try {
   assert.equal(new URL(page.url()).pathname, listingHref);
   assert.equal(await page.locator('h1').textContent(), 'Listing Details');
   await page.goBack(); await waitReady();
-  for (const [name, heading] of [['Browse Listings', 'Browse Listings'], ['Post an Ad', 'Add Listing'], ['Join MiniMarket', 'Register'], ['Log in', 'Login']]) {
+  for (const [name, heading] of [['Browse Listings', 'Browse Listings'], ['Post an Ad', 'Login'], ['Join MiniMarket', 'Register'], ['Log in', 'Login']]) {
     await page.locator('.home-page').getByRole('link', { name, exact: true }).click();
     assert.equal(await page.locator('h1').textContent(), heading);
     await page.goBack(); await waitReady();
@@ -147,7 +147,7 @@ try {
   await page.getByRole('link', { name: 'Post an Ad', exact: true }).click();
   finishLate();
   await page.waitForLoadState('networkidle');
-  assert.equal(await page.locator('h1').textContent(), 'Add Listing');
+  assert.equal(await page.locator('h1').textContent(), 'Login');
   assert.equal(await page.evaluate(() => {
     const event = new Event('submit', { bubbles: true, cancelable: true });
     window.oldSearch.dispatchEvent(event);

@@ -9,6 +9,7 @@ import * as page7 from './pages/my-listings/my-listings.js';
 import * as page8 from './pages/favorites/favorites.js';
 import * as page9 from './pages/admin/admin.js';
 import * as page10 from './pages/not-found/not-found.js';
+import { safeReturnUrl } from './utils/auth-validation.js';
 
 // Static /listings/add must precede the parameterized detail route.
 const routes = [
@@ -18,22 +19,46 @@ const routes = [
   [/^\/my-listings$/, page7], [/^\/favorites$/, page8], [/^\/admin$/, page9],
 ];
 
-export function createRouter(container, onNavigate) {
+export function createRouter(container, onNavigate, { auth }) {
   let cleanup;
-  function navigate(to) {
+  let accessKey;
+  function navigate(to, { replace = false } = {}) {
     const url = new URL(to, window.location.href);
-    if (url.origin !== window.location.origin) return;
-    if (url.href !== location.href) history.pushState(null, '', url.pathname + url.search + url.hash);
+    if (url.origin !== window.location.origin || !['http:', 'https:'].includes(url.protocol)) return;
+    if (url.href !== location.href) history[replace ? 'replaceState' : 'pushState'](null, '', url.pathname + url.search + url.hash);
     render();
   }
   function render() {
     cleanup?.();
+    cleanup = undefined;
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    const state = auth.getState();
+    const accountPage = ['/login', '/register'].includes(path);
+    const protectedPage = ['/my-listings', '/favorites', '/listings/add', '/admin'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
+    if (!state.ready && (accountPage || protectedPage)) {
+      container.innerHTML = '<div class="home-feedback" role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Restoring your session…</div>';
+      document.title = 'Loading | MiniMarket';
+      onNavigate(path, state);
+      return;
+    }
+    if (protectedPage && !state.user) {
+      const returnTo = path + location.search + location.hash;
+      navigate(`/login?${new URLSearchParams({ returnTo })}`, { replace: true });
+      return;
+    }
+    if (path === '/admin' && state.profile?.role !== 'admin') {
+      navigate('/my-listings', { replace: true });
+      return;
+    }
+    if (accountPage && state.user) {
+      navigate(safeReturnUrl(new URLSearchParams(location.search).get('returnTo')), { replace: true });
+      return;
+    }
     const match = routes.find(([pattern]) => pattern.test(path));
     const page = match?.[1] ?? page10;
-    cleanup = page.mount(container, { navigate });
+    cleanup = page.mount(container, { navigate, auth });
     document.title = page.title + ' | MiniMarket';
-    onNavigate(path);
+    onNavigate(path, state);
     const hashTarget = document.getElementById(window.location.hash.slice(1));
     const focusTarget = hashTarget || container.querySelector('h1') || container;
     focusTarget.focus({ preventScroll: true });
@@ -55,10 +80,18 @@ export function createRouter(container, onNavigate) {
 
   document.addEventListener('click', handleClick);
   window.addEventListener('popstate', render);
+  const unsubscribe = auth.subscribe((state) => {
+    const nextKey = `${state.ready}:${state.user?.id || ''}:${state.profile?.role || ''}:${state.error || ''}`;
+    if (nextKey !== accessKey) { accessKey = nextKey; render(); }
+  });
   render();
-  return () => {
-    cleanup?.();
-    document.removeEventListener('click', handleClick);
-    window.removeEventListener('popstate', render);
+  return {
+    navigate,
+    dispose() {
+      cleanup?.();
+      unsubscribe();
+      document.removeEventListener('click', handleClick);
+      window.removeEventListener('popstate', render);
+    },
   };
 }

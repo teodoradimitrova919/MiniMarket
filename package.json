@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "node --experimental-vm-modules scripts/verify-services.mjs",
     "seed": "node --env-file=.env.seed.local scripts/seed.js",
-    "test:seed": "node scripts/verify-seed.mjs"
+    "test:seed": "node scripts/verify-seed.mjs",
+    "test:auth": "node --experimental-vm-modules scripts/verify-auth-state.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.119.0",
