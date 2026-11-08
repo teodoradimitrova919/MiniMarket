@@ -59,6 +59,9 @@ export function onAuthStateChange(callback) {
 }
 
 export async function getCurrentProfile(userId) {
-  return runQuery(supabase.from('profiles').select('id, username, role').eq('id', userId).single(),
-    'Unable to load your profile');
+  const [profile, assignment] = await Promise.all([
+    runQuery(supabase.from('profiles').select('id, username').eq('id', userId).single(), 'Unable to load your profile'),
+    runQuery(supabase.from('user_roles').select('role').eq('user_id', userId).single(), 'Unable to verify your application role'),
+  ]);
+  return { ...profile, role: assignment.role };
 }

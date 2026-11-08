@@ -12,7 +12,7 @@
 | `onAuthStateChange(callback)` | Unsubscribe function; callback receives event and session |
 | `getCurrentProfile(userId)` | Profile read under RLS |
 
-Auth errors have friendly messages and codes; raw request details, tokens, and passwords are never logged. Registration sends only username metadata. The existing database trigger creates the profile as `user`; no frontend role assignment or profile insertion is performed. Admin navigation and route access use the role read from `profiles`, never mutable user metadata.
+Auth errors have friendly messages and codes; raw request details, tokens, and passwords are never logged. Registration sends only username metadata. The database trigger creates the profile and authoritative `user_roles` assignment as `user`; no frontend role assignment or profile insertion is performed. `getCurrentProfile` combines profile identity/name with the role read under RLS from `user_roles`, never mutable metadata or the legacy profile-role mirror. Every `/admin` subroute is guarded, and server operations independently verify current roles. See [admin authorization](../../supabase/ADMIN.md).
 
 `auth-state.js` keeps a small in-memory view of the verified user/profile. It initializes from the SDK session before protected/auth routes render, reloads identity/profile after auth events, and clears old state on sign-out or failed verification. Revision checks ignore stale profile requests. It schedules async work outside the SDK auth callback, and disposes subscriptions/timers. Same-user token refresh does not remount the current page unnecessarily.
 
@@ -38,4 +38,4 @@ State tests cover validation, safe return URLs, initialization, profile-based ro
 
 Browser verification passed for real registration and the trigger-created user profile, valid/invalid login, logout to Home, refresh persistence, visitor/user/admin header links and guards, safe return URLs, Back/Forward, cross-tab logout, expired-session handling, responsive layouts, and confirmation-without-session/duplicate-submit behavior. The last two branches use controlled responses and send no email. Temporary registration accounts were removed through the server-side Auth Admin API; existing demo accounts/passwords were not modified. Server credentials are used only by the Node test cleanup, never sent to the browser.
 
-Listing CRUD forms were added in the subsequent [My Listings phase](../pages/my-listings/README.md), including an unsaved-change check before explicit logout. Favorites/Admin functionality, image uploads, and deployment remain deferred.
+Listing CRUD forms include an unsaved-change check before explicit logout. The Admin Panel now manages listings/categories/users and listing images; privileged Auth operations remain server-side. Favorites UI and frontend deployment remain deferred.

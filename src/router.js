@@ -10,6 +10,9 @@ import * as page8 from './pages/favorites/favorites.js';
 import * as page9 from './pages/admin/admin.js';
 import * as page10 from './pages/not-found/not-found.js';
 import * as dashboard from './pages/dashboard/dashboard.js';
+import * as adminListings from './pages/admin-listings/admin-listings.js';
+import * as adminCategories from './pages/admin-categories/admin-categories.js';
+import * as adminUsers from './pages/admin-users/admin-users.js';
 import { safeReturnUrl } from './utils/auth-validation.js';
 import { showError } from './services/toast-service.js';
 
@@ -20,6 +23,7 @@ const routes = [
   [/^\/listings\/([^/]+)\/edit$/, page6], [/^\/listings\/([^/]+)$/, page4],
   [/^\/my-listings$/, page7], [/^\/favorites$/, page8], [/^\/admin$/, page9],
   [/^\/dashboard$/, dashboard],
+  [/^\/admin\/listings$/, adminListings], [/^\/admin\/categories$/, adminCategories], [/^\/admin\/users$/, adminUsers],
 ];
 
 export function createRouter(container, onNavigate, { auth }) {
@@ -54,7 +58,8 @@ export function createRouter(container, onNavigate, { auth }) {
     mountedPath = undefined;
     const state = auth.getState();
     const accountPage = ['/login', '/register'].includes(path);
-    const protectedPage = ['/dashboard', '/my-listings', '/favorites', '/listings/add', '/admin'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
+    const adminPage = path === '/admin' || path.startsWith('/admin/');
+    const protectedPage = adminPage || ['/dashboard', '/my-listings', '/favorites', '/listings/add'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
     if (!state.ready && (accountPage || protectedPage)) {
       container.innerHTML = '<div class="home-feedback" role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Restoring your session…</div>';
       document.title = 'Loading | MiniMarket';
@@ -66,7 +71,7 @@ export function createRouter(container, onNavigate, { auth }) {
       navigate(`/login?${new URLSearchParams({ returnTo })}`, { replace: true });
       return;
     }
-    if (path === '/admin' && state.profile?.role !== 'admin') {
+    if (adminPage && state.profile?.role !== 'admin') {
       showError('You do not have permission to open the Admin Dashboard.');
       navigate('/my-listings', { replace: true });
       return;

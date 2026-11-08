@@ -4,8 +4,9 @@ import './listing-modals.css';
 import { mountListingForm } from '../listing-form/listing-form.js';
 import { mountListingDetails } from '../listing-details/listing-details.js';
 import { showError } from '../../services/toast-service.js';
+import { bindModalTabLoop } from '../../utils/modal-focus.js';
 
-export function createListingModals({ auth, onChanged, focusFallback } = {}) {
+export function createListingModals({ auth, onChanged, focusFallback, deleteOperation } = {}) {
   const host = document.createElement('div');
   host.innerHTML = html;
   document.body.append(host);
@@ -39,16 +40,7 @@ export function createListingModals({ auth, onChanged, focusFallback } = {}) {
     finally { if (active && !opened) restoreFocus(); }
   }
   for (const [name, dialog] of Object.entries(dialogs)) {
-    // Wrap boundary Tab presses as well as Bootstrap's focus-in trap.
-    dialog.addEventListener('keydown', event => {
-      if (event.key !== 'Tab' || event.defaultPrevented) return;
-      const controls = [...dialog.querySelectorAll('a[href], button, input, textarea, select, [tabindex]')]
-        .filter(element => element.tabIndex >= 0 && !element.matches(':disabled') && element.getClientRects().length);
-      const first = controls[0], last = controls.at(-1);
-      if (!first) { event.preventDefault(); dialog.focus(); }
-      else if (event.shiftKey && [first, dialog].includes(document.activeElement)) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    }, { signal: events.signal });
+    bindModalTabLoop(dialog, events.signal);
     dialog.addEventListener('hide.bs.modal', event => {
       if (forceClose) return;
       if ((name === 'delete' && deleting) || (name === 'form' && (formCleanup?.isPending() || !canLeave()))) event.preventDefault();
@@ -108,7 +100,7 @@ export function createListingModals({ auth, onChanged, focusFallback } = {}) {
       const id = selected.id;
       const { deleteListing } = await import('../../services/listings-service.js');
       if (!authorized()) return;
-      await deleteListing(id);
+      await (deleteOperation || deleteListing)(id);
       if (!authorized()) return;
       deleting = false;
       modals.delete.hide();

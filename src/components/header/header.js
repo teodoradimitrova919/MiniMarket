@@ -32,7 +32,7 @@ export function mountHeader(container, { onLogout }) {
       errorMessage.hidden = !state.error;
       for (const link of container.querySelectorAll('a[href]')) {
         const href = link.getAttribute('href');
-        const active = href === path || (href === '/listings' && path.startsWith('/listings/') && path !== '/listings/add');
+        const active = href === path || (href === '/listings' && path.startsWith('/listings/') && path !== '/listings/add') || (href === '/admin' && path.startsWith('/admin/'));
         link.classList.toggle('active', active);
         if (active) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');

@@ -1,0 +1,23 @@
+.admin-nav { padding: .65rem; border: 1px solid #dfe7da; border-radius: .9rem; background: #fff; }
+.admin-nav .nav-link { color: #22664d; }
+.admin-nav .nav-link.active { background: #22664d; color: #fff; }
+.admin-heading h1 { font-size: clamp(2rem,4vw,3rem); }
+.admin-heading > p:last-child { color: #637268; }
+.admin-toolbar { padding: 1rem; border: 1px solid #dfe7da; border-radius: .9rem; background: white; margin-bottom: 1.5rem; }
+.admin-table { border: 1px solid #dfe7da; border-radius: .9rem; background: white; }
+.admin-table table { min-width: 680px; }
+.admin-table td { padding: 1rem; vertical-align: middle; }
+.admin-table th { padding: 1rem; background: #f0f4ea; white-space: nowrap; }
+.admin-title { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-owner { min-width: 170px; max-width: 180px; overflow-wrap: anywhere; font-size: .85rem; }
+.admin-table td:last-child { min-width: 210px; }
+.admin-thumbnail { width: 56px; height: 56px; object-fit: cover; border-radius: .5rem; background: #edf2e7; }
+.admin-thumbnail-placeholder { display: grid; place-items: center; color: #657b5e; }
+.admin-feedback { padding: 1.5rem; border: 1px dashed #cdd8c6; border-radius: .8rem; color: #5b7154; }
+.admin-feedback .btn { margin-top: 1rem; }
+.admin-page [hidden], .admin-dialog [hidden] { display: none !important; }
+.admin-dialog .modal-content { border-radius: 1rem; }
+.admin-dialog .modal-header { background: #f0f4ea; }
+.admin-dialog .modal-body { overflow-wrap: anywhere; }
+.admin-stat { border: 1px solid #dfe7da; border-radius: 1rem; background: #fff; padding: 1.5rem; }
+.admin-stat strong { display: block; font-size: 2rem; color: #22664d; }

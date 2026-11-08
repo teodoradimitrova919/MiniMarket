@@ -51,8 +51,16 @@ export async function updateListing(id, data) {
 export async function deleteListing(id) {
   return notifyMutation(async () => {
     await requireUser();
-    const record = await runQuery(supabase.from('listings').delete().eq('id', validateId(id, 'Listing ID'))
-      .select('id').maybeSingle(), 'Unable to delete listing');
+    let record;
+    try {
+      record = await runQuery(supabase.from('listings').delete().eq('id', validateId(id, 'Listing ID'))
+        .select('id').maybeSingle(), 'Unable to delete listing');
+    } catch(error) {
+      if(error.code!=='PT409') throw error;
+      const { invokeAdmin }=await import('./admin-service.js');
+      await invokeAdmin('listing.delete',{id,confirm:id});
+      record={id};
+    }
     return requireRecord(record, 'Listing');
   }, { success: 'Listing deleted successfully.', error: 'The listing could not be deleted. Please try again.' });
 }

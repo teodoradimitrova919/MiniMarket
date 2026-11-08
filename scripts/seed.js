@@ -154,11 +154,13 @@ export async function seed(client, { dryRun = false } = {}) {
       if (!dryRun) {
         const id = users.get(demo.key).id;
         const profile = await request(client.from('profiles').select('*').eq('id', id).single(), 'Reading demo profile');
-        if (profile.username !== demo.username || profile.role !== demo.role) {
+        if (profile.username !== demo.username) {
           // Only seed-marked accounts reach here. No client-controlled role claim.
-          await request(client.from('profiles').update({ username: demo.username, role: demo.role })
+          await request(client.from('profiles').update({ username: demo.username })
             .eq('id', id).select('id').single(), 'Configuring demo profile');
         }
+        const assignment = await request(client.from('user_roles').select('role').eq('user_id', id).single(), 'Reading demo role');
+        if (assignment.role !== demo.role) await request(client.from('user_roles').update({ role: demo.role }).eq('user_id', id).select('user_id').single(), 'Configuring server-side demo role');
       }
     }
 

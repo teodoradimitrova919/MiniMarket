@@ -1,5 +1,6 @@
--- Run through the scoped Supabase MCP SQL tool as postgres.
--- All fixtures and checks run in one transaction and are ALWAYS rolled back.
+-- Historical INITIAL-schema test: empty disposable database, before admin migrations only.
+-- Do not run against a populated/current project. Use verify-admin.mjs for current live RLS/API checks.
+-- All historical fixtures and checks run in one transaction and are ALWAYS rolled back.
 begin;
 
 insert into auth.users (id, raw_user_meta_data) values

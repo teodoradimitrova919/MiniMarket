@@ -98,8 +98,8 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: listing modals
+## Current phase: Admin Panel
 
-The shell, database/RLS, services, seed, Home, authentication, toasts, Dashboard, listing CRUD pages, and Browse are complete. Add reusable Bootstrap Add/View/Edit/Delete listing modals to My Listings, with public View modals on Browse. Reuse the shared form, validation, services, and single mutation toasts. Preserve the Add/Edit/Details routes; use a shared read-only details component. Confirm unsaved modal changes, prevent duplicate submissions, refresh owned rows, and clean up focus/listeners/backdrops on navigation. Do not implement Favorites/Admin pages, uploads, schema changes, extra dependencies, or deployment. Wait for further instructions after modal verification.
+Public browsing, authentication, Dashboard, listing CRUD pages/modals, and services are complete. Implement MiniMarket-only admin overview/listings/categories/users routes using Bootstrap, shared forms/modals/services, authoritative user_roles, guarded private RPC implementations, and server-side Auth administration. Preserve public reads, existing admins, ownership, and normal user RLS. Use Storage policies and retryable cleanup before listing/Auth deletion; protect the last admin and keep privileged keys server-only. Do not invent status/category fields, project-management features, rich text, shopping features, Favorites UI, or Netlify deployment. Follow supabase/ADMIN.md and stop after admin verification and GitHub synchronization.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.

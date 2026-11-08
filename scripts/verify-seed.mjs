@@ -21,7 +21,7 @@ assert.notEqual(seedId('same'), seedId('different'));
 
 function mockDatabase() {
   const users = [];
-  const tables = { profiles: [], categories: [], listings: [], favorites: [] };
+  const tables = { profiles: [], user_roles: [], categories: [], listings: [], favorites: [] };
   const adminCreates = [];
   let writes = 0;
   const client = {
@@ -39,6 +39,7 @@ function mockDatabase() {
         users.push(user);
         // Simulate the existing Auth trigger, not a direct write by the script.
         tables.profiles.push({ id: user.id, username: attributes.user_metadata.username, role: 'user' });
+        tables.user_roles.push({ user_id: user.id, role: 'user' });
         return { data: { user }, error: null };
       },
     } },
@@ -76,8 +77,9 @@ function mockDatabase() {
               tables[table].push(data); rows = [data];
             } else if (operation === 'update') {
               writes += 1;
-              assert.equal(table, 'profiles', 'Existing rows may only be updated for seed-owned profiles');
+              assert.ok(['profiles', 'user_roles'].includes(table), 'Only seed-owned profiles and roles may be updated');
               rows.forEach((row) => Object.assign(row, payload));
+              if (table === 'user_roles') for (const row of rows) tables.profiles.find(profile => profile.id === row.user_id).role = row.role;
             }
             if ((required && rows.length !== 1) || (single && rows.length > 1)) return { data: null, error: { code: 'PGRST116' } };
             return { data: single ? rows[0] || null : rows, error: null };

@@ -1,0 +1,12 @@
+<section class="admin-page" aria-labelledby="page-title">
+  <header class="admin-heading mb-4"><p class="eyebrow">Marketplace administration</p><h1 id="page-title" tabindex="-1">Listings Management</h1><p>Review listings from every seller. Ownership stays with the original seller.</p></header>
+  <div data-admin-nav></div>
+  <form class="admin-toolbar row g-3 align-items-end" data-admin-filter role="search" aria-label="Search admin listings">
+    <div class="col-12 col-md-5"><label class="form-label" for="admin-search">Search by title</label><input class="form-control" id="admin-search" name="search" type="search" maxlength="100"></div>
+    <div class="col-12 col-md-5"><label class="form-label" for="admin-category">Category</label><select class="form-select" id="admin-category" name="category"><option value="">All Categories</option></select></div>
+    <div class="col-12 col-md-2"><button class="btn btn-success w-100" type="submit">Search</button></div>
+  </form>
+  <div data-admin-status aria-live="polite"></div>
+  <div class="table-responsive admin-table" data-admin-table hidden><table class="table mb-0"><caption class="visually-hidden">All marketplace listings</caption><thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Price</th><th>Seller</th><th>Created</th><th>Actions</th></tr></thead><tbody data-admin-rows></tbody></table></div>
+  <nav class="d-flex flex-wrap align-items-center justify-content-center gap-3 mt-4" data-admin-pager aria-label="Listings pagination"></nav>
+</section>

@@ -1,0 +1,8 @@
+<section class="admin-page" aria-labelledby="page-title">
+  <header class="admin-heading mb-4"><p class="eyebrow">Marketplace administration</p><h1 id="page-title" tabindex="-1">Users Management</h1><p>Manage display names and email addresses. Roles are managed through trusted administrator operations.</p></header>
+  <div data-admin-nav></div>
+  <form class="admin-toolbar d-flex align-items-end gap-3 flex-wrap" role="search" aria-label="Search registered users"><div class="flex-grow-1"><label class="form-label" for="admin-search">Search users by name or email</label><input class="form-control" id="admin-search" name="search" type="search" maxlength="100"></div><button class="btn btn-success" type="submit">Search</button></form>
+  <div data-admin-status aria-live="polite"></div>
+  <div class="table-responsive admin-table" data-admin-table hidden><table class="table mb-0"><caption class="visually-hidden">Registered users; private administrator view</caption><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Registered</th><th>Listings</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+  <nav class="d-flex flex-wrap align-items-center justify-content-center gap-3 mt-4" data-admin-pager aria-label="Users pagination"></nav>
+</section>

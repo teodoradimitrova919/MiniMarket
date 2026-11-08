@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, toasts, Dashboard, listing CRUD pages, and Browse are complete. My Listings adds reusable Add/View/Edit/Delete modals; Browse also uses View. Direct Details and View share a read-only component, while modal/page Add/Edit share the existing validated form and services. Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [listing modals](src/components/listing-modals/README.md), [Browse](src/pages/listings/README.md), [listing CRUD](src/pages/my-listings/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
+MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, toasts, Dashboard, listing CRUD pages/modals, and Browse are complete. The Admin Panel adds authoritative roles, admin overview/listings/categories/users routes, image management, guarded RPCs, and server-side Auth operations. Shared forms and listing modals remain reusable. Public reads and ordinary ownership rules are preserved. Favorites UI and frontend deployment remain deferred. See [admin architecture/security](supabase/ADMIN.md), [listing modals](src/components/listing-modals/README.md), [Browse](src/pages/listings/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
@@ -34,7 +34,10 @@ Pages call services rather than Supabase directly. Use simple modules and functi
 | `/listings/:id/edit` | Edit advertisement | Owner or administrator |
 | `/my-listings` | Manage own advertisements | Authenticated |
 | `/favorites` | Saved advertisements | Authenticated |
-| `/admin` | Manage advertisements and categories | Administrator |
+| `/admin` | Marketplace statistics | Administrator |
+| `/admin/listings` | All listings, ownership, images, and shared CRUD modals | Administrator |
+| `/admin/categories` | Category CRUD and listing usage counts | Administrator |
+| `/admin/users` | Safe user directory, edits, deletion impact, and cleanup | Administrator |
 | Any unmatched URL | Not Found | Public |
 
 Match `/listings/add` before the dynamic listing detail route. Shared navigation exposes browsing, account actions, and relevant protected destinations. Preserve normal link behavior and browser back/forward navigation. Frontend guards improve navigation; database authorization remains authoritative.
@@ -67,7 +70,7 @@ MiniMarket/
 `-- .gitignore
 ```
 
-Pages use separate HTML fragments, CSS, and JS modules within one Vite HTML shell. The router enforces existing account/admin guards and mount cleanup. Browse opts into a cleanup function's `updateLocation()` hook for query-only navigation, retaining fetched public data and control focus. Account-state changes still remount pages. Listing modal hosts mount once per Browse/My Listings page and dispose on unmount, including guards/backdrops/focus listeners. Favorites and Admin retain placeholder content.
+Pages use separate HTML fragments, CSS, and JS modules within one Vite HTML shell. The router enforces existing account/admin guards and mount cleanup. Browse opts into a cleanup function's `updateLocation()` hook for query-only navigation, retaining fetched public data and control focus. Account-state changes still remount pages. Listing and admin modal hosts dispose on unmount, including guards/backdrops/focus listeners. Favorites retains placeholder content.
 
 ## Planned Supabase integration
 
@@ -75,7 +78,8 @@ Use Supabase Auth for accounts, Postgres for application data, and Storage for l
 
 Plan these relationships without creating tables yet:
 
-- `profiles`: UUID primary key referencing the Auth user; profile information, role (`user` or `admin`), and timestamps.
+- `profiles`: UUID primary key referencing the Auth user, username, creation timestamp, and a compatibility role mirror.
+- `user_roles`: one authoritative enum role per Auth user, controlled by trusted signup/admin mechanisms and RLS.
 - `categories`: UUID primary key, category name, and appropriate timestamps; one category has many listings.
 - `listings`: UUID primary key; owner foreign key to `profiles`, category foreign key to `categories`, title, description, nonnegative price, image storage reference, and timestamps.
 - `favorites`: user and listing foreign keys, a UUID primary key, a creation timestamp, and a unique user/listing pair. This connects profiles and listings through a many-to-many relationship.

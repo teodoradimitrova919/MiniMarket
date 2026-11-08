@@ -1,0 +1,5 @@
+project_id = "MiniMarket"
+
+[functions.minimarket-admin]
+verify_jwt = true
+entrypoint = "./functions/minimarket-admin/index.ts"
