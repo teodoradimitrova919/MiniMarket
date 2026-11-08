@@ -16,6 +16,12 @@ Open the local URL printed by Vite. On Windows PowerShell with script execution 
 - `npm run build`: build to `dist/`.
 - `npm run preview`: serve the production build locally.
 
+## SQL migrations
+
+Database SQL is committed in [`supabase/migrations/`](supabase/migrations/). Open the [initial MiniMarket schema migration](supabase/migrations/20261108082659_initial_minimarket_schema.sql) to see all four tables, foreign keys, constraints, indexes, profile/timestamp triggers, grants, and 13 RLS policies.
+
+This migration is already applied to MiniMarket and matches Supabase's migration history. Subsequent frontend/service work required no additional schema migrations. Do not rerun or edit an applied migration; add a new migration for future database changes. See [database documentation](supabase/README.md).
+
 ## Current scope
 
 One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page folders. Home shows live categories/latest listings; Login/Register use Supabase Auth; Dashboard shows personal statistics. My Listings now shows an owned-listing table with View/Edit/Delete, and Add/Edit use a shared validated form with unsaved-change protection. Browse Listings, listing details, Favorites, and Admin remain placeholders. Unknown routes render Not Found.

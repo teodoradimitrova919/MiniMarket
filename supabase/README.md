@@ -4,7 +4,13 @@ The scoped MCP project is `kkcfqkwkdcqvnurbdxus`, matching the repository's Mini
 
 ## Migration history
 
-`migrations/20261108082659_initial_minimarket_schema.sql` was applied through MCP as `initial_minimarket_schema`. The local filename uses the version assigned by the remote migration runner; its SQL was compared with the recorded remote statements and matches exactly. Do not reapply this migration to the existing project or edit it after application. Add a new migration for future changes.
+The SQL files live in the committed [`migrations/` directory](migrations/):
+
+| Version | SQL file | Contents |
+| --- | --- | --- |
+| `20261108082659` | [initial_minimarket_schema.sql](migrations/20261108082659_initial_minimarket_schema.sql) | Four tables, UUID/FK constraints, indexes, signup and updated_at triggers, grants, and 13 RLS policies |
+
+This migration was applied through MCP as `initial_minimarket_schema`. The local filename uses the version assigned by the remote migration runner. On 2026-11-08, the local SQL and remote recorded statements were compared again and matched exactly. No later schema changes have been made, so no additional SQL migrations are required for the existing UI/service features. Do not reapply this migration to the existing project or edit it after application. Add a new migration for future changes.
 
 ## Tables and permissions
 
