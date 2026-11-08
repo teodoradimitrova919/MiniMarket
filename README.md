@@ -24,7 +24,7 @@ This migration is already applied to MiniMarket and matches Supabase's migration
 
 ## Current scope
 
-One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page folders. Home shows live categories/latest listings; Login/Register use Supabase Auth; Dashboard shows personal statistics. My Listings now shows an owned-listing table with View/Edit/Delete, and Add/Edit use a shared validated form with unsaved-change protection. Browse Listings, listing details, Favorites, and Admin remain placeholders. Unknown routes render Not Found.
+One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page folders. Home shows live categories/latest listings; Login/Register use Supabase Auth; Dashboard shows personal statistics. My Listings shows an owned-listing table with View/Edit/Delete, and Add/Edit use a shared validated form with unsaved-change protection. Browse Listings supports public search, category filters, and sorting. Listing details, Favorites, and Admin remain placeholders. Unknown routes render Not Found.
 
 The History API router supports internal navigation, Back/Forward, active links, page titles, focus movement, and mount/unmount cleanup. External links, modified clicks, downloads, and same-page fragments retain browser behavior. Vite handles direct URLs locally; `netlify.toml` supplies the future hosting fallback. No deployment has been performed.
 
@@ -35,6 +35,8 @@ See [authentication setup and verification](src/services/AUTH.md) for the verifi
 Reusable Bootstrap [toast notifications](src/components/toast/README.md) provide success/error/info messages from one shared shell container. Existing mutation services and Home failures supply curated feedback; auth/form errors remain inline and routine reads/login/navigation stay quiet. No new marketplace UI or upload features were added.
 
 ## My Listings and listing CRUD
+
+For public discovery, see [Browse Listings behavior and verification](src/pages/listings/README.md): combined title/category filters, URL/history support, and newest/price sorting over all loaded public listings.
 
 See [listing CRUD design and verification](src/pages/my-listings/README.md). The responsive owned-listing table uses joined category names and newest-first ordering. Add/Edit share a form, preserve failed submissions, and show validation near fields. Deletion requires a Bootstrap modal; related favorites are removed by the database cascade. Unsaved changes warn on links, Back/Forward, refresh, tab closing, and explicit logout; saved/pristine forms stay quiet. Run `npm run test:unsaved` for guard tests, in addition to `npm test` and `npm run test:auth`.
 
@@ -48,7 +50,7 @@ Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from `.env.example` 
 
 ## Home page behavior and verification
 
-Search submits through the shared History API router to `/listings?q=...`; category cards link to `/listings?category=<UUID>`. The Listings page does not filter yet. Detail links lead to their placeholder. Post an Ad redirects visitors to Login and preserves a safe internal return URL. Categories and recent listings have independent loading, empty, error, and retry states. Page cleanup removes listeners and prevents late responses from rendering after navigation.
+Search submits through the shared History API router to `/listings?search=...`; category cards link to `/listings?category=<UUID>`. Browse initializes both filters from these links. Detail links lead to their placeholder. Post an Ad redirects visitors to Login and preserves a safe internal return URL. Categories and recent listings have independent loading, empty, error, and retry states. Page cleanup removes listeners and prevents late responses from rendering after navigation.
 
 Verified with live public Supabase reads, eight-row ordering/limit, search encoding, category/detail/CTA links, Back/Forward, direct loading/refresh, and desktop/tablet/mobile widths (1440, 768, 375, 320px). Controlled browser responses check loading/empty/error/retry, unsafe text/image handling, broken image fallback, and unmount cleanup without modifying database records. Service tests and the production build pass.
 

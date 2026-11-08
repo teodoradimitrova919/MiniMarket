@@ -11,6 +11,10 @@
 .listing-card .card-body { display: flex; flex-direction: column; padding: 1.2rem; }
 .listing-card-category { color: #65755f; font-size: .72rem; margin-bottom: .45rem; }
 .listing-card-title { font-size: 1rem; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; margin-bottom: auto; }
+.listing-card-title, .listing-card-description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.listing-card-description { -webkit-line-clamp: 3; font-size: .85rem; line-height: 1.6; color: #647168; margin: .75rem 0 auto; overflow-wrap: anywhere; }
+.listing-card [hidden] { display: none !important; }
+.listing-card .card-body { flex: 1; min-width: 0; }
 .listing-card-price { color: #22664d; font-weight: 750; font-size: 1.15rem; }
 .listing-card-arrow { display: grid; place-items: center; height: 28px; width: 28px; background: #f1f5ed; border-radius: 50%; color: #22664d; }
 @media (prefers-reduced-motion: reduce) { .listing-card { transition: none; } .listing-card:hover { transform: none; } }

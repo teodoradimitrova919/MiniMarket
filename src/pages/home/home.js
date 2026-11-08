@@ -102,7 +102,7 @@ export function mount(container, { navigate } = {}) {
     if (!navigate) return;
     event.preventDefault();
     const term = new FormData(event.currentTarget).get('q').trim();
-    navigate(term ? `/listings?${new URLSearchParams({ q: term })}` : '/listings');
+    navigate(term ? `/listings?${new URLSearchParams({ search: term })}` : '/listings');
   }, { signal: events.signal });
 
   void loadCategories();

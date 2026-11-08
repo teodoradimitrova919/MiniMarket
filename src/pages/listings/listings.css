@@ -1,1 +1,13 @@
-.page-listings { --page-accent: #22664d; }
+.browse-heading { margin-bottom: 1.75rem; }
+.browse-heading h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 750; letter-spacing: -.04em; }
+.browse-heading > p:last-child { color: #657368; margin: .75rem 0 0; }
+.browse-filters { background: #fff; border: 1px solid #dfe6dc; border-radius: 1rem; padding: clamp(1rem, 3vw, 1.5rem); margin-bottom: 2rem; }
+.browse-filters .form-label { font-size: .85rem; font-weight: 650; }
+.browse-filters .form-control, .browse-filters .form-select { border-color: #ccd7c8; }
+.browse-filters .form-control:focus, .browse-filters .form-select:focus { border-color: #22664d; box-shadow: 0 0 0 .2rem #22664d22; }
+.browse-count { color: #657368; font-size: .85rem; }
+.browse-clear { color: #22664d; font-size: .85rem; white-space: nowrap; text-underline-offset: 3px; }
+.browse-feedback { text-align: center; padding: 3rem 1rem; color: #657368; border: 1px dashed #ccd7c8; border-radius: 1rem; }
+.browse-feedback .btn { margin-top: 1rem; }
+.page-listings [hidden] { display: none !important; }
+.page-listings [data-browse-grid] > div { min-width: 0; }

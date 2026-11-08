@@ -24,6 +24,7 @@ const routes = [
 
 export function createRouter(container, onNavigate, { auth }) {
   let cleanup;
+  let mountedPath;
   let accessKey;
   let currentIndex = Number.isInteger(history.state?.minimarketIndex) ? history.state.minimarketIndex : 0;
   let currentUrl = location.href;
@@ -38,13 +39,19 @@ export function createRouter(container, onNavigate, { auth }) {
     if (!replace) currentIndex += 1;
     history[replace ? 'replaceState' : 'pushState']({ ...history.state, minimarketIndex: currentIndex }, '', url.pathname + url.search + url.hash);
     currentUrl = location.href;
-    render();
+    render({ preservePage: true });
     return true;
   }
-  function render() {
+  function render({ preservePage = false } = {}) {
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    // Opt-in pages update query-driven views without losing loaded data or focus.
+    if (preservePage && mountedPath === path && cleanup?.updateLocation) {
+      cleanup.updateLocation();
+      return;
+    }
     cleanup?.();
     cleanup = undefined;
-    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    mountedPath = undefined;
     const state = auth.getState();
     const accountPage = ['/login', '/register'].includes(path);
     const protectedPage = ['/dashboard', '/my-listings', '/favorites', '/listings/add', '/admin'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
@@ -72,6 +79,7 @@ export function createRouter(container, onNavigate, { auth }) {
     const page = match?.[1] ?? page10;
     const captures = match?.[0].exec(path);
     cleanup = page.mount(container, { navigate, auth, params: { id: captures?.[1] } });
+    mountedPath = path;
     document.title = page.title + ' | MiniMarket';
     onNavigate(path, state);
     const hashTarget = document.getElementById(window.location.hash.slice(1));
@@ -97,7 +105,7 @@ export function createRouter(container, onNavigate, { auth }) {
       return;
     }
     currentIndex = targetIndex; currentUrl = location.href;
-    render();
+    render({ preservePage: true });
   }
 
   function handleClick(event) {

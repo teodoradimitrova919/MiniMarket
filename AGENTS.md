@@ -98,9 +98,8 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: listings CRUD
+## Current phase: Browse Listings
 
-The shell, database/RLS, services, seed, Home, authentication, toasts, and Dashboard are complete. Implement My Listings plus shared Add/Edit forms and modal-confirmed deletion using existing services/RLS. Show only owned listings; allow admin editing under existing policy. Keep field validation inline, retain values on save failure, and warn about unsaved changes through router links/history and native unload. Use existing mutation toasts once. Do not implement listing details/browse filtering, Favorites/Admin pages, uploads, schema changes, extra dependencies, or deployment. Wait for further instructions after CRUD verification.
+The shell, database/RLS, services, seed, Home, authentication, toasts, Dashboard, and listing CRUD are complete. Implement public Browse Listings with reusable cards, title search, category filtering, price/newest sorting, and query-driven navigation/history. Keep data queries in existing services and use all public results rather than a truncated API page. Do not implement listing details, Favorites/Admin pages, uploads, schema changes, extra dependencies, or deployment. Wait for further instructions after Browse verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
-

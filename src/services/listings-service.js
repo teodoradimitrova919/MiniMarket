@@ -10,7 +10,7 @@ function listingsQuery(columns = '*') {
 }
 
 export async function getListings() {
-  return getAllRows(listingsQuery, 'Unable to load listings');
+  return getAllRows(() => listingsQuery('*, category:categories(name)'), 'Unable to load listings');
 }
 
 export async function getLatestListings() {

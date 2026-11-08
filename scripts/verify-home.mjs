@@ -52,11 +52,11 @@ try {
   await page.evaluate(() => { window.shellMarker = true; });
   await page.getByLabel('Search advertisements', { exact: true }).fill('  chair & lamp  ');
   await page.locator('[data-home-search]').getByRole('button').click();
-  assert.equal(new URL(page.url()).searchParams.get('q'), 'chair & lamp');
+  assert.equal(new URL(page.url()).searchParams.get('search'), 'chair & lamp');
   assert.equal(await page.locator('h1').textContent(), 'Browse Listings');
   assert.equal(await page.evaluate(() => window.shellMarker), true, 'Search uses the existing SPA router');
   await page.goBack(); await waitReady();
-  await page.goForward(); assert.equal(new URL(page.url()).searchParams.get('q'), 'chair & lamp');
+  await page.goForward(); assert.equal(new URL(page.url()).searchParams.get('search'), 'chair & lamp');
   await page.goBack(); await waitReady();
   await page.locator('[data-home-search]').getByRole('button').click();
   assert.equal(new URL(page.url()).search, '');

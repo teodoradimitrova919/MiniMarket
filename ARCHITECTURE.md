@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, toasts, and Dashboard are complete. The current phase adds My Listings and shared Add/Edit forms with modal-confirmed deletion and unsaved-change protection. Browse filtering, listing details, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [listing CRUD design and verification](src/pages/my-listings/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
+MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, toasts, Dashboard, and listing CRUD are complete. Browse Listings adds public cards, combined title/category filters, and sorting. Listing details, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [Browse design and verification](src/pages/listings/README.md), [listing CRUD](src/pages/my-listings/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
@@ -67,7 +67,7 @@ MiniMarket/
 `-- .gitignore
 ```
 
-The shell folders and configuration now exist. Empty service, utility, public, script, and migration folders are reserved using .gitkeep files. All routes currently render public placeholders; the Access column above describes future authorization requirements.
+Pages use separate HTML fragments, CSS, and JS modules within one Vite HTML shell. The router enforces existing account/admin guards and mount cleanup. Browse opts into a cleanup function's `updateLocation()` hook for query-only navigation, retaining fetched public data and control focus. Account-state changes still remount pages. Details, Favorites, and Admin retain placeholder content.
 
 ## Planned Supabase integration
 

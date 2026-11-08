@@ -1,8 +1,36 @@
-<section class="page-listings page-panel" aria-labelledby="page-title">
-  <span class="page-icon"><i class="bi bi-grid" aria-hidden="true"></i></span>
-  <p class="eyebrow">Your community marketplace</p>
-  <h1 id="page-title" tabindex="-1">Browse Listings</h1>
-  <h2 class="page-headline">Find something worth keeping.</h2>
-  <p class="page-description">This space will bring together listings from the community. Search and filters are coming in a future update.</p>
-  <span class="badge rounded-pill phase-badge">Coming in a future update</span>
+<section class="page-listings" aria-labelledby="page-title">
+  <div class="browse-heading">
+    <p class="eyebrow">Discover your next great find</p>
+    <h1 id="page-title" tabindex="-1">Browse Listings</h1>
+    <p>Good finds. Fair prices. A marketplace for everyone.</p>
+  </div>
+  <form class="browse-filters" data-browse-filters role="search" aria-label="Filter advertisements">
+    <div class="row g-3 align-items-end">
+      <div class="col-12 col-lg-5">
+        <label class="form-label" for="browse-search">Search by title</label>
+        <div class="input-group">
+          <input class="form-control" id="browse-search" name="search" type="search" placeholder="What are you looking for?">
+          <button class="btn btn-success" type="submit"><i class="bi bi-search me-1" aria-hidden="true"></i>Search</button>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-4">
+        <label class="form-label" for="browse-category">Category</label>
+        <select class="form-select" id="browse-category" name="category"><option value="">All Categories</option></select>
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label" for="browse-sort">Sort by</label>
+        <select class="form-select" id="browse-sort" name="sort">
+          <option value="newest">Newest First</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center gap-3 mt-3">
+      <p class="browse-count mb-0" data-browse-count role="status" aria-live="polite"></p>
+      <a href="/listings" class="browse-clear" data-clear-filters hidden>Clear filters</a>
+    </div>
+  </form>
+  <div class="browse-feedback" data-browse-feedback role="status"></div>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" data-browse-grid aria-label="Advertisements"></div>
 </section>

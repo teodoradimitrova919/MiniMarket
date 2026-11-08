@@ -76,6 +76,7 @@ const rejectsCode = (promise, code) => assert.rejects(promise, (error) => error.
 reply([listing]);
 assert.deepEqual(await listings.getListings(), [listing]);
 assert.equal(last().table, 'listings');
+assert.deepEqual(step('select'), ['select', '*, category:categories(name)']);
 assert.deepEqual(last().steps.filter(([m]) => m === 'order'), [['order', 'created_at', { ascending: false }], ['order', 'id', { ascending: false }]]);
 assert.deepEqual(step('range'), ['range', 0, 99]);
 reply([listing]); assert.deepEqual(await listings.getLatestListings(), [listing]);
