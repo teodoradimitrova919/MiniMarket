@@ -33,6 +33,8 @@ Own-listing reads and all mutations call `auth.getUser()` first. Update/delete f
 All functions require a verified current user. IDs always come from that user, and reads/deletes explicitly filter by user_id in addition to RLS.
 
 - `getFavorites()` returns listing rows ordered by when they were saved (newest first), not favorite relationship rows. Null joined listings are omitted.
+- `getUserFavorites()` returns those rows with joined category names and batched private attachment thumbnails for the Favorites page.
+- `getFavoriteIds()` returns only the current user's saved listing IDs for one batched heart-state lookup per mounted view.
 - `addFavorite(listingId)` returns the created favorite relationship row. The unique database constraint handles duplicate/concurrent additions; duplicates reject with code `23505` and a friendly message.
 - `removeFavorite(listingId)` returns `true` when removed and `false` when already absent.
 - `isFavorite(listingId)` returns a boolean.
@@ -58,4 +60,4 @@ npm run build
 
 For this implementation, mocked checks, live anonymous reads, client checks, and the production build passed. The existing `scripts/verify-database.sql` was rerun separately through scoped MCP: visitor, owner, other-user, and administrator SQL role checks passed, including listing CRUD restrictions, category permissions, and private/unique favorites. Every fixture was rolled back; no schema changes were needed.
 
-The later [listing CRUD verification](../pages/my-listings/README.md) exercised real creation, owned-listing reads, update/delete, admin editing, and cross-user denial using temporary fixtures. Category mutations and favorites management UI remain deferred; their existing mocked/SQL checks are separate from UI integration verification.
+The later [listing CRUD verification](../pages/my-listings/README.md) exercised real creation, owned-listing reads, update/delete, admin editing, and cross-user denial using temporary fixtures. The [Favorites UI verification](../pages/favorites/README.md) covers the saved-card grid, shared heart controls, account isolation, and dashboard counts with temporary fixtures.

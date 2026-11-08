@@ -57,7 +57,7 @@ export function createListingModals({ auth, onChanged, focusFallback, deleteOper
     if (!active || opened) return;
     opened = 'view'; opener = trigger;
     dialogs.view.querySelector('[data-details-page]').href = `/listings/${encodeURIComponent(id)}`;
-    viewCleanup = mountListingDetails(dialogs.view.querySelector('[data-modal-details-host]'), { listingId: id });
+    viewCleanup = mountListingDetails(dialogs.view.querySelector('[data-modal-details-host]'), { listingId: id, auth });
     modals.view.show(trigger);
   }
   function openForm(id, trigger = document.activeElement) {

@@ -4,7 +4,12 @@ import { mountListingDetails } from '../../components/listing-details/listing-de
 
 export const title = 'Listing Details';
 
-export function mount(container, { params }) {
+export function mount(container, { params, auth }) {
   container.innerHTML = html;
-  return mountListingDetails(container.querySelector('[data-details-host]'), { listingId: params.id });
+  const back = container.querySelector('[data-back-my-listings]');
+  const updateNavigation = () => { back.hidden = !auth.getState().user; };
+  updateNavigation();
+  const unsubscribe = auth.subscribe(updateNavigation);
+  const disposeDetails = mountListingDetails(container.querySelector('[data-details-host]'), { listingId: params.id, auth });
+  return () => { unsubscribe(); disposeDetails(); };
 }

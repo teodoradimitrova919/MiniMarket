@@ -1,0 +1,5 @@
+.favorite-button { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border: 1px solid #dce6dc; border-radius: 50%; background: #fff; color: #22664d; box-shadow: 0 2px 8px #203d3210; }
+.favorite-button:hover { background: #edf4ed; border-color: #22664d; }
+.favorite-button:focus-visible { outline: 3px solid #8eb9a3; outline-offset: 3px; }
+.favorite-button:disabled { opacity: .6; cursor: wait; }
+.listing-card > .favorite-button { position: absolute; top: .75rem; right: .75rem; z-index: 1; }

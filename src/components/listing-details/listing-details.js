@@ -4,13 +4,15 @@ import { formatPrice } from '../../utils/format-price.js';
 import { safeImageUrl } from '../../utils/image-url.js';
 import { showError } from '../../services/toast-service.js';
 import { mountListingAttachments } from '../listing-attachments/listing-attachments.js';
+import { mountFavoriteControls } from '../favorite-controls.js';
 
-export function mountListingDetails(container, { listingId }) {
+export function mountListingDetails(container, { listingId, auth }) {
   container.innerHTML = html;
   const events = new AbortController();
   let active = true;
   let loading = false;
   let attachments;
+  let favorites;
   const status = container.querySelector('[data-details-status]');
   const content = container.querySelector('[data-details-content]');
   async function load() {
@@ -30,6 +32,11 @@ export function mountListingDetails(container, { listingId }) {
         container.querySelector(`[data-details-${name}]`).textContent = value;
       }
       const url = safeImageUrl(listing.image_url);
+      const favorite = container.querySelector('[data-favorite-id]');
+      favorite.dataset.favoriteId = listing.id;
+      favorite.dataset.favoriteTitle = listing.title;
+      favorites?.dispose();
+      favorites = mountFavoriteControls(container, { auth });
       if (url) {
         const image = container.querySelector('[data-details-image]');
         const placeholder = container.querySelector('[data-details-placeholder]');
@@ -61,5 +68,5 @@ export function mountListingDetails(container, { listingId }) {
     } finally { loading = false; if (active) container.setAttribute('aria-busy', 'false'); }
   }
   void load();
-  return () => { active = false; events.abort(); attachments?.dispose(); };
+  return () => { active = false; events.abort(); attachments?.dispose(); favorites?.dispose(); };
 }

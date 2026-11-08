@@ -4,12 +4,23 @@ import { validateId } from '../utils/validation.js';
 import { runQuery } from '../utils/service-errors.js';
 import { notifyMutation } from '../utils/operation-feedback.js';
 
-export async function getFavorites() {
+export async function getFavorites({ includeCategory = false } = {}) {
   const user = await requireUser();
-  const rows = await getAllRows(() => supabase.from('favorites').select('listing:listings(*)')
+  const rows = await getAllRows(() => supabase.from('favorites').select(includeCategory ? 'listing:listings(*,category:categories(name))' : 'listing:listings(*)')
     .eq('user_id', user.id).order('created_at', { ascending: false }).order('id', { ascending: false }),
   'Unable to load favorites');
   return rows.map((row) => row.listing).filter(Boolean);
+}
+
+export async function getUserFavorites() {
+  const { decorateAttachmentThumbnails } = await import('./attachment-service.js');
+  return decorateAttachmentThumbnails(await getFavorites({ includeCategory: true }));
+}
+
+export async function getFavoriteIds() {
+  const user = await requireUser();
+  const rows = await getAllRows(() => supabase.from('favorites').select('listing_id').eq('user_id', user.id).order('id'), 'Unable to load saved listings');
+  return rows.map(row => row.listing_id);
 }
 
 export async function addFavorite(listingId) {

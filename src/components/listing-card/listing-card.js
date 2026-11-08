@@ -7,9 +7,13 @@ import { safeImageUrl } from '../../utils/image-url.js';
 const template = document.createElement('template');
 template.innerHTML = html;
 
-export function createListingCard(listing, { signal, showDescription = false } = {}) {
+export function createListingCard(listing, { signal, showDescription = false, favorites = false } = {}) {
   const card = template.content.firstElementChild.cloneNode(true);
   const category = listing.category?.name || 'Uncategorized';
+  const favorite = card.querySelector('[data-favorite-id]');
+  favorite.hidden = !favorites;
+  favorite.dataset.favoriteId = listing.id;
+  favorite.dataset.favoriteTitle = listing.title;
   card.querySelector('[data-listing-title]').textContent = listing.title;
   card.querySelector('[data-listing-category]').textContent = category;
   card.querySelector('[data-listing-price]').textContent = formatPrice(listing.price);

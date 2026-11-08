@@ -4,6 +4,7 @@ import { createListingCard } from '../../components/listing-card/listing-card.js
 import { readListingFilters, resolveCategory, filterListings } from '../../utils/listing-filters.js';
 import { showError } from '../../services/toast-service.js';
 import { createListingModals, isPlainLinkClick } from '../../components/listing-modals/listing-modals.js';
+import { mountFavoriteControls } from '../../components/favorite-controls.js';
 
 export const title = 'Browse Listings';
 
@@ -20,6 +21,7 @@ export function mount(container, { navigate, auth }) {
   const category = form.elements.category;
   const sort = form.elements.sort;
   const grid = container.querySelector('[data-browse-grid]');
+  const favorites = mountFavoriteControls(grid, { auth });
   const count = container.querySelector('[data-browse-count]');
   const clear = container.querySelector('[data-clear-filters]');
   const feedback = container.querySelector('[data-browse-feedback]');
@@ -55,12 +57,13 @@ export function mount(container, { navigate, auth }) {
     for (const listing of matches) {
       const column = document.createElement('div');
       column.className = 'col';
-      const card = createListingCard(listing, { signal: cards.signal, showDescription: true });
+      const card = createListingCard(listing, { signal: cards.signal, showDescription: true, favorites: true });
       card.querySelector('[data-listing-link]').dataset.listingId = listing.id;
       column.append(card);
       content.append(column);
     }
     grid.replaceChildren(content);
+    favorites.refresh();
     feedback.hidden = matches.length > 0;
     feedback.textContent = listings.length ? 'No listings match your search and category. Try another search or clear the filters.' : 'No listings yet. Check back soon for new finds.';
     feedback.setAttribute('role', 'status');
@@ -120,7 +123,7 @@ export function mount(container, { navigate, auth }) {
   sort.addEventListener('change', applyFilters, { signal: events.signal });
   updateLocation();
   load();
-  const cleanup = () => { active = false; events.abort(); cards.abort(); modals.dispose(); };
+  const cleanup = () => { active = false; events.abort(); cards.abort(); favorites.dispose(); modals.dispose(); };
   cleanup.updateLocation = updateLocation;
   return cleanup;
 }

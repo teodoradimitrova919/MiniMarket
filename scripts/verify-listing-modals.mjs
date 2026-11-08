@@ -21,7 +21,10 @@ let dialogCount = 0;
 page.on('dialog', async dialog => { dialogCount++; await dialog[acceptDiscard ? 'accept' : 'dismiss'](); });
 const check = (result, action) => { if (result.error) throw new Error(`${action} failed.`); return result.data; };
 const modal = () => page.locator('#listing-form-modal');
-const ready = () => modal().locator('[data-listing-form]:not([hidden]) [data-listing-fields]:not([disabled])').waitFor();
+const ready = async () => {
+  await modal().locator('[data-listing-form]:not([hidden]) [data-listing-fields]:not([disabled])').waitFor();
+  await modal().locator('[data-save-listing]:not([disabled])').waitFor();
+};
 const tableReady = () => page.locator('[data-my-listings-table]:not([hidden])').waitFor();
 const writes = { POST:0, PATCH:0, DELETE:0 };
 let failWrite;
@@ -51,6 +54,7 @@ async function login(user) {
   await page.waitForURL(url => url.pathname === '/dashboard');
 }
 async function noBackdrop() {
+  await page.locator('.modal-backdrop').waitFor({ state:'detached' });
   assert.equal(await page.locator('.modal-backdrop').count(), 0);
   assert.equal(await page.locator('body').evaluate(body => body.classList.contains('modal-open')), false);
 }
