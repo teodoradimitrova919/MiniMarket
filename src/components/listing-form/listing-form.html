@@ -1,0 +1,18 @@
+<div class="listing-form-component">
+  <div data-listing-form-status aria-live="polite"></div>
+  <form class="listing-form-panel" data-listing-form novalidate hidden aria-busy="false">
+    <div class="alert alert-danger" data-save-error role="alert" tabindex="-1" hidden></div>
+    <fieldset data-listing-fields disabled>
+      <legend class="visually-hidden">Advertisement details</legend>
+      <div class="mb-4"><label class="form-label" for="listing-title">Title <span class="text-muted">(required)</span></label><input class="form-control" id="listing-title" name="title" type="text" required aria-describedby="listing-title-error"><div class="invalid-feedback" id="listing-title-error" data-error="title"></div></div>
+      <div class="mb-4"><label class="form-label" for="listing-description">Description <span class="text-muted">(optional)</span></label><textarea class="form-control" id="listing-description" name="description" rows="5" placeholder="Tell people a little about your item."></textarea></div>
+      <div class="row g-4 mb-4">
+        <div class="col-md-5"><label class="form-label" for="listing-price">Price (€) <span class="text-muted">(required)</span></label><input class="form-control" id="listing-price" name="price" type="number" min="0" max="9999999999.99" step="0.01" inputmode="decimal" required aria-describedby="listing-price-help listing-price-error"><div class="form-text" id="listing-price-help">Use zero for a free item. Up to two decimal places.</div><div class="invalid-feedback" id="listing-price-error" data-error="price"></div></div>
+        <div class="col-md-7"><label class="form-label" for="listing-category">Category <span class="text-muted">(required)</span></label><select class="form-select" id="listing-category" name="category_id" required aria-describedby="listing-category-error"><option value="">Choose a category</option></select><div class="invalid-feedback" id="listing-category-error" data-error="category_id"></div></div>
+      </div>
+    </fieldset>
+    <p class="listing-image-note"><i class="bi bi-image me-2" aria-hidden="true"></i>Images can be added in a future update.</p>
+    <div class="d-flex flex-wrap gap-2 pt-3 border-top"><button class="btn btn-primary" type="submit" data-save-listing>Save Listing</button><a class="btn btn-outline-secondary" href="/my-listings" data-cancel-listing>Cancel</a></div>
+  </form>
+  <a class="btn btn-outline-secondary mt-3" href="/my-listings" data-form-back>Back to My Listings</a>
+</div>

@@ -25,11 +25,21 @@ const routes = [
 export function createRouter(container, onNavigate, { auth }) {
   let cleanup;
   let accessKey;
+  let currentIndex = Number.isInteger(history.state?.minimarketIndex) ? history.state.minimarketIndex : 0;
+  let currentUrl = location.href;
+  let restoringPop = false;
+  history.replaceState({ ...history.state, minimarketIndex: currentIndex }, '', location.href);
+  const canLeave = () => !cleanup?.canLeave || cleanup.canLeave();
   function navigate(to, { replace = false } = {}) {
     const url = new URL(to, window.location.href);
-    if (url.origin !== window.location.origin || !['http:', 'https:'].includes(url.protocol)) return;
-    if (url.href !== location.href) history[replace ? 'replaceState' : 'pushState'](null, '', url.pathname + url.search + url.hash);
+    if (url.origin !== window.location.origin || !['http:', 'https:'].includes(url.protocol)) return false;
+    if (url.href === location.href) return true;
+    if (!canLeave()) return false;
+    if (!replace) currentIndex += 1;
+    history[replace ? 'replaceState' : 'pushState']({ ...history.state, minimarketIndex: currentIndex }, '', url.pathname + url.search + url.hash);
+    currentUrl = location.href;
     render();
+    return true;
   }
   function render() {
     cleanup?.();
@@ -60,7 +70,8 @@ export function createRouter(container, onNavigate, { auth }) {
     }
     const match = routes.find(([pattern]) => pattern.test(path));
     const page = match?.[1] ?? page10;
-    cleanup = page.mount(container, { navigate, auth });
+    const captures = match?.[0].exec(path);
+    cleanup = page.mount(container, { navigate, auth, params: { id: captures?.[1] } });
     document.title = page.title + ' | MiniMarket';
     onNavigate(path, state);
     const hashTarget = document.getElementById(window.location.hash.slice(1));
@@ -68,6 +79,25 @@ export function createRouter(container, onNavigate, { auth }) {
     focusTarget.focus({ preventScroll: true });
     if (hashTarget) hashTarget.scrollIntoView();
     else window.scrollTo(0, 0);
+  }
+
+  function handlePopState(event) {
+    if (restoringPop) { restoringPop = false; return; }
+    const targetIndex = Number.isInteger(event.state?.minimarketIndex) ? event.state.minimarketIndex : currentIndex;
+    const previous = new URL(currentUrl);
+    // Native fragment history should not unmount or discard the current form.
+    if (location.pathname === previous.pathname && location.search === previous.search) {
+      currentIndex = targetIndex; currentUrl = location.href; return;
+    }
+    if (!canLeave()) {
+      if (targetIndex !== currentIndex) {
+        restoringPop = true;
+        history.go(currentIndex - targetIndex);
+      } else history.replaceState({ ...history.state, minimarketIndex: currentIndex }, '', currentUrl);
+      return;
+    }
+    currentIndex = targetIndex; currentUrl = location.href;
+    render();
   }
 
   function handleClick(event) {
@@ -83,19 +113,19 @@ export function createRouter(container, onNavigate, { auth }) {
   }
 
   document.addEventListener('click', handleClick);
-  window.addEventListener('popstate', render);
+  window.addEventListener('popstate', handlePopState);
   const unsubscribe = auth.subscribe((state) => {
     const nextKey = `${state.ready}:${state.user?.id || ''}:${state.profile?.role || ''}:${state.error || ''}`;
     if (nextKey !== accessKey) { accessKey = nextKey; render(); }
   });
   render();
   return {
-    navigate,
+    navigate, canLeave,
     dispose() {
       cleanup?.();
       unsubscribe();
       document.removeEventListener('click', handleClick);
-      window.removeEventListener('popstate', render);
+      window.removeEventListener('popstate', handlePopState);
     },
   };
 }

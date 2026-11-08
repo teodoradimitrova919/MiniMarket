@@ -11,6 +11,7 @@ const disposeToasts = initializeToasts();
 const auth = createAuthState();
 const header = mountHeader(document.querySelector('#site-header'), {
   async onLogout() {
+    if (!router.canLeave()) return;
     const { logout } = await import('./services/auth-service.js');
     await logout();
     await auth.refresh();

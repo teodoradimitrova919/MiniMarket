@@ -18,15 +18,19 @@ Open the local URL printed by Vite. On Windows PowerShell with script execution 
 
 ## Current scope
 
-One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page folders. Home at `/` has a search hero, live category shortcuts, eight latest listings, How It Works, and account links. Login and Register use Supabase Auth. The protected `/dashboard` shows personal statistics and navigation shortcuts. Listings, listing details, add/edit, My Listings, Favorites, and Admin remain placeholders. Unknown routes render Not Found.
+One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page folders. Home shows live categories/latest listings; Login/Register use Supabase Auth; Dashboard shows personal statistics. My Listings now shows an owned-listing table with View/Edit/Delete, and Add/Edit use a shared validated form with unsaved-change protection. Browse Listings, listing details, Favorites, and Admin remain placeholders. Unknown routes render Not Found.
 
 The History API router supports internal navigation, Back/Forward, active links, page titles, focus movement, and mount/unmount cleanup. External links, modified clicks, downloads, and same-page fragments retain browser behavior. Vite handles direct URLs locally; `netlify.toml` supplies the future hosting fallback. No deployment has been performed.
 
-Registration, login, logout, session restoration, and protected routes are implemented. Dashboard, My Listings, Favorites, Add Listing, and Edit Listing require authentication; Admin additionally requires a verified administrator profile. Header links reflect the current session and role. Login and active-session registration default to Dashboard, while safe return URLs take priority. The Supabase database, RLS policies, and services remain the authorization/data boundary. Listing management, Favorites/Admin functionality, uploads, Storage integration, and deployment remain deferred.
+Registration, login, logout, session restoration, and protected routes are implemented. Dashboard, My Listings, Favorites, Add Listing, and Edit Listing require authentication; Admin additionally requires a verified administrator profile. Login/active-session registration default to Dashboard, with safe return URLs taking priority. Listing mutations use existing services and RLS; regular users edit/delete only owned listings, and admins retain existing policy permissions. Favorites/Admin functionality, uploads, Storage integration, and deployment remain deferred.
 
 See [authentication setup and verification](src/services/AUTH.md) for the verified email-confirmation setting, session design, and browser tests. Run `npm run test:auth` for the auth state/validation checks.
 
 Reusable Bootstrap [toast notifications](src/components/toast/README.md) provide success/error/info messages from one shared shell container. Existing mutation services and Home failures supply curated feedback; auth/form errors remain inline and routine reads/login/navigation stay quiet. No new marketplace UI or upload features were added.
+
+## My Listings and listing CRUD
+
+See [listing CRUD design and verification](src/pages/my-listings/README.md). The responsive owned-listing table uses joined category names and newest-first ordering. Add/Edit share a form, preserve failed submissions, and show validation near fields. Deletion requires a Bootstrap modal; related favorites are removed by the database cascade. Unsaved changes warn on links, Back/Forward, refresh, tab closing, and explicit logout; saved/pristine forms stay quiet. Run `npm run test:unsaved` for guard tests, in addition to `npm test` and `npm run test:auth`.
 
 ## Dashboard
 

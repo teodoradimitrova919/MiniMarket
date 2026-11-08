@@ -38,4 +38,4 @@ State tests cover validation, safe return URLs, initialization, profile-based ro
 
 Browser verification passed for real registration and the trigger-created user profile, valid/invalid login, logout to Home, refresh persistence, visitor/user/admin header links and guards, safe return URLs, Back/Forward, cross-tab logout, expired-session handling, responsive layouts, and confirmation-without-session/duplicate-submit behavior. The last two branches use controlled responses and send no email. Temporary registration accounts were removed through the server-side Auth Admin API; existing demo accounts/passwords were not modified. Server credentials are used only by the Node test cleanup, never sent to the browser.
 
-Listing CRUD forms, Favorites/Admin functionality, image uploads, and deployment are outside this phase.
+Listing CRUD forms were added in the subsequent [My Listings phase](../pages/my-listings/README.md), including an unsaved-change check before explicit logout. Favorites/Admin functionality, image uploads, and deployment remain deferred.

@@ -1,0 +1,15 @@
+.listing-form-component { max-width: 820px; }
+.listing-form-panel { padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid #dfe7da; background: #fff; border-radius: 1.25rem; }
+.listing-form-panel .form-label { font-size: .9rem; font-weight: 650; }
+.listing-form-panel .form-label span { font-size: .8rem; font-weight: 400; }
+.listing-form-panel .form-control, .listing-form-panel .form-select { padding: .7rem .85rem; border-radius: .6rem; }
+.listing-form-panel textarea { resize: vertical; }
+.listing-form-panel .form-control:focus, .listing-form-panel .form-select:focus { border-color: #22664d; box-shadow: 0 0 0 .2rem #22664d22; }
+.listing-form-component [hidden] { display: none !important; }
+.listing-form-feedback { padding: 2rem; border: 1px dashed #cbd7c4; border-radius: 1rem; background: #eef3e8; color: #4f6849; }
+.listing-form-feedback p { margin-bottom: 0; }
+.listing-form-feedback .btn { margin-top: 1rem; }
+.listing-image-note { font-size: .83rem; color: #687862; margin-bottom: 1.5rem; }
+.listing-editor-heading { margin-bottom: 2rem; }
+.listing-editor-heading h1 { font-size: clamp(2.2rem, 4vw, 3.3rem); }
+.listing-editor-heading > p:last-child { color: #62765b; line-height: 1.7; }

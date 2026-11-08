@@ -98,9 +98,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: user Dashboard
+## Current phase: listings CRUD
 
-The shell, database/RLS, services, seed, Home, authentication, and toasts are complete. Add only the authenticated `/dashboard` overview: exact user-scoped listing/favorite counts, distinct categories across all listing pages, responsive statistics/navigation cards, loading/empty/error states, and stale-response cleanup. Dashboard is the default signed-in landing page; safe internal return URLs take priority. Keep `/my-listings` unchanged. Do not add listing CRUD forms, Favorites/Admin functionality, uploads, dependencies, schema changes, or deployment. Wait for further instructions after Dashboard verification.
+The shell, database/RLS, services, seed, Home, authentication, toasts, and Dashboard are complete. Implement My Listings plus shared Add/Edit forms and modal-confirmed deletion using existing services/RLS. Show only owned listings; allow admin editing under existing policy. Keep field validation inline, retain values on save failure, and warn about unsaved changes through router links/history and native unload. Use existing mutation toasts once. Do not implement listing details/browse filtering, Favorites/Admin pages, uploads, schema changes, extra dependencies, or deployment. Wait for further instructions after CRUD verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

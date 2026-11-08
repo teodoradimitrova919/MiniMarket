@@ -24,7 +24,7 @@ export async function getListingById(id) {
 
 export async function getMyListings() {
   const user = await requireUser();
-  return getAllRows(() => listingsQuery().eq('owner_id', user.id), 'Unable to load your listings');
+  return getAllRows(() => listingsQuery('*, category:categories(name)').eq('owner_id', user.id), 'Unable to load your listings');
 }
 
 export async function createListing(data) {

@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, and toasts are complete. The current phase adds the protected user Dashboard and exact personal statistics, with Dashboard as the default signed-in landing page. Listing management forms, filtering, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [Dashboard design and verification](src/pages/dashboard/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
+MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, toasts, and Dashboard are complete. The current phase adds My Listings and shared Add/Edit forms with modal-confirmed deletion and unsaved-change protection. Browse filtering, listing details, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [listing CRUD design and verification](src/pages/my-listings/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
@@ -11,6 +11,7 @@ Core features are browsing and searching listings, account registration and logi
 - **Entry point:** `src/main.js` initializes the shared layout and router.
 - **Router:** one History API router waits for session initialization on protected/auth pages, applies authentication/admin guards, passes navigate/auth to page mounts, and calls cleanup before navigation. Pages remove listeners and ignore stale responses on unmount. RLS enforces database authorization.
 - **Pages:** each page has its own JavaScript module and separate CSS and HTML fragments. Fragments contain no `html`, `head`, or `body` elements.
+- **Listing editor:** Add/Edit mount one shared form component. Page cleanup may expose canLeave; the router checks it for links/history and restores canceled traversals using indexed entries. Native beforeunload protection is active only for dirty forms. Auth changes still unmount immediately.
 - **Shared components:** header, navigation, footer, listing cards, and reusable status feedback. Substantial components keep HTML, CSS, and JavaScript separate.
 - **Notifications:** the shell initializes one toast service. Data mutation services publish curated outcome events through a small utility; they do not render Bootstrap UI. Validation/auth errors remain inline and successful reads/navigation stay quiet. Toast instances/listeners are disposed on removal or shell teardown.
 - **Services:** listing, category, favorite, and Auth services share one Supabase client and isolate backend details from pages. Home reads public data. A small Auth state module coordinates verified users/profiles and SDK subscriptions; storage operations remain deferred.

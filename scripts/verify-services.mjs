@@ -90,6 +90,7 @@ assert.ok(hasFilter('id', listingId));
 reply(null); assert.equal(await listings.getListingById(listingId), null);
 reply([listing]); assert.deepEqual(await listings.getMyListings(), [listing]);
 assert.ok(hasFilter('owner_id', userId));
+assert.deepEqual(step('select'), ['select', '*, category:categories(name)']);
 assert.equal(feedback.length, 0, 'Successful reads do not notify');
 
 reply(listing);

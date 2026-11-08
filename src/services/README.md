@@ -13,7 +13,7 @@ For the implemented registration/login/logout, session state, and protected rout
 | `getListings()` | All listing rows, newest first; ID breaks timestamp ties |
 | `getLatestListings()` | Up to eight newest rows with nested `category.name`, for Home |
 | `getListingById(id)` | Listing row, or `null` if absent |
-| `getMyListings()` | Current user's rows, newest first |
+| `getMyListings()` | Current user's rows, newest first, with nested `category.name` |
 | `createListing(data)` | Created row |
 | `updateListing(id, data)` | Updated row; accepts partial changes |
 | `deleteListing(id)` | `{ id }` of the deleted row |
@@ -58,4 +58,4 @@ npm run build
 
 For this implementation, mocked checks, live anonymous reads, client checks, and the production build passed. The existing `scripts/verify-database.sql` was rerun separately through scoped MCP: visitor, owner, other-user, and administrator SQL role checks passed, including listing CRUD restrictions, category permissions, and private/unique favorites. Every fixture was rolled back; no schema changes were needed.
 
-**Not performed during service implementation:** authenticated JavaScript service integration calls using real user/admin sessions; no Auth test accounts existed at that time. The later [demo seed](../../scripts/SEED.md) adds demo accounts and records. Real-session service creation, own-listing retrieval, update/delete, cross-user rejection, category admin mutations, and favorite mutations/privacy/duplicates still need service integration verification. SQL role checks and mocked service checks do not substitute for those calls.
+The later [listing CRUD verification](../pages/my-listings/README.md) exercised real creation, owned-listing reads, update/delete, admin editing, and cross-user denial using temporary fixtures. Category mutations and favorites management UI remain deferred; their existing mocked/SQL checks are separate from UI integration verification.
