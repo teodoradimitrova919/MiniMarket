@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: initial database setup
+## Current phase: database services
 
-The application shell is complete. This phase adds the shared Supabase client, the initial profiles/categories/listings/favorites schema, secure signup profile creation, RLS policies, synchronized migrations, and database verification only. All UI routes remain placeholders. Do not implement forms, login/registration flows, listing CRUD services, Storage, marketplace features, or deployment. Wait for further instructions after completing database setup.
+The shell and initial database/RLS setup are complete. This phase adds listings, categories, and favorites service modules with shared validation, clear errors, and controlled tests. Use the existing client and schema; RLS remains the authorization boundary. All UI routes remain placeholders. Do not implement forms, login/registration flows, image uploads, Storage, additional marketplace features, or deployment. Wait for further instructions after completing the service layer.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

@@ -22,7 +22,7 @@ One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page f
 
 The History API router supports internal navigation, Back/Forward, active links, page titles, focus movement, and mount/unmount cleanup. External links, modified clicks, downloads, and same-page fragments retain browser behavior. Vite handles direct URLs locally; `netlify.toml` supplies the future hosting fallback. No deployment has been performed.
 
-Frontend authentication and route guards are deferred; placeholder routes are public. The initial Supabase database and RLS policies are implemented, with a shared client module ready for future services. There are no forms, advertisement cards, listing CRUD services, Storage integration, or deployment. See [database design, migrations, and verification](supabase/README.md).
+Frontend authentication and route guards are deferred; placeholder routes are public. The Supabase database, RLS policies, shared client, and listings/categories/favorites services are implemented. There are no forms, advertisement cards, login/registration flows, Storage integration, or deployment. See [database design and migrations](supabase/README.md) and [service contracts and verification limitations](src/services/README.md). Run `npm test` for controlled service tests.
 
 ## Environment
 
