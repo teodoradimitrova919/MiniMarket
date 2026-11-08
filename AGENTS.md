@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: authentication
+## Current phase: toast notifications
 
-The shell, database/RLS, services, seed, and Home are complete. Implement registration/login/logout, SDK session restoration, session-aware navigation, and authentication/admin route guards only. Registration uses the existing profile trigger and always defaults to user; roles come from profiles, not editable metadata. Preserve safe internal return URLs and clean up stale state/listeners on account changes. Keep listing CRUD forms, Favorites/Admin functionality, uploads, Storage, and deployment deferred. Do not reset demo passwords or change schema/RLS unnecessarily. Wait for further instructions after authentication verification.
+The shell, database/RLS, services, seed, Home, and authentication are complete. Add reusable Bootstrap success/error/info toasts with one shell container, safe text, accessible live regions, auto/manual dismissal, deduplication, and cleanup. Integrate only existing operations; keep validation/auth errors inline and routine reads/navigation/auth successes quiet. Do not change auth/authorization logic or schema, add missing marketplace/UI/upload functionality, dependencies, or deployment. Wait for further instructions after toast verification.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

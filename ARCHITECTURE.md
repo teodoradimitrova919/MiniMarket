@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, demo seed, and Home are complete. The current phase adds registration/login/logout, SDK session restoration, role-aware navigation, and protected routes. Other marketplace pages remain placeholders. Listing management forms, filtering, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [database design](supabase/README.md), [service contracts](src/services/README.md), and [authentication design and verification](src/services/AUTH.md).
+MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, and authentication are complete. The current phase adds reusable Bootstrap toasts in one shell container, fed by existing operation outcomes and page errors. Auth rules and schema remain unchanged. Listing management forms, filtering, Favorites/Admin functionality, uploads, Storage, and deployment remain deferred. See [database design](supabase/README.md), [authentication](src/services/AUTH.md), and [toast architecture and verification](src/components/toast/README.md).
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 
@@ -12,6 +12,7 @@ Core features are browsing and searching listings, account registration and logi
 - **Router:** one History API router waits for session initialization on protected/auth pages, applies authentication/admin guards, passes navigate/auth to page mounts, and calls cleanup before navigation. Pages remove listeners and ignore stale responses on unmount. RLS enforces database authorization.
 - **Pages:** each page has its own JavaScript module and separate CSS and HTML fragments. Fragments contain no `html`, `head`, or `body` elements.
 - **Shared components:** header, navigation, footer, listing cards, and reusable status feedback. Substantial components keep HTML, CSS, and JavaScript separate.
+- **Notifications:** the shell initializes one toast service. Data mutation services publish curated outcome events through a small utility; they do not render Bootstrap UI. Validation/auth errors remain inline and successful reads/navigation stay quiet. Toast instances/listeners are disposed on removal or shell teardown.
 - **Services:** listing, category, favorite, and Auth services share one Supabase client and isolate backend details from pages. Home reads public data. A small Auth state module coordinates verified users/profiles and SDK subscriptions; storage operations remain deferred.
 - **Utilities:** form validation, price formatting, and safe rendering. Prefer DOM text APIs for user content; never interpolate untrusted values into HTML.
 - **Styles:** Bootstrap 5 and Bootstrap Icons, with a small shared stylesheet for consistent colors, typography, spacing, and responsive behavior.

@@ -105,6 +105,7 @@ try {
   mode = 'error'; await page.reload();
   await page.locator(`${categoryRegion} [role="alert"]`).waitFor();
   await page.locator(`${listingRegion} [role="alert"]`).waitFor();
+  assert.equal(await page.locator('.minimarket-toast-error').count(), 1, 'A combined Home load failure has one notification');
   mode = 'content';
   await page.locator(listingRegion).getByRole('button', { name: 'Try again' }).click();
   await page.locator('.listing-card').waitFor();

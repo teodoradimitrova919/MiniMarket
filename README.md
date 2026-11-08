@@ -26,6 +26,8 @@ Registration, login, logout, session restoration, and protected routes are imple
 
 See [authentication setup and verification](src/services/AUTH.md) for the verified email-confirmation setting, session design, and browser tests. Run `npm run test:auth` for the auth state/validation checks.
 
+Reusable Bootstrap [toast notifications](src/components/toast/README.md) provide success/error/info messages from one shared shell container. Existing mutation services and Home failures supply curated feedback; auth/form errors remain inline and routine reads/login/navigation stay quiet. No new marketplace UI or upload features were added.
+
 ## Environment
 
 Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from `.env.example` in `.env.local`, then restart Vite to load Home data. Missing configuration or failed requests show section error states while the shell remains usable. Vite client variables are public; never use service-role or secret keys. Keep privileged seed configuration only in `.env.seed.local`. Local environment files are ignored by Git.

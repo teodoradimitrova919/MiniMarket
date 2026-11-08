@@ -3,6 +3,10 @@ import { readFile } from 'node:fs/promises';
 import { SourceTextModule, SyntheticModule } from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
+const feedback = [];
+globalThis.window = new EventTarget();
+window.addEventListener('minimarket:operation-feedback', (event) => feedback.push(event.detail));
+
 // Replace only the shared client; execute the actual service and utility modules.
 async function loadServices(client) {
   const modules = new Map();
@@ -86,10 +90,12 @@ assert.ok(hasFilter('id', listingId));
 reply(null); assert.equal(await listings.getListingById(listingId), null);
 reply([listing]); assert.deepEqual(await listings.getMyListings(), [listing]);
 assert.ok(hasFilter('owner_id', userId));
+assert.equal(feedback.length, 0, 'Successful reads do not notify');
 
 reply(listing);
 assert.deepEqual(await listings.createListing({ ...input, owner_id: otherId, id: otherId, created_at: 'bad' }), listing);
 assert.deepEqual(step('insert')[1], { title: 'Desk', category_id: categoryId, price: 12.5, owner_id: userId });
+assert.deepEqual(feedback.at(-1), { type: 'success', message: 'Listing created successfully.' });
 reply(listing);
 assert.deepEqual(await listings.updateListing(listingId, { title: ' New title ', owner_id: otherId, updated_at: 'bad' }), listing);
 assert.deepEqual(step('update')[1], { title: 'New title' });
@@ -100,8 +106,10 @@ for (const operation of [() => listings.updateListing(listingId, input), () => l
   reply(null); await rejectsCode(operation(), 'NOT_FOUND_OR_FORBIDDEN');
 }
 fail('42501'); await rejectsCode(listings.updateListing(listingId, input), '42501');
+assert.match(feedback.at(-1).message, /permission/);
 
 const beforeValidation = requests.length;
+const feedbackBeforeValidation = feedback.length;
 for (const price of ['', ' ', null, true, false, [], {}, NaN, Infinity, -1, '-1', '12abc', '1e2', '0x10', '1.234', 10000000000]) {
   await rejectsCode(listings.createListing({ ...input, price }), 'VALIDATION_ERROR');
 }
@@ -111,6 +119,7 @@ for (const data of [null, [], {}, { ...input, title: ' ' }, { ...input, category
 await rejectsCode(listings.updateListing(listingId, { owner_id: otherId }), 'VALIDATION_ERROR');
 await rejectsCode(listings.getListingById('not-an-id'), 'VALIDATION_ERROR');
 assert.equal(requests.length, beforeValidation, 'Invalid input never sends a query');
+assert.equal(feedback.length, feedbackBeforeValidation, 'Validation stays inline without toast feedback');
 reply(listing); await listings.createListing({ ...input, price: 0 }); assert.equal(step('insert')[1].price, 0);
 reply(listing); await listings.updateListing(listingId, { description: '', image_url: null });
 assert.deepEqual(step('update')[1], { description: null, image_url: null });
@@ -150,7 +159,9 @@ assert.ok(hasFilter('user_id', userId) && hasFilter('listing_id', listingId));
 reply(null); assert.equal(await favorites.isFavorite(listingId), false);
 reply({ id: 'favorite' }); assert.equal(await favorites.removeFavorite(listingId), true);
 assert.ok(hasFilter('user_id', userId) && hasFilter('listing_id', listingId));
+const beforeMissingFavorite = feedback.length;
 reply(null); assert.equal(await favorites.removeFavorite(listingId), false);
+assert.equal(feedback.length, beforeMissingFavorite, 'Already-absent favorites do not show a removal success');
 await rejectsCode(favorites.addFavorite('invalid'), 'VALIDATION_ERROR');
 
 fail('XX000'); await assert.rejects(listings.getListings(), (error) => error.code === 'XX000' && !error.message.includes('Internal database details'));
@@ -177,6 +188,11 @@ assert.equal(requests.length, beforeAuth, 'Missing authentication never sends da
 reply([]); assert.deepEqual(await listings.getListings(), []);
 reply([]); assert.deepEqual(await categories.getCategories(), []);
 assert.equal(responses.length, 0);
+for (const message of ['Listing updated successfully.', 'Listing deleted successfully.', 'Category created successfully.', 'Category updated successfully.', 'Category deleted successfully.', 'Listing added to favorites.', 'Listing removed from favorites.']) {
+  assert.ok(feedback.some((event) => event.type === 'success' && event.message === message));
+}
+assert.ok(feedback.every((event) => !/Internal database details|XX000|23505|42501/.test(event.message)));
+delete globalThis.window;
 console.log('PASS: mocked services — queries, pagination, authenticated IDs, field allowlists, validation, return values, duplicates, errors, and authentication gates.');
 
 if (process.argv.includes('--live')) {

@@ -1,0 +1,14 @@
+<div class="toast-container minimarket-toasts position-fixed top-0 end-0 p-3" id="minimarket-toasts" role="region" aria-label="Notifications">
+  <div class="toast-stack" data-toast-region="assertive" aria-live="assertive" aria-atomic="false"></div>
+  <div class="toast-stack" data-toast-region="polite" aria-live="polite" aria-atomic="false"></div>
+  <template data-toast-template>
+    <div class="toast minimarket-toast" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi me-2" data-toast-icon aria-hidden="true"></i>
+        <strong class="me-auto" data-toast-title></strong>
+        <button class="btn-close ms-3" type="button" data-bs-dismiss="toast" aria-label="Dismiss notification"></button>
+      </div>
+      <div class="toast-body" data-toast-message></div>
+    </div>
+  </template>
+</div>

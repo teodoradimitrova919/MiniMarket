@@ -10,6 +10,7 @@ import * as page8 from './pages/favorites/favorites.js';
 import * as page9 from './pages/admin/admin.js';
 import * as page10 from './pages/not-found/not-found.js';
 import { safeReturnUrl } from './utils/auth-validation.js';
+import { showError } from './services/toast-service.js';
 
 // Static /listings/add must precede the parameterized detail route.
 const routes = [
@@ -47,6 +48,7 @@ export function createRouter(container, onNavigate, { auth }) {
       return;
     }
     if (path === '/admin' && state.profile?.role !== 'admin') {
+      showError('You do not have permission to open the Admin Dashboard.');
       navigate('/my-listings', { replace: true });
       return;
     }

@@ -5,7 +5,9 @@ import { mountHeader } from './components/header/header.js';
 import { mountFooter } from './components/footer/footer.js';
 import { createRouter } from './router.js';
 import { createAuthState } from './services/auth-state.js';
+import { initializeToasts } from './services/toast-service.js';
 
+const disposeToasts = initializeToasts();
 const auth = createAuthState();
 const header = mountHeader(document.querySelector('#site-header'), {
   async onLogout() {
@@ -25,5 +27,6 @@ if (import.meta.hot) {
     router.dispose();
     header.unmount();
     unmountFooter();
+    disposeToasts();
   });
 }

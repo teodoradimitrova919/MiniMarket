@@ -2,6 +2,7 @@ import html from './home.html?raw';
 import './home.css';
 import { createListingCard } from '../../components/listing-card/listing-card.js';
 import { categoryIcon } from '../../utils/category-icons.js';
+import { showError } from '../../services/toast-service.js';
 
 export const title = 'Home';
 
@@ -65,7 +66,10 @@ export function mount(container, { navigate } = {}) {
       categoriesRegion.replaceChildren(grid);
       categoriesRegion.setAttribute('aria-busy', 'false');
     } catch {
-      if (active) feedback(categoriesRegion, 'We couldn’t load categories. Please try again.', { retry: loadCategories });
+      if (active) {
+        feedback(categoriesRegion, 'We couldn’t load categories. Please try again.', { retry: loadCategories });
+        showError('Marketplace data could not be loaded. Please try again.');
+      }
     }
   }
 
@@ -87,7 +91,10 @@ export function mount(container, { navigate } = {}) {
       listingsRegion.replaceChildren(grid);
       listingsRegion.setAttribute('aria-busy', 'false');
     } catch {
-      if (active) feedback(listingsRegion, 'We couldn’t load the latest listings. Please try again.', { retry: loadListings });
+      if (active) {
+        feedback(listingsRegion, 'We couldn’t load the latest listings. Please try again.', { retry: loadListings });
+        showError('Marketplace data could not be loaded. Please try again.');
+      }
     }
   }
 
