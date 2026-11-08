@@ -2,7 +2,7 @@
 
 ## Scope and current phase
 
-MiniMarket is a lightweight marketplace for classified advertisements. The current phase implements the application shell, shared components, placeholder pages, and History API routing. Authentication, marketplace operations, database tables, Supabase connections, and deployment remain deferred.
+MiniMarket is a lightweight marketplace for classified advertisements. The application shell, shared components, placeholder pages, and History API routing are complete. The current phase adds the initial database schema, RLS policies, migration history, and shared Supabase client. Frontend authentication, marketplace operations, Storage, and deployment remain deferred. See [the implemented database design and verification](supabase/README.md); database sections below describe the original plan, with the linked document recording final choices.
 
 Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
 

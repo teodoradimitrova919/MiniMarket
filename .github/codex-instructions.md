@@ -97,9 +97,9 @@ Database guidelines:
 - Keep the project suitable for AI-assisted development with Codex.
 - Maintain a clear Git commit history throughout development.
 
-## Current phase: application shell
+## Current phase: initial database setup
 
-Implement project setup, the shared layout, History API routing, and placeholder pages only. Install the requested frontend dependencies and Supabase SDK without initializing a Supabase client. All placeholder routes are publicly accessible for shell verification; authentication and role guards belong to a later phase. Do not implement forms, advertisement cards, marketplace operations, database tables, Supabase connections, or deployments. Wait for further instructions after completing the shell.
+The application shell is complete. This phase adds the shared Supabase client, the initial profiles/categories/listings/favorites schema, secure signup profile creation, RLS policies, synchronized migrations, and database verification only. All UI routes remain placeholders. Do not implement forms, login/registration flows, listing CRUD services, Storage, marketplace features, or deployment. Wait for further instructions after completing database setup.
 
 See ARCHITECTURE.md for the architecture plan and proposed folder structure.
 

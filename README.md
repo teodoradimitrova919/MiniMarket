@@ -22,11 +22,11 @@ One HTML shell, shared responsive header/footer, and separate HTML/CSS/JS page f
 
 The History API router supports internal navigation, Back/Forward, active links, page titles, focus movement, and mount/unmount cleanup. External links, modified clicks, downloads, and same-page fragments retain browser behavior. Vite handles direct URLs locally; `netlify.toml` supplies the future hosting fallback. No deployment has been performed.
 
-Authentication and role restrictions are deferred; placeholder routes are public. There are no forms, advertisement cards, database operations, or Supabase client connections. The Supabase SDK is installed for later work. Reserved service and utility folders contain no implementation yet; migrations are empty.
+Frontend authentication and route guards are deferred; placeholder routes are public. The initial Supabase database and RLS policies are implemented, with a shared client module ready for future services. There are no forms, advertisement cards, listing CRUD services, Storage integration, or deployment. See [database design, migrations, and verification](supabase/README.md).
 
 ## Environment
 
-Copy `.env.example` to `.env.local` when backend integration begins. The shell does not require environment values. Future configuration uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Vite client variables are public; never use service-role or secret keys. Local environment files are ignored by Git.
+Copy `.env.example` to `.env.local` before using the Supabase client, then restart Vite. The placeholder shell does not import the client and does not require environment values. Client configuration uses `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Vite client variables are public; never use service-role or secret keys. Local environment files are ignored by Git.
 
 ## Architecture
 
