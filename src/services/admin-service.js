@@ -21,7 +21,9 @@ export async function getAdminListings({page=1,search='',category=''}={}) {
   const listings=await runQuery(Promise.resolve(response),'Unable to load admin listings');
   const ids=[...new Set(listings.map(listing=>listing.owner_id))];
   const owners=ids.length ? await runQuery(supabase.from('profiles').select('id,username').in('id',ids),'Unable to load listing owners') : [];
-  return {rows:listings.map(listing=>({...listing,owner:owners.find(owner=>owner.id===listing.owner_id)})),total:response.count};
+  const { decorateAttachmentThumbnails } = await import('./attachment-service.js');
+  const thumbnails = await decorateAttachmentThumbnails(listings);
+  return {rows:thumbnails.map(listing=>({...listing,owner:owners.find(owner=>owner.id===listing.owner_id)})),total:response.count};
 }
 export async function getAdminCategories({page=1,search=''}={}) {
   await requireAdmin();

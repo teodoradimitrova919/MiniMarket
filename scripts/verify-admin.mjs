@@ -145,19 +145,7 @@ try{
   await page.locator('#listing-price').fill('31');await page.locator('[data-save-listing]').click();await ready();
   await page.locator('#listing-form-modal').waitFor({state:'hidden'});await ready();
   assert.match(await row().textContent(),/31.00/);
-  await row().getByRole('button',{name:'Image',exact:true}).click();
-  await recordDialog().locator('input[type="file"]').setInputFiles({name:'demo.png',mimeType:'image/png',buffer:png});
-  await recordDialog().getByRole('button',{name:'Upload image',exact:true}).click();
-  await recordDialog().getByText('The image change and file cleanup are complete.',{exact:true}).waitFor();
-  await ready();
-  await recordDialog().getByRole('button',{name:'Remove current image',exact:true}).click();
-  assert.equal(await row().locator('img').count(),1,'Canceling image removal does not mutate the listing');
-  acceptDiscard=true;
-  const removedImage=page.waitForResponse(response=>response.url().includes('/functions/v1/minimarket-admin')&&response.request().postDataJSON()?.action==='images.remove');
-  await recordDialog().getByRole('button',{name:'Remove current image',exact:true}).click();await removedImage;
-  acceptDiscard=false;
-  await page.waitForFunction(id=>!document.querySelector(`tr[data-admin-listing-id="${id}"] img`),chosen.id);await ready();
-  await recordDialog().getByRole('button',{name:'Cancel',exact:true}).click();
+  assert.equal(await row().getByRole('button',{name:'Image',exact:true}).count(),0);
   await row().getByRole('button',{name:'Delete',exact:true}).click();await page.locator('#delete-listing-modal').getByRole('button',{name:'Cancel',exact:true}).click();
   assert.ok(await row().count());
   await page.locator('.admin-nav a[href="/admin/categories"]').click();await ready();
@@ -192,7 +180,7 @@ try{
     await page.setViewportSize({width:1440,height:1000});
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: browser admin guards, dashboard counts, real listings pagination/search, View/Edit/Image modals, delete cancel, category create/edit/delete/in-use handling, user View/Edit/Delete, responsive layout, direct refresh, history, and modal cleanup.');
+  console.log('PASS: browser admin guards, dashboard counts, real listings pagination/search, View/Edit modals, delete cancel, category create/edit/delete/in-use handling, user View/Edit/Delete, responsive layout, direct refresh, history, and modal cleanup.');
 }finally{
   if(browser)await browser.close();
   for(const fixture of fixtures){

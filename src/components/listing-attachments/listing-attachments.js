@@ -2,7 +2,7 @@ import html from './listing-attachments.html?raw';
 import './listing-attachments.css';
 import {validateAttachmentFile,formatFileSize,MAX_LISTING_IMAGES,MAX_LISTING_DOCUMENTS} from '../../utils/attachment-validation.js';
 import {serviceError} from '../../utils/service-errors.js';
-import {showError} from '../../services/toast-service.js';
+import {showError,showSuccess} from '../../services/toast-service.js';
 
 export function mountListingAttachments(container,{listingId,editable=false,imageContainer,onPendingChange,onImagesChange,onBusyChange}={}){
   container.innerHTML=html;
@@ -42,6 +42,9 @@ export function mountListingAttachments(container,{listingId,editable=false,imag
   function release(entry){if(entry.preview){URL.revokeObjectURL(entry.preview);objectUrls.delete(entry.preview);}}
   function renderPending(){
     pendingRegion.replaceChildren();
+    const selection=container.querySelector('[data-attachment-selection]');
+    selection.hidden=!pending.length;
+    selection.textContent=pending.length?`${pending.length} ${pending.length===1?'file is':'files are'} added and ready. Save the listing to upload ${pending.length===1?'it':'them'}.`:'';
     for(const entry of pending){
       const column=document.createElement('div');column.className='col';const figure=document.createElement('figure');figure.className='attachment-tile mb-0';
       if(entry.file.type.startsWith('image/')){if(!entry.preview){entry.preview=URL.createObjectURL(entry.file);objectUrls.add(entry.preview);}const image=document.createElement('img');image.src=entry.preview;image.alt=`Selected image: ${entry.file.name}`;figure.append(image);}
@@ -62,7 +65,9 @@ export function mountListingAttachments(container,{listingId,editable=false,imag
     const additions=[];
     try{
       for(const file of input.files){const info=validateAttachmentFile(file);if(images!==info.type.startsWith('image/'))throw serviceError(images?'Choose JPG, PNG, or WebP images.':'Choose PDF documents.','VALIDATION_ERROR');additions.push({file,token:crypto.randomUUID()});}
+      if(!additions.length)return;
       pending.push(...additions);validatePending();message('');renderPending();onPendingChange?.();
+      showSuccess(additions.length===1?`${additions[0].file.name} added. Save the listing to upload it.`:`${additions.length} files added. Save the listing to upload them.`);
     }catch(problem){pending=pending.filter(entry=>!additions.includes(entry));message(problem.message);}
     input.value='';
   }
