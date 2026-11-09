@@ -23,9 +23,15 @@ try{
   await page.goto(base+'/listings/add');await page.locator('[data-listing-fields]:not([disabled])').waitFor();
   await page.locator('#listing-title').fill(title);await page.locator('#listing-price').fill('12');
   const category=await page.locator('#listing-category option').nth(1).getAttribute('value');await page.locator('#listing-category').selectOption(category);
+  await page.locator('[data-select-images]').setInputFiles(Array.from({length:6},(_,index)=>({name:`overflow-${index}.png`,mimeType:'image/png',buffer:png})));
+  assert.match(await page.locator('[data-attachment-error]').innerText(),/5 attachments in total/);
+  assert.equal(await page.locator('[data-pending-attachments] > .col').count(),0);
   await page.locator('[data-select-images]').setInputFiles([{name:'same.png',mimeType:'image/png',buffer:png},{name:'same.png',mimeType:'image/png',buffer:png}]);
   assert.equal(await page.locator('[data-pending-attachments] img').count(),2);
   await page.locator('[data-select-documents]').setInputFiles({name:'manual.pdf',mimeType:'application/pdf',buffer:pdf});
+  await page.locator('[data-select-documents]').setInputFiles(Array.from({length:3},(_,index)=>({name:`overflow-${index}.pdf`,mimeType:'application/pdf',buffer:pdf})));
+  assert.match(await page.locator('[data-attachment-error]').innerText(),/5 attachments in total/);
+  assert.equal(await page.locator('[data-pending-attachments] > .col').count(),3,'Mixed overflow preserves existing selections');
   let injected=false;
   await page.route('**/storage/v1/object/listing-attachments/**',async route=>{
     if(!injected&&route.request().method()==='POST'&&route.request().url().endsWith('.pdf')){injected=true;return route.fulfill({status:400,contentType:'application/json',body:JSON.stringify({message:'Injected upload failure',error:'failure'})});}
@@ -49,6 +55,7 @@ try{
   const visitor=await browser.newPage({viewport:{width:390,height:844},acceptDownloads:true});visitor.on('pageerror',e=>errors.push(e.message));
   await visitor.goto(base+`/listings/${id}`);await visitor.locator('[data-attachment-images] img').first().waitFor();
   await visitor.waitForFunction(()=>[...document.querySelectorAll('[data-attachment-images] img')].every(i=>i.complete&&i.naturalWidth>0));
+  assert.equal(await visitor.locator('[data-attachment-images]').evaluate(gallery=>{const row=gallery.getBoundingClientRect(),secondary=gallery.children[1].getBoundingClientRect();return Math.abs((secondary.left+secondary.right)/2-(row.left+row.right)/2)<2;}),true,'Secondary images are centered');
   assert.equal(await visitor.locator('[data-remove-attachment]').count(),0);
   assert.equal(await visitor.locator('[data-attachment-fields]').isVisible(),false);
   const downloadEvent=visitor.waitForEvent('download');await visitor.locator('[data-attachment-documents]').getByRole('button',{name:'Download',exact:true}).click();

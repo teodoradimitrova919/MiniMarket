@@ -1,0 +1,242 @@
+{
+  "verifiedAt": "2026-11-09T09:40:33.747Z",
+  "totalExistingListings": 25,
+  "alreadyContainingImages": 7,
+  "successfullyPopulated": 17,
+  "skipped": [
+    {
+      "id": "1af87d7b-912b-4590-8e14-523e64f28e80",
+      "title": "Test ITtem",
+      "reason": "Title and description do not identify the advertised item; no reliable image match."
+    }
+  ],
+  "failedUploads": [],
+  "repeatRunUploads": 0,
+  "publicImagesVerifiedByHash": 17,
+  "preservedAttachmentRecords": 8,
+  "existingImagesPreserved": [
+    {
+      "id": "1cca9f03-377b-4def-89d3-bd073ae7f768",
+      "title": "new items"
+    },
+    {
+      "id": "a8b588a2-1ba6-4152-ac65-d068c9632a0b",
+      "title": "test4"
+    },
+    {
+      "id": "a9ca0182-1acc-4c22-846f-ef7453e137af",
+      "title": "Wooden Animal Puzzle Set"
+    },
+    {
+      "id": "c41d1909-b893-4304-a7f5-0c467c85dde9",
+      "title": "test2"
+    },
+    {
+      "id": "cf3b9fe5-2977-4aab-bdc3-c55841e6b74b",
+      "title": "ntelicheck2"
+    },
+    {
+      "id": "d030d57b-690f-4c36-96ef-a6ebdd9715c1",
+      "title": "efr34t34t"
+    },
+    {
+      "id": "dad51168-0d9c-4a09-981a-0f714550b2a6",
+      "title": "tesrhjkhjkh"
+    }
+  ],
+  "notes": [
+    "Both original buckets retained. No Storage/Auth authorization policies changed by population.",
+    "All new photos are illustrative references, not photos of the actual sale item. Exact edition/model/contents/condition may differ.",
+    "The existing bee image on Wooden Animal Puzzle Set was preserved as requested; its pre-existing product mismatch needs owner review.",
+    "No Netlify deployment command was run. Source-credit UI requires the normal frontend build/deployment."
+  ],
+  "sources": [
+    {
+      "listingId": "009f616f-0590-40cc-8bc5-d26cd9b43a03",
+      "title": "Oak-Effect Coffee Table",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/49fbbb42-1fa9-46af-976f-6c69dfc73aee/009f616f-0590-40cc-8bc5-d26cd9b43a03/3a355ee1-3ebf-476a-8c88-f77cad36dd45.jpg",
+      "author": "Kaboompics.com",
+      "sourceUrl": "https://www.pexels.com/photo/wooden-coffee-table-and-simple-decorations-7607464/",
+      "license": "Pexels License",
+      "licenseUrl": "https://www.pexels.com/license/",
+      "changes": "Resized by source CDN; cropped on cards.",
+      "sha256": "daa9ce4bc7dd1b05ef29c5164b504cecde9ff6cbf70bd6e1b588b206effa240e"
+    },
+    {
+      "listingId": "037b95a0-1a11-470f-87c8-c5fdc95dfb4a",
+      "title": "Tennis Racket with Cover",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/2a313cf4-8f3c-48f0-8155-59db9e10bfcd/037b95a0-1a11-470f-87c8-c5fdc95dfb4a/fea1fbef-cc26-4715-a4f9-edfc1a5eabbe.jpg",
+      "author": "nao2g",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Tennis_racket_and_ball.JPG",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "10e1291f65681ffd3cefd139f7c9c034a9124c2a88d1b2e22762e21d90bf2e20"
+    },
+    {
+      "listingId": "30476c7e-beb4-48f2-8477-88cc1894dcbe",
+      "title": "LED Desk Lamp",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/30476c7e-beb4-48f2-8477-88cc1894dcbe/8e7d5dc0-f524-45da-8fdc-dbd8dcfb84b0.jpg",
+      "author": "Indesign Technology",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Concise_bamboo_eye_protection_LED_desk_lamp.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "e0a0ac4894468b77f4a1af983ace6b570087bf0c32aff32f1e66548b369f3417"
+    },
+    {
+      "listingId": "3f0ea94c-51a9-4469-863e-97f1d5815837",
+      "title": "Warm Winter Coat",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/2a313cf4-8f3c-48f0-8155-59db9e10bfcd/3f0ea94c-51a9-4469-863e-97f1d5815837/86fba177-6898-4117-b855-e0001ad684b8.jpg",
+      "author": "Adenosine Triphosphate",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Adidas_Helionic_Down_Jacket.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "3bba05ed8b15072f2de645a3cdec17061af0a3b101d8d7c38748a6436fe43386"
+    },
+    {
+      "listingId": "3fb152ff-e111-42cf-807f-fb14b9721a8a",
+      "title": "Classic Denim Jacket",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/49fbbb42-1fa9-46af-976f-6c69dfc73aee/3fb152ff-e111-42cf-807f-fb14b9721a8a/d0180c4c-7f06-4770-8efe-4cf49784eeb6.jpg",
+      "author": "Mikael Monjour",
+      "sourceUrl": "https://www.pexels.com/photo/hanging-denim-jacket-in-close-up-photography-11096066/",
+      "license": "Pexels License",
+      "licenseUrl": "https://www.pexels.com/license/",
+      "changes": "Resized by source CDN; cropped on cards.",
+      "sha256": "62b33788c4bacac0a67c5234699da25ddfc3740af1ebc4d679e8d44c60eea646"
+    },
+    {
+      "listingId": "42fc55a5-5ac1-4a8c-851d-8d3d952a30fd",
+      "title": "Samsung Galaxy A54",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/42fc55a5-5ac1-4a8c-851d-8d3d952a30fd/93df96e3-cc7e-49d9-8976-8121a712d82f.jpg",
+      "author": "Hajoon0102",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Back_of_the_Samsung_Galaxy_A54_5G.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "5d53fb0b294b6ec7e7bdcf720884e9b96a693ab2f23eb18e2e3720ad770e2abc"
+    },
+    {
+      "listingId": "53542789-d332-44c5-8f7c-8cb8366b9973",
+      "title": "Nike Running Shoes",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/53542789-d332-44c5-8f7c-8cb8366b9973/e7d54dfd-3a71-4a45-bcd4-29e20310001f.jpg",
+      "author": "Yottanesia",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Nike_Running_Shoes_Not_Dissected_Reference.jpg",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "1eb0d830ac17ef1c1e5d693b3ee0cb3c0a59e5147faf89be1322019cfcf3f922"
+    },
+    {
+      "listingId": "5535ce90-0b40-4460-860e-1707fba5ad8a",
+      "title": "Everyday Cooking Book Set",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/2a313cf4-8f3c-48f0-8155-59db9e10bfcd/5535ce90-0b40-4460-860e-1707fba5ad8a/24e419bc-8854-4ecd-ac6c-f325a05b369e.jpg",
+      "author": "Katrin Gilger",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Cookbooks_(4362350759).jpg",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "d2149f74d82caa49a16f47b2405b6f2ec5a90415485f6cda62cf1c2fea883b7a"
+    },
+    {
+      "listingId": "94d3d14f-7029-4281-8d93-1aff2602b192",
+      "title": "Creative Building Brick Set2",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/94d3d14f-7029-4281-8d93-1aff2602b192/858aba7b-90d0-4d49-bd14-e165c293b9b3.jpg",
+      "author": "Alan Chia",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lego_Color_Bricks.jpg",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "7643b284e05865a4c6440a7741fb8e8b5f4dce4bec9a900d2414c96afdb9a52c"
+    },
+    {
+      "listingId": "97ac7463-ce1a-48a7-8362-11fbf76e5e4b",
+      "title": "Harry Potter Book Collection",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/97ac7463-ce1a-48a7-8362-11fbf76e5e4b/103a3c7a-61bf-49aa-b38a-8aa6d9e930f6.jpg",
+      "author": "BrokenSphere",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Harry_Potter_Books_1-7_without_dust_jackets,_1st_American_eds._1.JPG",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "0ebc8391a4e449e1b8cb397c6861843400f6d3e94530962278ec4afc5cb9b8c0"
+    },
+    {
+      "listingId": "bd5929f7-275e-42e1-8d33-690bd2e84b3e",
+      "title": "Family Board Game Bundle",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/49fbbb42-1fa9-46af-976f-6c69dfc73aee/bd5929f7-275e-42e1-8d33-690bd2e84b3e/2187b7a5-1933-4913-9e9d-55177a6d954d.jpg",
+      "author": "Zoshua Colah",
+      "sourceUrl": "https://unsplash.com/photos/stack-of-board-games-on-a-shelf-98UXqtk2qHc",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "changes": "Resized by source CDN; cropped on cards.",
+      "sha256": "7f5f4592997e81aa0ca3c19247bb5b3ced8d32a37b223a815b2b9407d685bbda"
+    },
+    {
+      "listingId": "c7506640-bdd5-4282-867d-7ae604029366",
+      "title": "Adjustable Office Chair",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/c7506640-bdd5-4282-867d-7ae604029366/fb81b528-4269-4ede-918a-729345a0d57d.jpg",
+      "author": "Waldyrious",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sihoo_M57_mesh_office_chair_01.jpg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "bb4dbdcf5367ac3b5a71e526dc8cf98bb9143ee590aa50189253aa13517c5301"
+    },
+    {
+      "listingId": "ca1a121b-9ae9-4a97-8be6-936540dc0108",
+      "title": "Yoga Mat and Blocks",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/49fbbb42-1fa9-46af-976f-6c69dfc73aee/ca1a121b-9ae9-4a97-8be6-936540dc0108/230bda54-f48f-4744-946e-67fe0e66f5d7.jpg",
+      "author": "Samantha Sheppard",
+      "sourceUrl": "https://unsplash.com/photos/a-yoga-mat-with-two-blocks-on-top-of-it-b8Q5fHBsyik",
+      "license": "Unsplash License",
+      "licenseUrl": "https://unsplash.com/license",
+      "changes": "Resized by source CDN; cropped on cards.",
+      "sha256": "ef1abb81bf9b6daff7c500c094e8803fb9fafce853b938a5ba8f51cc58b3a949"
+    },
+    {
+      "listingId": "d13fa3e0-d270-47ac-8f39-917d3d312bbf",
+      "title": "Trail Mountain Bike",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/d13fa3e0-d270-47ac-8f39-917d3d312bbf/e0e8aaa5-8e24-4012-98a2-adddffeb729f.jpg",
+      "author": "Andy Armstrong",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Hardtail-mountain-bike.jpg",
+      "license": "CC BY-SA 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "15d853a3ac69090e3d4275944ffc94fa280186fcc0a03c4b77b7391d9113bec8"
+    },
+    {
+      "listingId": "e5843a5c-7e9a-47a9-8cb1-f772fa57094d",
+      "title": "Lenovo IdeaPad Laptop",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/9b80ddc1-a42d-481f-b2a7-08f195e9c42d/e5843a5c-7e9a-47a9-8cb1-f772fa57094d/2c3eeb7f-e844-4701-9162-e2c52d4274b4.jpg",
+      "author": "Info-farmer",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Lenovo_IdeaPad_Flex14_laptop.jpg",
+      "license": "CC0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "340f2530b45a359090e8da53f03f8ebbb6ac04b1a3fd191efca03efc6ffb279f"
+    },
+    {
+      "listingId": "e917db2f-a475-4d59-8409-78c7bc55c66b",
+      "title": "Garden Hand Tool Set",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/2a313cf4-8f3c-48f0-8155-59db9e10bfcd/e917db2f-a475-4d59-8409-78c7bc55c66b/06131362-80ed-422a-b8a9-c04c74af5155.jpg",
+      "author": "Büşra İnce",
+      "sourceUrl": "https://www.pexels.com/photo/gardening-tools-by-a-plant-18222297/",
+      "license": "Pexels License",
+      "licenseUrl": "https://www.pexels.com/license/",
+      "changes": "Resized by source CDN; cropped on cards.",
+      "sha256": "9fd7bfcaba8e7e1ad6f7c14fbc38974e593a6c48abcaf5323ab700ecf5071278"
+    },
+    {
+      "listingId": "f14c5c21-90e8-4949-8f17-475c41d9b6ed",
+      "title": "Portable Bluetooth Speaker",
+      "imageUrl": "https://kkcfqkwkdcqvnurbdxus.supabase.co/storage/v1/object/public/listing-images/2a313cf4-8f3c-48f0-8155-59db9e10bfcd/f14c5c21-90e8-4949-8f17-475c41d9b6ed/1637ffa8-5f84-4ebe-b338-9d632e3f0020.jpg",
+      "author": "Pittigrilli",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:JBL_GO2_Bluetooth_speaker_00_10_27_681000.jpeg",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "changes": "Unmodified original; displayed at responsive sizes and cropped on cards.",
+      "sha256": "22670114f55dd81ae60cbd4ea091c0dbbcc5414a5748c58197dea289f669f18e"
+    }
+  ]
+}

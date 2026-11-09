@@ -48,7 +48,7 @@ export function uploadAttachment(listingId,file){
     const attachmentId=crypto.randomUUID(),path=`${id}/${attachmentId}.${info.extension}`;
     await runQuery(supabase.storage.from(ATTACHMENT_BUCKET).upload(path,file,{contentType:info.type,upsert:false}),'Unable to upload attachment');
     try{
-      return await runQuery(supabase.from('listing_attachments').insert({id:attachmentId,listing_id:id,storage_path:path,original_filename:info.name,mime_type:info.type,size_bytes:info.size}).select('*').single(),'Unable to register attachment',{'23514':'Upload up to five images and five PDFs, each no larger than 5 MB.'});
+      return await runQuery(supabase.from('listing_attachments').insert({id:attachmentId,listing_id:id,storage_path:path,original_filename:info.name,mime_type:info.type,size_bytes:info.size}).select('*').single(),'Unable to register attachment',{'23514':'A listing allows up to five attachments total, each no larger than 5 MB.'});
     }catch(error){
       try{await runQuery(supabase.storage.from(ATTACHMENT_BUCKET).remove([path]),'Unable to remove unregistered upload');}
       catch{throw serviceError('The upload could not be registered and file cleanup failed. Use Retry file cleanup, or retry after reloading the editor.','ATTACHMENT_CLEANUP_FAILED');}

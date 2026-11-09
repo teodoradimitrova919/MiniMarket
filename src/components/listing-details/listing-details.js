@@ -5,6 +5,7 @@ import { safeImageUrl } from '../../utils/image-url.js';
 import { showError } from '../../services/toast-service.js';
 import { mountListingAttachments } from '../listing-attachments/listing-attachments.js';
 import { mountFavoriteControls } from '../favorite-controls.js';
+import { createImageCredit } from '../image-credit.js';
 
 export function mountListingDetails(container, { listingId, auth, onDelete }) {
   container.innerHTML = html;
@@ -76,6 +77,9 @@ export function mountListingDetails(container, { listingId, auth, onDelete }) {
       await attachments.ready;
       if (!active) return;
       if (!hasAttachmentImages && url) {
+        const credit = createImageCredit(url);
+        container.querySelector('[data-image-credit]')?.remove();
+        if (credit) { credit.dataset.imageCredit = ''; container.querySelector('.listing-details-media').after(credit); }
         const image = container.querySelector('[data-details-image]');
         image.alt = listing.title;
         image.src = url;

@@ -1,8 +1,7 @@
 import {serviceError} from './service-errors.js';
 export const ATTACHMENT_BUCKET='listing-attachments';
 export const MAX_ATTACHMENT_BYTES=5*1024*1024;
-export const MAX_LISTING_IMAGES=5;
-export const MAX_LISTING_DOCUMENTS=5;
+export const MAX_LISTING_ATTACHMENTS=5;
 const extensions={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','application/pdf':'pdf'};
 export function validateAttachmentFile(file){
   if(!file||!Object.hasOwn(extensions,file.type))throw serviceError('Choose a JPG, PNG, WebP image or a PDF document.','VALIDATION_ERROR');

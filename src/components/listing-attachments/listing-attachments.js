@@ -1,6 +1,6 @@
 import html from './listing-attachments.html?raw';
 import './listing-attachments.css';
-import {validateAttachmentFile,formatFileSize,MAX_LISTING_IMAGES,MAX_LISTING_DOCUMENTS} from '../../utils/attachment-validation.js';
+import {validateAttachmentFile,formatFileSize,MAX_LISTING_ATTACHMENTS} from '../../utils/attachment-validation.js';
 import {serviceError} from '../../utils/service-errors.js';
 import {showError,showSuccess} from '../../services/toast-service.js';
 
@@ -56,9 +56,7 @@ export function mountListingAttachments(container,{listingId,editable=false,imag
   }
   function validatePending(){
     for(const entry of pending)validateAttachmentFile(entry.file);
-    const images=records.filter(row=>row.mime_type.startsWith('image/')).length+pending.filter(entry=>entry.file.type.startsWith('image/')).length;
-    const pdfs=records.filter(row=>row.mime_type==='application/pdf').length+pending.filter(entry=>entry.file.type==='application/pdf').length;
-    if(images>MAX_LISTING_IMAGES||pdfs>MAX_LISTING_DOCUMENTS)throw serviceError('Each listing can have up to 5 images and 5 PDF documents.','VALIDATION_ERROR');
+    if(pending.length && records.length+pending.length>MAX_LISTING_ATTACHMENTS)throw serviceError('A listing can have up to 5 attachments in total, including images and PDFs.','VALIDATION_ERROR');
   }
   function selectFiles(input,images){
     if(externalBusy||isBusy())return;

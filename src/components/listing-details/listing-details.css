@@ -11,6 +11,7 @@
 .listing-details-status { padding: 1rem 0; color: #58685c; }
 .listing-details-owner { margin-top: 1.5rem; padding: 1rem 1.25rem; border: 1px solid #e0e8dd; border-radius: .85rem; background: #f7f9f4; overflow-wrap: anywhere; }
 .listing-details-gallery:empty { display: none; }
+.listing-details-gallery [data-attachment-images] { justify-content: center; }
 .listing-details-gallery [data-attachment-images] > .col { flex: 0 0 auto; width: 25%; }
 .listing-details-gallery [data-attachment-images] > .col:first-child { width: 100%; }
 .listing-details-gallery .attachment-tile { border-radius: 1rem; background: #fff; }

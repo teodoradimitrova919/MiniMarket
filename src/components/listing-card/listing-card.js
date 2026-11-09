@@ -3,6 +3,7 @@ import './listing-card.css';
 import { categoryIcon } from '../../utils/category-icons.js';
 import { formatPrice } from '../../utils/format-price.js';
 import { safeImageUrl } from '../../utils/image-url.js';
+import { createImageCredit } from '../image-credit.js';
 
 const template = document.createElement('template');
 template.innerHTML = html;
@@ -28,6 +29,8 @@ export function createListingCard(listing, { signal, showDescription = false, fa
   }
   card.querySelector('[data-placeholder-icon]').classList.add(`bi-${categoryIcon(category)}`);
   const url = safeImageUrl(listing.attachment_image_url || listing.image_url);
+  const credit = createImageCredit(url);
+  if (credit) card.append(credit);
   if (url) {
     const image = card.querySelector('[data-listing-image]');
     const placeholder = card.querySelector('[data-image-placeholder]');

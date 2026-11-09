@@ -68,7 +68,7 @@ try{
   assert.ok((await owner.client.storage.from(bucket).upload(`${listing.id}/${randomUUID()}.html`,Buffer.from('bad'),{contentType:'text/html'})).error);
   assert.ok((await owner.client.storage.from(bucket).upload(`${listing.id}/${randomUUID()}.png`,new Uint8Array(5242881),{contentType:'image/png'})).error);
   assert.ok((await owner.client.storage.from(bucket).upload(`../${randomUUID()}.png`,png,{contentType:'image/png'})).error);
-  await upload(owner.client,listing.id);await upload(owner.client,listing.id);
+  await upload(owner.client,listing.id);
   const overflowId=randomUUID(),overflowPath=`${listing.id}/${overflowId}.png`;
   check(await owner.client.storage.from(bucket).upload(overflowPath,png,{contentType:'image/png'}),'Overflow upload');files.push(overflowPath);
   assert.ok((await owner.client.from('listing_attachments').insert({id:overflowId,listing_id:listing.id,storage_path:overflowPath,original_filename:'overflow.png',mime_type:'image/png',size_bytes:png.length})).error);

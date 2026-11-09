@@ -1,5 +1,7 @@
 # MiniMarket
 
+Product image maintenance: see [the population guide](scripts/IMAGE_POPULATION.md) for the reviewed source catalog, dry-run/apply commands, image credits and safe recovery.
+
 A lightweight marketplace built manually with Vite, Vanilla JavaScript ES modules, Bootstrap 5, and Bootstrap Icons.
 
 ## Run locally
@@ -66,7 +68,7 @@ See [server-side seed setup, dry run, execution, and verification](scripts/SEED.
 
 ## Listing attachments
 
-Owners can add up to five images and five PDFs per listing (5 MB per file), preview selected images, and manage saved files in the shared Add/Edit form. Visitors can view galleries and download PDFs through short-lived signed URLs. The private bucket, database policies, cleanup behavior, deployed functions and verification commands are documented in [supabase/ATTACHMENTS.md](supabase/ATTACHMENTS.md).
+Owners can add up to five attachments total (images and PDFs combined) per listing (5 MB per file), preview selected images, and manage saved files in the shared Add/Edit form. Visitors can view galleries and download PDFs through short-lived signed URLs. The private bucket, database policies, cleanup behavior, deployed functions and verification commands are documented in [supabase/ATTACHMENTS.md](supabase/ATTACHMENTS.md).
 
 ## Architecture
 
