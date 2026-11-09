@@ -4,6 +4,7 @@ import { formatPrice } from '../../utils/format-price.js';
 import { formatDate } from '../../utils/format-date.js';
 import { showError } from '../../services/toast-service.js';
 import { createListingModals, isPlainLinkClick } from '../../components/listing-modals/listing-modals.js';
+import { createListingThumbnail } from '../../components/listing-thumbnail.js';
 
 export const title = 'My Listings';
 export function mount(container, { auth }) {
@@ -13,6 +14,7 @@ export function mount(container, { auth }) {
   const table = container.querySelector('[data-my-listings-table]');
   const rows = container.querySelector('[data-listing-rows]');
   const events = new AbortController();
+  let rowEvents = new AbortController();
   let active = true;
   let loading = false;
   let reloadRequested = false;
@@ -35,9 +37,11 @@ export function mount(container, { auth }) {
     link.append(image, document.createTextNode(label)); return link;
   }
   function renderRows() {
+    rowEvents.abort(); rowEvents = new AbortController();
     const fragment = document.createDocumentFragment();
     for (const listing of records) {
       const row = document.createElement('tr'); row.dataset.listingId = listing.id;
+      const imageCell = document.createElement('td'); imageCell.append(createListingThumbnail(listing, { signal: rowEvents.signal }));
       const titleCell = document.createElement('td');
       const title = document.createElement('span'); title.className = 'my-listing-title text-truncate d-block'; title.textContent = listing.title; title.title = listing.title;
       titleCell.append(title);
@@ -49,7 +53,7 @@ export function mount(container, { auth }) {
       group.append(actionLink('View', 'eye', href, listing.id), actionLink('Edit', 'pencil', `${href}/edit`, listing.id));
       const button = document.createElement('button'); button.type = 'button'; button.className = 'btn btn-sm btn-outline-danger'; button.textContent = 'Delete'; button.dataset.deleteListing = listing.id;
       button.setAttribute('aria-label', `Delete ${listing.title}`); group.append(button); actions.append(group);
-      row.append(titleCell, category, price, date, actions); fragment.append(row);
+      row.append(imageCell, titleCell, category, price, date, actions); fragment.append(row);
     }
     rows.replaceChildren(fragment);
   }
@@ -90,7 +94,7 @@ export function mount(container, { auth }) {
     if (listing) modals.openDelete(listing, button);
   }, { signal: events.signal });
   void load();
-  const cleanup = () => { active = false; events.abort(); modals.dispose(); };
+  const cleanup = () => { active = false; events.abort(); rowEvents.abort(); modals.dispose(); };
   cleanup.canLeave = modals.canLeave;
   return cleanup;
 }
