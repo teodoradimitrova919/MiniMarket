@@ -3,12 +3,14 @@ import './home.css';
 import { createListingCard } from '../../components/listing-card/listing-card.js';
 import { categoryIcon } from '../../utils/category-icons.js';
 import { showError } from '../../services/toast-service.js';
+import { bindFilterReset } from '../../utils/filter-reset.js';
 
 export const title = 'Home';
 
 export function mount(container, { navigate } = {}) {
   container.innerHTML = html;
   const events = new AbortController();
+  bindFilterReset(container.querySelector('[data-home-search]'),{signal:events.signal,button:container.querySelector('[data-clear-filters]'),searchName:'q'});
   let active = true;
   const categoriesRegion = container.querySelector('[data-home-categories]');
   const listingsRegion = container.querySelector('[data-home-listings]');

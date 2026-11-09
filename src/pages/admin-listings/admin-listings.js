@@ -6,19 +6,21 @@ import { formatPrice } from '../../utils/format-price.js';
 import { formatDate } from '../../utils/format-date.js';
 import { safeImageUrl } from '../../utils/image-url.js';
 import { showError } from '../../services/toast-service.js';
+import { bindFilterReset } from '../../utils/filter-reset.js';
 export const title='Listings Management';
 export function mount(container,{auth}) {
   container.innerHTML=html;
   const shell=mountAdminShell(container,{auth}),form=container.querySelector('form'),table=container.querySelector('[data-admin-table]'),rows=container.querySelector('tbody'),pager=container.querySelector('[data-admin-pager]');
   const focusFallback=()=>container.querySelector('h1');
-  let service,page=1,revision=0,rowsEvents=new AbortController(),categories;
+  let service,page=1,revision=0,rowsEvents=new AbortController(),categories,requestedSearch='';
   const modals=createListingModals({auth,focusFallback,onChanged:load,deleteOperation:async id=>service.deleteAdminListing(id)});
   async function load(){
+    const search=form.elements.search.value.trim(),category=form.elements.category.value;requestedSearch=search;
     const current=++revision;table.hidden=true;pager.replaceChildren();shell.feedback('Loading all listings…');
     try{
       service=await import('../../services/admin-service.js');
       const categoryService=await import('../../services/categories-service.js');
-      const [data,available]=await Promise.all([service.getAdminListings({page,search:form.elements.search.value,category:form.elements.category.value}),categories||categoryService.getCategories()]);
+      const [data,available]=await Promise.all([service.getAdminListings({page,search,category}),categories||categoryService.getCategories()]);
       if(!shell.isCurrent()||current!==revision)return;
       if(!categories){categories=available;for(const item of categories)form.elements.category.add(new Option(item.name,item.id));}
       if(!data.rows.length&&page>1&&data.total){page=Math.ceil(data.total/20);return load();}
@@ -53,5 +55,6 @@ export function mount(container,{auth}) {
   }
   form.addEventListener('submit',event=>{event.preventDefault();page=1;void load();},{signal:shell.events.signal});
   form.elements.category.addEventListener('change',()=>{page=1;void load();},{signal:shell.events.signal});
+  bindFilterReset(form,{signal:shell.events.signal,onClear:()=>{page=1;void load();},onSearchCleared:()=>{if(requestedSearch){page=1;void load();}}});
   void load();const cleanup=()=>{shell.dispose();rowsEvents.abort();modals.dispose();};cleanup.canLeave=()=>modals.canLeave();return cleanup;
 }

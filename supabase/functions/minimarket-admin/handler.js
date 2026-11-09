@@ -59,7 +59,7 @@ export function createAdminHandler({ admin, caller, url, origins }) {
       const actor=verified.data.user;
       const client=caller(match[1]);
       const body=await request.json().catch(()=>fail(400,'Send a valid JSON request.'));
-      allowed(body,['action','id','page','pageSize','search','patch','confirm','key']);
+      allowed(body,['action','id','page','pageSize','search','patch','confirm','key','user']);
       const assignment=await result(client.from('user_roles').select('role').eq('user_id',actor.id).single(),'Your account is unavailable.');
       const isAdmin=assignment.role==='admin';
       // Owners use this same cleanup path when an owned listing contains Storage images.
@@ -73,6 +73,31 @@ export function createAdminHandler({ admin, caller, url, origins }) {
         return respond({deleted:true});
       }
       if(!isAdmin) fail(403,'Administrator access is required.');
+      if(body.action==='users.create') {
+        allowed(body.user,['username','email','password','role']);
+        const desiredRole=body.user?.role ?? 'user';
+        if(!['user','admin'].includes(desiredRole))fail(400,'Choose either the user or admin role.');
+        const username=text(body.user?.username,'Display name',80);
+        const email=text(body.user?.email,'Email',254).toLowerCase();
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))fail(400,'Enter a valid email address.');
+        const password=body.user?.password;
+        if(typeof password!=='string'||!password.trim()||password.length<6||new TextEncoder().encode(password).length>72)fail(400,'Use a password with at least 6 characters and at most 72 bytes.');
+        // Auth triggers start accounts as regular users. Promotion uses the guarded role RPC, never metadata.
+        const created=await result(admin.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{username}}),'The user could not be created. Check the password requirements and whether this email is already registered.');
+        if(!created.user)fail(409,'User creation could not be confirmed. Search for the email before retrying.');
+        let assignedRole='user',roleAssignmentPending=false;
+        if(desiredRole==='admin'){
+          let promotion;
+          try{promotion=await client.rpc('admin_set_role',{target:created.user.id,desired:'admin'});}catch{promotion={error:true};}
+          if(!promotion.error)assignedRole='admin';
+          else{
+            // Account creation has committed. Report partial success instead of inviting duplicate creation.
+            try{const actual=await admin.from('user_roles').select('role').eq('user_id',created.user.id).maybeSingle();assignedRole=actual.data?.role ?? null;}catch{assignedRole=null;}
+            roleAssignmentPending=assignedRole!=='admin';
+          }
+        }
+        return respond({user:{id:created.user.id,email:created.user.email,username,role:assignedRole,created_at:created.user.created_at,listingCount:0,deletionPending:false},roleAssignmentPending});
+      }
       if(body.action==='users.list') {
         const page=Number(body.page ?? 1), pageSize=Number(body.pageSize ?? 20);
         if(!Number.isInteger(page)||page<1||!Number.isInteger(pageSize)||pageSize<1||pageSize>50) fail(400,'Invalid pagination.');

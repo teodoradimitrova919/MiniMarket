@@ -4,12 +4,13 @@ import {mountAdminShell,cell,actionButton,renderPager} from '../../components/ad
 import {createAdminDialog,field,detail} from '../../components/admin-dialog/admin-dialog.js';
 import {formatDate} from '../../utils/format-date.js';
 import {showError} from '../../services/toast-service.js';
+import {bindFilterReset} from '../../utils/filter-reset.js';
 export const title='Categories Management';
 export function mount(container,{auth}){
   container.innerHTML=html;
   const shell=mountAdminShell(container,{auth}),form=container.querySelector('form'),table=container.querySelector('[data-admin-table]'),rows=container.querySelector('tbody'),pager=container.querySelector('[data-admin-pager]');
   const dialog=createAdminDialog({focusFallback:()=>container.querySelector('[data-add-category]')});
-  let page=1,revision=0,rowsEvents=new AbortController();
+  let page=1,revision=0,requestedSearch='',rowsEvents=new AbortController();
   function edit(category,trigger){
     dialog.open({title:category?'Edit Category':'Add Category',nodes:[field('Category name','name',{value:category?.name||''})],dirty:true,onSave:async form=>{
       const service=await import('../../services/categories-service.js');
@@ -24,9 +25,10 @@ export function mount(container,{auth}){
     }},trigger);
   }
   async function load(){
+    const search=form.elements.search.value.trim();requestedSearch=search;
     const current=++revision;table.hidden=true;pager.replaceChildren();shell.feedback('Loading categories…');
     try{
-      const {getAdminCategories}=await import('../../services/admin-service.js');const data=await getAdminCategories({page,search:form.elements.search.value});
+      const {getAdminCategories}=await import('../../services/admin-service.js');const data=await getAdminCategories({page,search});
       if(!shell.isCurrent()||current!==revision)return;
       if(!data.rows.length&&page>1&&data.total){page=Math.ceil(data.total/20);return load();}
       rowsEvents.abort();rowsEvents=new AbortController();rows.replaceChildren();
@@ -41,5 +43,6 @@ export function mount(container,{auth}){
   }
   container.querySelector('[data-add-category]').addEventListener('click',event=>edit(null,event.currentTarget),{signal:shell.events.signal});
   form.addEventListener('submit',event=>{event.preventDefault();page=1;void load();},{signal:shell.events.signal});
+  bindFilterReset(form,{signal:shell.events.signal,onClear:()=>{page=1;void load();},onSearchCleared:()=>{if(requestedSearch){page=1;void load();}}});
   void load();const cleanup=()=>{shell.dispose();rowsEvents.abort();dialog.dispose();};cleanup.canLeave=dialog.canLeave;return cleanup;
 }

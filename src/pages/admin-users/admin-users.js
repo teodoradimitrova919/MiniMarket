@@ -4,12 +4,26 @@ import {mountAdminShell,cell,actionButton,renderPager} from '../../components/ad
 import {createAdminDialog,field,detail} from '../../components/admin-dialog/admin-dialog.js';
 import {formatDate} from '../../utils/format-date.js';
 import {showError} from '../../services/toast-service.js';
+import {bindFilterReset} from '../../utils/filter-reset.js';
 export const title='Users Management';
 export function mount(container,{auth}){
   container.innerHTML=html;
   const shell=mountAdminShell(container,{auth}),form=container.querySelector('form'),table=container.querySelector('[data-admin-table]'),rows=container.querySelector('tbody'),pager=container.querySelector('[data-admin-pager]');
   const dialog=createAdminDialog({focusFallback:()=>container.querySelector('h1')});
-  let service,page=1,revision=0,actionRevision=0,rowsEvents=new AbortController();
+  let service,page=1,revision=0,actionRevision=0,requestedSearch='',rowsEvents=new AbortController();
+  function add(trigger){
+    actionRevision++;
+    const password=field('Password','password',{type:'password',maxLength:72,help:'At least 6 characters. Give the password to the user through a trusted channel.'});
+    password.querySelector('input').minLength=6;
+    password.querySelector('input').autocomplete='new-password';
+    dialog.open({title:'Add User',submitLabel:'Create User',dirty:true,nodes:[field('Display name','username',{maxLength:80}),field('Email address','email',{type:'email',maxLength:254}),password,field('Role','role',{value:'user',options:[{label:'User',value:'user'},{label:'Administrator',value:'admin'}],help:'Administrators can manage all listings, categories, and users.'}),detail('Account access','The email is confirmed immediately. The selected role is assigned securely after the account is created.')],onSave:async form=>{
+      const api=await import('../../services/admin-service.js');
+      const result=await api.createAdminUser({username:form.elements.username.value,email:form.elements.email.value,password:form.elements.password.value,role:form.elements.role.value});
+      form.elements.password.value='';
+      if(result.roleAssignmentPending)showError('The account was created, but its requested role could not be confirmed. Use Edit User to check and finish the role change. Do not create the account again.');
+      if(shell.isCurrent()){container.querySelector('#admin-search').value='';page=1;await load();}
+    }},trigger);
+  }
   async function view(user,trigger){
     const current=++actionRevision;
     try{const data=await service.getAdminUser(user.id);if(!shell.isCurrent()||current!==actionRevision)return;
@@ -39,9 +53,10 @@ export function mount(container,{auth}){
     }catch(error){if(shell.isCurrent())showError(error.message);}
   }
   async function load(){
+    const search=form.elements.search.value.trim();requestedSearch=search;
     const current=++revision;actionRevision++;table.hidden=true;pager.replaceChildren();shell.feedback('Loading registered users…');
     try{
-      service=await import('../../services/admin-service.js');const data=await service.getAdminUsers({page,pageSize:20,search:form.elements.search.value});
+      service=await import('../../services/admin-service.js');const data=await service.getAdminUsers({page,pageSize:20,search});
       if(!shell.isCurrent()||current!==revision)return;
       if(!data.users.length&&page>1&&data.total){page=Math.ceil(data.total/20);return load();}
       rowsEvents.abort();rowsEvents=new AbortController();rows.replaceChildren();
@@ -58,5 +73,7 @@ export function mount(container,{auth}){
     }catch{if(shell.isCurrent()&&current===revision){shell.feedback('Registered users could not be loaded.',load);showError('Users could not be loaded. Please try again.');}}
   }
   form.addEventListener('submit',event=>{event.preventDefault();page=1;void load();},{signal:shell.events.signal});
+  container.querySelector('[data-add-user]').addEventListener('click',event=>add(event.currentTarget),{signal:shell.events.signal});
+  bindFilterReset(form,{signal:shell.events.signal,onClear:()=>{page=1;void load();},onSearchCleared:()=>{if(requestedSearch){page=1;void load();}}});
   void load();const cleanup=()=>{shell.dispose();rowsEvents.abort();dialog.dispose();};cleanup.canLeave=dialog.canLeave;return cleanup;
 }

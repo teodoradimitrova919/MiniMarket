@@ -3,8 +3,8 @@
   <div data-admin-nav></div>
   <form class="admin-toolbar row g-3 align-items-end" data-admin-filter role="search" aria-label="Search admin listings">
     <div class="col-12 col-md-5"><label class="form-label" for="admin-search">Search by title</label><input class="form-control" id="admin-search" name="search" type="search" maxlength="100"></div>
-    <div class="col-12 col-md-5"><label class="form-label" for="admin-category">Category</label><select class="form-select" id="admin-category" name="category"><option value="">All Categories</option></select></div>
-    <div class="col-12 col-md-2"><button class="btn btn-success w-100" type="submit">Search</button></div>
+    <div class="col-12 col-md-4"><label class="form-label" for="admin-category">Category</label><select class="form-select" id="admin-category" name="category"><option value="">All Categories</option></select></div>
+    <div class="col-12 col-md-3 d-flex flex-wrap gap-2"><button class="btn btn-success" type="submit">Search</button><button class="btn btn-outline-secondary" type="button" data-clear-filters>Clear filters</button></div>
   </form>
   <div data-admin-status aria-live="polite"></div>
   <div class="table-responsive admin-table" data-admin-table hidden><table class="table mb-0"><caption class="visually-hidden">All marketplace listings</caption><thead><tr><th>Image</th><th>Title</th><th>Category</th><th>Price</th><th>Seller</th><th>Created</th><th>Actions</th></tr></thead><tbody data-admin-rows></tbody></table></div>

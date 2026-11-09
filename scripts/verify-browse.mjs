@@ -60,12 +60,12 @@ try {
   assert.equal(await page.locator('#view-listing-modal').isVisible(), false, 'Query history closes the old View modal');
   assert.equal(await page.locator('.modal-backdrop').count(), 0);
   await page.goForward();
-  await page.getByRole('link', { name: 'Clear filters' }).click();
+  await page.getByRole('button', { name: 'Clear filters' }).click();
   assert.deepEqual(await titles(), live.map(row => row.title));
   await submit('no-such-product-19028');
   assert.equal(await page.locator('.listing-card').count(), 0);
   assert.match(await page.locator('[data-browse-feedback]').textContent(), /No listings match/);
-  await page.getByRole('link', { name: 'Clear filters' }).click();
+  await page.getByRole('button', { name: 'Clear filters' }).click();
   const details = await page.locator('[data-listing-link]').first().getAttribute('href');
   await page.locator('[data-view-details]').first().click();
   await page.locator('#view-listing-modal [data-details-content]:not([hidden])').waitFor();

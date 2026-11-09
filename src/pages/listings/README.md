@@ -12,6 +12,8 @@ URL parameters:
 
 Unknown categories produce no matches and can be cleared. Filter submissions retain unrelated query parameters; Clear filters resets to `/listings`. The router calls the page's optional `cleanup.updateLocation()` on query-only navigation, synchronizing controls/results without remounting. Normal navigation and auth-state changes still clean up listeners and image callbacks; late reads cannot render or notify after unmount.
 
+The Clear filters button is always available, including for unsent search text. It restores an empty search, All Categories, and Newest First. Clearing only the search input applies the empty search while keeping category/sort. The shared `utils/filter-reset.js` helper also powers Home and the three admin lists; admin resets return to page one. `scripts/verify-filter-resets.mjs` performs read-only live browser checks across all these views using the existing separate Playwright setup.
+
 Cards reuse the Home component with a Browse-only description excerpt and visible View Details affordance. Dynamic text uses `textContent`, titles/descriptions are clamped, prices use the EUR formatter, and unsafe/broken image URLs retain placeholders. Ordinary card clicks open the reusable read-only View modal without changing filter URLs. Modified clicks retain the direct details route; the modal also offers Open details page. See [listing modals](../../components/listing-modals/README.md).
 
 Loading, no data, no matches, and retryable errors have inline states. Unexpected read errors also use the existing error toast. Retry retains successful reads and requests only missing data; no load/search success toasts are shown.

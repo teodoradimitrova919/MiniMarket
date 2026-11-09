@@ -1,5 +1,13 @@
 # MiniMarket administration
 
+## Adding users and clearing search
+
+Users Management includes **Clear filters** to reset the search and pagination. Clearing the search input (including its native clear control) also reloads all users; stale filtered responses cannot overwrite newer results.
+
+**Add User** opens the shared modal for display name, email, password, and User/Administrator role (default User). The deployed `users.create` action verifies the caller's current administrator role before invoking server-only Auth Admin `createUser`. It validates these fields and confirms the email immediately. Auth triggers provision the regular User role; Administrator selections then use the caller-authorized `admin_set_role` RPC, never user metadata. If promotion cannot be confirmed, the UI reports that the account exists and directs the administrator to Edit User to finish the change. Role changes also remain available through Edit User. The admin's own session is preserved; no welcome email is sent. Successful creation resets search and refreshes the table. Duplicate emails and invalid passwords show errors without creating another account. Passwords are never returned and are cleared after success; fields are removed when the modal closes. No database schema changes are needed.
+
+Run `node scripts/verify-admin-create-handler.mjs` for local authorization, validation, partial-promotion and safe-response checks. `scripts/verify-admin-user-create.mjs` uses the same ignored configuration and separate Playwright setup as the existing admin browser suite. Run with `ADMIN_CREATE_ROLE=user` and then `ADMIN_CREATE_ROLE=admin`. It verifies search resets, validation, duplicate submission/email handling, actual login, the selected authoritative role and profile mirror, actual admin permissions, preserved admin session, anonymous/non-admin denials, and mobile controls. It creates a uniquely named temporary account and deletes it in `finally`. References: [server-only Auth user creation](https://supabase.com/docs/reference/javascript/auth-admin-createuser).
+
 Routes: `/admin`, `/admin/listings`, `/admin/categories`, and `/admin/users`. The shared header shows **Admin Panel** only after a verified admin role is loaded. Every admin subroute is guarded. Database RLS and server authorization enforce permissions independently of the router.
 
 ## Database and roles

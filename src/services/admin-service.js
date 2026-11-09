@@ -44,6 +44,7 @@ export async function invokeAdmin(action, fields={}) {
   return data;
 }
 export const getAdminUsers = options => invokeAdmin('users.list',options);
+export const createAdminUser = user => notifyMutation(()=>invokeAdmin('users.create',{user}),{success:result=>result.roleAssignmentPending?null:'User created successfully.',error:'The user could not be created. Please try again.'});
 export const getAdminUser = id => invokeAdmin('users.view',{id:validateId(id)});
 export const getUserDeletionImpact = id => invokeAdmin('users.impact',{id:validateId(id)});
 export const updateAdminUser = (id,patch) => notifyMutation(()=>invokeAdmin('users.update',{id:validateId(id),patch}),{success:'User updated successfully.',error:'The user could not be updated. Please try again.'});

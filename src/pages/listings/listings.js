@@ -5,6 +5,7 @@ import { readListingFilters, resolveCategory, filterListings } from '../../utils
 import { showError } from '../../services/toast-service.js';
 import { createListingModals, isPlainLinkClick } from '../../components/listing-modals/listing-modals.js';
 import { mountFavoriteControls } from '../../components/favorite-controls.js';
+import { bindFilterReset } from '../../utils/filter-reset.js';
 
 export const title = 'Browse Listings';
 
@@ -23,7 +24,6 @@ export function mount(container, { navigate, auth }) {
   const grid = container.querySelector('[data-browse-grid]');
   const favorites = mountFavoriteControls(grid, { auth });
   const count = container.querySelector('[data-browse-count]');
-  const clear = container.querySelector('[data-clear-filters]');
   const feedback = container.querySelector('[data-browse-feedback]');
   const modals = createListingModals({ auth, focusFallback: () => container.querySelector('h1') });
   grid.addEventListener('click', event => {
@@ -47,7 +47,6 @@ export function mount(container, { navigate, auth }) {
       category.append(option);
     }
     category.value = selected?.id || filters.category;
-    clear.hidden = !filters.search && !filters.category && filters.sort === 'newest';
     if (!listings || !categories || loading) return;
     cards.abort();
     cards = new AbortController();
@@ -70,7 +69,7 @@ export function mount(container, { navigate, auth }) {
   }
 
   function applyFilters(event) {
-    event.preventDefault();
+    event?.preventDefault();
     const params = new URLSearchParams(location.search);
     params.delete('q');
     for (const [key, value] of [['search', search.value.trim()], ['category', category.value], ['sort', sort.value === 'newest' ? '' : sort.value]]) {
@@ -121,6 +120,7 @@ export function mount(container, { navigate, auth }) {
   form.addEventListener('submit', applyFilters, { signal: events.signal });
   category.addEventListener('change', applyFilters, { signal: events.signal });
   sort.addEventListener('change', applyFilters, { signal: events.signal });
+  bindFilterReset(form,{signal:events.signal,onClear:()=>{if(location.search||location.hash)navigate('/listings');else updateLocation();},onSearchCleared:()=>{if(readListingFilters(location.search).search)applyFilters();}});
   updateLocation();
   load();
   const cleanup = () => { active = false; events.abort(); cards.abort(); favorites.dispose(); modals.dispose(); };
