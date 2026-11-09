@@ -1,6 +1,7 @@
 .listing-details-component [hidden] { display: none !important; }
 .listing-details-media { background: #edf2e7; border-radius: .9rem; overflow: hidden; }
-.listing-details-media img { display: block; width: 100%; max-height: 350px; object-fit: contain; }
+.listing-details-media img { display: block; width: auto; max-width: 100%; height: auto; max-height: 520px; object-fit: contain; }
+.listing-details-media.has-photo { width: fit-content; max-width: 100%; margin-inline: auto; background: #fff; border: 1px solid #dfe7da; box-shadow: 0 4px 18px rgb(30 63 48 / 7%); }
 .listing-details-placeholder { min-height: 190px; display: flex; flex-direction: column; gap: .7rem; justify-content: center; align-items: center; color: #6d7e63; }
 .listing-details-placeholder i { font-size: 3rem; }
 .listing-details-placeholder span { font-size: .85rem; }
@@ -27,4 +28,5 @@
 @media (max-width: 575.98px) {
   .listing-details-gallery [data-attachment-images] > .col { width: 50%; }
   .listing-details-gallery [data-attachment-images] > .col:first-child img { max-height: 440px; }
+  .listing-details-media img { max-height: 440px; }
 }

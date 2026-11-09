@@ -31,6 +31,8 @@ export function createListingCard(listing, { signal, showDescription = false, fa
   if (url) {
     const image = card.querySelector('[data-listing-image]');
     const placeholder = card.querySelector('[data-image-placeholder]');
+    // A known photo is loading; do not briefly label it as a missing photo.
+    placeholder.hidden = true;
     image.alt = listing.title;
     image.addEventListener('load', () => { placeholder.hidden = true; }, { once: true, signal });
     image.addEventListener('error', async () => {

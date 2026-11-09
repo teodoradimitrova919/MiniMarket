@@ -37,23 +37,34 @@ export function mountListingDetails(container, { listingId, auth }) {
       favorite.dataset.favoriteTitle = listing.title;
       favorites?.dispose();
       favorites = mountFavoriteControls(container, { auth });
-      if (url) {
-        const image = container.querySelector('[data-details-image]');
-        const placeholder = container.querySelector('[data-details-placeholder]');
-        image.alt = listing.title;
-        image.addEventListener('load', () => { placeholder.hidden = true; }, { once: true, signal: events.signal });
-        image.addEventListener('error', () => { image.hidden = true; placeholder.hidden = false; }, { once: true, signal: events.signal });
-        image.src = url;
-        image.hidden = false;
-      }
-      status.hidden = true;
-      content.hidden = false;
       attachments?.dispose();
+      let hasAttachmentImages = false;
       attachments = mountListingAttachments(container.querySelector('[data-listing-attachments]'), {
         listingId,
         imageContainer: container.querySelector('[data-details-gallery]'),
-        onImagesChange(hasImages) { container.querySelector('.listing-details-media').hidden = hasImages; },
+        onImagesChange(hasImages) { hasAttachmentImages = hasImages; container.querySelector('.listing-details-media').hidden = hasImages; },
       });
+      // Resolve the preferred image before revealing content; never flash the legacy image first.
+      await attachments.ready;
+      if (!active) return;
+      if (!hasAttachmentImages && url) {
+        const image = container.querySelector('[data-details-image]');
+        image.alt = listing.title;
+        image.src = url;
+        try {
+          await image.decode();
+          if (!active) return;
+          image.hidden = false;
+          container.querySelector('[data-details-placeholder]').hidden = true;
+          container.querySelector('.listing-details-media').classList.add('has-photo');
+        } catch { /* Keep the no-photo placeholder when a legacy image is unavailable. */ }
+      } else {
+        const primary = container.querySelector('[data-details-gallery] img:not([hidden])');
+        if (primary) await primary.decode().catch(() => {});
+      }
+      if (!active) return;
+      status.hidden = true;
+      content.hidden = false;
     } catch (error) {
       if (!active) return;
       if (error.code === 'VALIDATION_ERROR') { status.textContent = 'This listing is no longer available.'; return; }

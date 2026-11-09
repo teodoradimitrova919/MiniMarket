@@ -62,7 +62,7 @@ export function createRouter(container, onNavigate, { auth }) {
     const accountPage = ['/login', '/register'].includes(path);
     const adminPage = path === '/admin' || path.startsWith('/admin/');
     const protectedPage = adminPage || ['/dashboard', '/my-listings', '/favorites', '/listings/add'].includes(path) || /^\/listings\/[^/]+\/edit$/.test(path);
-    if (!state.ready && (accountPage || protectedPage)) {
+    if (!state.ready) {
       container.innerHTML = '<div class="home-feedback" role="status"><span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Restoring your session…</div>';
       document.title = 'Loading | MiniMarket';
       onNavigate(path, state);

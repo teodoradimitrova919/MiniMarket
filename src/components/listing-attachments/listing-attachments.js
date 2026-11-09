@@ -105,7 +105,7 @@ export function mountListingAttachments(container,{listingId,editable=false,imag
       const isImage=row.mime_type.startsWith('image/');const item=document.createElement(isImage?'figure':'li');item.className=isImage?'attachment-tile mb-0':'list-group-item';
       if(isImage){
         const placeholder=document.createElement('div');placeholder.className='attachment-preview-missing';placeholder.textContent='Preview unavailable';
-        const image=document.createElement('img');image.alt=row.original_filename;image.loading='lazy';image.hidden=!signed.has(row.id);placeholder.hidden=signed.has(row.id);
+        const image=document.createElement('img');image.alt=row.original_filename;image.loading=imageContainer&&row.id===images[0]?.id?'eager':'lazy';image.hidden=!signed.has(row.id);placeholder.hidden=signed.has(row.id);
         const fallback=()=>{image.hidden=true;placeholder.hidden=false;};
         image.addEventListener('error',async()=>{try{const url=await(await api()).getAttachmentUrl(row.id,{force:true});if(!active||renderEvents.signal.aborted)return;image.addEventListener('error',fallback,{once:true,signal:renderEvents.signal});image.src=url;}catch{if(active)fallback();}},{once:true,signal:renderEvents.signal});
         if(signed.has(row.id))image.src=signed.get(row.id);item.append(image,placeholder);
@@ -133,8 +133,10 @@ export function mountListingAttachments(container,{listingId,editable=false,imag
     catch(problem){if(active){message(problem.message);showError('File cleanup failed. Please retry.');}}
     finally{cleaning=false;controls();}
   },{signal:events.signal});
-  if(listingId)void load();else{status.textContent='Files will upload after your listing is created.';cleanupButton.hidden=true;}
+  const ready=listingId?load():Promise.resolve();
+  if(!listingId){status.textContent='Files will upload after your listing is created.';cleanupButton.hidden=true;}
   return {
+    ready,
     validatePending,showError:message,isBusy,
     pendingSignature:()=>pending.map(entry=>entry.token),
     setBusy(value){externalBusy=value;controls();},
