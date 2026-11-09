@@ -28,6 +28,11 @@ export function mountHeader(container, { onLogout }) {
       container.querySelectorAll('[data-auth-only]').forEach((element) => { element.hidden = !state.ready || !state.user; });
       container.querySelectorAll('[data-guest-only]').forEach((element) => { element.hidden = !state.ready || Boolean(state.user); });
       container.querySelectorAll('[data-admin-only]').forEach((element) => { element.hidden = !state.ready || state.profile?.role !== 'admin'; });
+      const name = state.ready && state.user ? state.profile?.username || 'Signed in' : '';
+      const profileName = container.querySelector('[data-profile-name]');
+      profileName.textContent = name;
+      profileName.parentElement.title = name;
+      profileName.parentElement.setAttribute('aria-label', name ? `Signed in as ${name}. Open your dashboard` : 'Your profile');
       errorMessage.textContent = state.error || '';
       errorMessage.hidden = !state.error;
       for (const link of container.querySelectorAll('a[href]')) {

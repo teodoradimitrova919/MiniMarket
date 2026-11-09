@@ -13,7 +13,12 @@
       <li class="nav-item" data-admin-only hidden><a class="nav-link" href="/admin">Admin Panel</a></li>
     </ul>
     <div class="d-flex gap-2 align-items-center py-2 py-xl-0" data-guest-only hidden><a class="nav-link px-3" href="/login">Login</a><a class="btn btn-primary" href="/register">Register</a></div>
-    <button class="btn btn-outline-success" type="button" data-logout data-auth-only hidden><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Logout</button>
+    <div class="header-account d-flex gap-2 align-items-center py-2 py-xl-0" data-auth-only hidden>
+      <a class="nav-link header-profile d-flex align-items-center gap-2" href="/dashboard" aria-label="Your profile">
+        <i class="bi bi-person-circle" aria-hidden="true"></i><span data-profile-name></span>
+      </a>
+      <button class="btn btn-outline-success" type="button" data-logout><i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Logout</button>
+    </div>
   </div>
 </nav>
 <div class="container pb-3" data-header-error role="alert" hidden></div>

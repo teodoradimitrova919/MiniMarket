@@ -28,7 +28,8 @@ export function mount(container, { navigate, auth }) {
   function updateLocation() {
     // Query-only history updates preserve loaded listings and filter focus.
     const filters = readListingFilters(location.search);
-    search.value = filters.search;
+    // Preserve spaces and the caret while typing; history navigation still restores another term.
+    if (search.value.trim() !== filters.search) search.value = filters.search;
     sort.value = filters.sort;
     category.querySelector('[data-unknown-category]')?.remove();
     const selected = resolveCategory(filters.category, categories || []);
@@ -59,7 +60,7 @@ export function mount(container, { navigate, auth }) {
     feedback.setAttribute('role', 'status');
   }
 
-  function applyFilters(event) {
+  function applyFilters(event, { replace = false } = {}) {
     event?.preventDefault();
     const params = new URLSearchParams(location.search);
     params.delete('q');
@@ -67,7 +68,7 @@ export function mount(container, { navigate, auth }) {
       if (value) params.set(key, value);
       else params.delete(key);
     }
-    navigate(`/listings${params.size ? `?${params}` : ''}`);
+    navigate(`/listings${params.size ? `?${params}` : ''}`, { replace });
   }
 
   async function load() {
@@ -109,9 +110,12 @@ export function mount(container, { navigate, auth }) {
   }
 
   form.addEventListener('submit', applyFilters, { signal: events.signal });
+  // Filter the already loaded records on every keystroke without a network request or history entry per letter.
+  search.addEventListener('input', event => applyFilters(event, { replace: true }), { signal: events.signal });
+  search.addEventListener('search', event => applyFilters(event, { replace: true }), { signal: events.signal });
   category.addEventListener('change', applyFilters, { signal: events.signal });
   sort.addEventListener('change', applyFilters, { signal: events.signal });
-  bindFilterReset(form,{signal:events.signal,onClear:()=>{if(location.search||location.hash)navigate('/listings');else updateLocation();},onSearchCleared:()=>{if(readListingFilters(location.search).search)applyFilters();}});
+  bindFilterReset(form,{signal:events.signal,onClear:()=>{if(location.search||location.hash)navigate('/listings');else updateLocation();}});
   updateLocation();
   load();
   const cleanup = () => { active = false; events.abort(); cards.abort(); favorites.dispose(); };

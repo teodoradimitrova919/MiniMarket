@@ -6,3 +6,10 @@
 .site-header [hidden] { display: none !important; }
 [data-header-error] { font-size: .9rem; color: #9c2c30; }
 .nav-link.active, .nav-link[aria-current="page"] { color: #22664d; text-decoration: underline; text-underline-offset: 7px; }
+.site-header .nav-link { border-radius: .5rem; transition: color .16s ease, background-color .16s ease, box-shadow .16s ease; }
+.site-header .nav-link:hover, .site-header .nav-link:focus-visible { color: #18583f; background-color: #e7f1e7; }
+.site-header .nav-link:focus-visible { outline: 2px solid #22664d; outline-offset: 2px; }
+.header-account { flex-shrink: 0; }
+.site-header .header-profile { padding: .5rem; color: #22664d; }
+.header-profile [data-profile-name] { max-width: 7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .site-header .nav-link { transition: none; } }
