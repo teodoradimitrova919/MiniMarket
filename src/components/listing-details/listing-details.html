@@ -11,6 +11,17 @@
     <button class="favorite-button mb-3" type="button" data-favorite-id aria-label="Save to favorites" aria-pressed="false"><i class="bi bi-heart" aria-hidden="true"></i></button>
     <p class="listing-details-price" data-details-price></p>
     <p class="listing-details-description" data-details-description></p>
+    <section class="listing-details-owner" aria-label="Listing owner">
+      <h3 class="fs-6 mb-2"><i class="bi bi-person-circle me-2" aria-hidden="true"></i>Listed by</h3>
+      <p class="mb-1 fw-semibold" data-owner-name hidden></p>
+      <a class="home-text-link" data-owner-email hidden></a>
+      <p class="small text-muted mb-0" data-owner-status role="status">Loading seller contact details…</p>
+      <button class="btn btn-sm btn-outline-secondary mt-2" type="button" data-owner-retry hidden>Retry seller details</button>
+    </section>
+    <div class="d-flex flex-wrap gap-2 my-3" data-owner-actions hidden>
+      <a class="btn btn-outline-success" data-owner-edit><i class="bi bi-pencil me-2" aria-hidden="true"></i>Edit listing</a>
+      <button class="btn btn-outline-danger" type="button" data-owner-delete><i class="bi bi-trash me-2" aria-hidden="true"></i>Delete listing</button>
+    </div>
     <div data-listing-attachments></div>
   </div>
 </div>

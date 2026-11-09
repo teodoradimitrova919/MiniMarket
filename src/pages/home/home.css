@@ -50,5 +50,6 @@
 .home-join .btn { border-radius: .65rem; padding: .7rem 1rem; font-weight: 600; font-size: .85rem; }
 .home-login-button { color: #fff; border-color: #89a18c; }
 .home-login-button:hover { color: #234d38; background: #fff; }
+.home-join[hidden] { display: none !important; }
 @media (max-width: 991px) { .home-hero-art { max-width: 300px; padding-top: 1.5rem; } .home-art-grid { grid-template-rows: 130px 115px; } .home-art-tile i { font-size: 3.5rem; } .home-join { flex-direction: column; align-items: start; } }
 @media (max-width: 575px) { .home-section-heading { align-items: start; flex-direction: column; gap: .75rem; } .home-search { gap: .25rem; padding-left: .6rem; } .home-search .btn { padding: .65rem .75rem; } .home-hero-description { font-size: .9rem; } .home-hero-art { max-width: 260px; } }

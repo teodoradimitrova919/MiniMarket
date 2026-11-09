@@ -7,9 +7,12 @@ import { bindFilterReset } from '../../utils/filter-reset.js';
 
 export const title = 'Home';
 
-export function mount(container, { navigate } = {}) {
+export function mount(container, { navigate, auth } = {}) {
   container.innerHTML = html;
   const events = new AbortController();
+  const updateJoin = () => { container.querySelector('[data-guest-join]').hidden = !auth?.getState().ready || Boolean(auth?.getState().user); };
+  updateJoin();
+  const unsubscribe = auth?.subscribe(updateJoin);
   bindFilterReset(container.querySelector('[data-home-search]'),{signal:events.signal,button:container.querySelector('[data-clear-filters]'),searchName:'q'});
   let active = true;
   const categoriesRegion = container.querySelector('[data-home-categories]');
@@ -112,5 +115,6 @@ export function mount(container, { navigate } = {}) {
   return () => {
     active = false;
     events.abort();
+    unsubscribe?.();
   };
 }

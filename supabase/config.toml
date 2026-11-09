@@ -8,3 +8,8 @@ entrypoint = "./functions/minimarket-admin/index.ts"
 [functions.listing-attachment-urls]
 verify_jwt = false
 entrypoint = "./functions/listing-attachment-urls/index.ts"
+
+# Seller contact is limited to an anonymously readable listing; Auth lookup is server-only.
+[functions.listing-owner]
+verify_jwt = false
+entrypoint = "./functions/listing-owner/index.ts"

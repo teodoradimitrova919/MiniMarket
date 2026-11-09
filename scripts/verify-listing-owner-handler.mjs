@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {createListingOwnerHandler} from '../supabase/functions/listing-owner/handler.js';
+const id='10000000-0000-4000-8000-000000000001';
+let visible=true,lookupCount=0,failed=false;
+const publicClient={from(table){assert.equal(table,'listings');const q={select(columns){assert.equal(columns,'owner_id');return q;},eq(key,value){assert.equal(key,'id');assert.equal(value,id);return q;},async maybeSingle(){return {data:visible?{owner_id:'real-owner'}:null};}};return q;}};
+const admin={from(table){assert.equal(table,'profiles');const q={select(columns){assert.equal(columns,'username');return q;},eq(key,value){assert.equal(value,'real-owner');return q;},async maybeSingle(){return {data:{username:'Seller name'}};}};return q;},auth:{admin:{async getUserById(value){lookupCount++;assert.equal(value,'real-owner');return failed?{error:{message:'private backend detail'}}:{data:{user:{id:value,email:'seller@example.test',app_metadata:{secret:true},password:'never-return'}}};}}}};
+const handler=createListingOwnerHandler({publicClient,admin,origins:['https://minimarketstore.netlify.app']});
+const request=(body,origin='https://minimarketstore.netlify.app')=>handler(new Request('https://example.test',{method:'POST',headers:{origin},body:JSON.stringify(body)}));
+const response=await request({listingId:id});assert.equal(response.status,200);assert.deepEqual(await response.json(),{owner:{name:'Seller name',email:'seller@example.test'}});assert.equal(response.headers.get('cache-control'),'no-store');
+assert.equal((await request({listingId:id,userId:'guessed-owner'})).status,400);
+assert.equal((await request({listingId:'bad'})).status,400);
+assert.equal((await request({listingId:id},'https://untrusted.example')).status,403);
+visible=false;const before=lookupCount;assert.equal((await request({listingId:id})).status,404);assert.equal(lookupCount,before,'Unreadable listing never reaches privileged Auth');
+visible=true;failed=true;const error=await request({listingId:id});assert.equal(error.status,503);assert.ok(!(await error.text()).includes('private backend detail'));
+console.log('PASS: seller DTO only, listing-derived owner ID, parent visibility before Auth lookup, validation, exact CORS, no-store and sanitized errors.');

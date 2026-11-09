@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {parseEnv} from 'node:util';
+import {randomUUID} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+import {createClient} from '@supabase/supabase-js';
+import {readConfig} from './seed.js';
+const config=readConfig(parseEnv(await readFile('.env.seed.local','utf8'))),env=parseEnv(await readFile('.env.local','utf8'));
+const options={auth:{persistSession:false,autoRefreshToken:false}},admin=createClient(config.url,config.key,options);
+const check=(r,label)=>{if(r.error)throw new Error(`${label} failed`);return r.data;};
+const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE_PATH).href);
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
+const email=`seller-details-${randomUUID()}@test.com`,password=randomUUID(),name=`Seller ${randomUUID()}`;
+let owner,listing;
+try{
+  owner=check(await admin.auth.admin.createUser({email,password,email_confirm:true,user_metadata:{username:name}}),'Fixture user').user;
+  const category=check(await admin.from('categories').select('id').limit(1),'Category')[0];
+  listing=check(await admin.from('listings').insert({owner_id:owner.id,category_id:category.id,title:`Seller details ${randomUUID()}`,price:7}).select().single(),'Fixture listing');
+  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+  const base=process.env.SELLER_TEST_URL||'http://127.0.0.1:5180';
+  await page.goto(base+'/');await page.locator('[data-guest-join]:not([hidden])').waitFor();assert.equal(await page.locator('[data-guest-join] a[href="/register"]').isVisible(),true);
+  await page.goto(base+`/listings/${listing.id}`);await page.locator('[data-details-content]:not([hidden])').waitFor();
+  assert.equal(await page.locator('[data-owner-name]').innerText(),name);assert.equal(await page.locator('[data-owner-email]').innerText(),email);assert.equal(await page.locator('[data-owner-actions]').isVisible(),false);
+  await page.goto(base+'/login');await page.getByLabel('Email',{exact:true}).fill('admin@admin.com');await page.getByLabel('Password',{exact:true}).fill('pass123');await page.locator('form button[type=submit]').click();await page.waitForURL('**/dashboard');
+  await page.goto(base+'/');assert.equal(await page.locator('[data-guest-join]').isVisible(),false);assert.equal(await page.locator('main a[href="/login"]:visible,main a[href="/register"]:visible').count(),0);
+  await page.goto(base+`/listings/${listing.id}`);await page.locator('[data-details-content]:not([hidden])').waitFor();assert.equal(await page.locator('[data-owner-actions]').isVisible(),false,'Non-owning administrator has no seller controls here');
+  await page.locator('[data-logout]').click();await page.waitForURL(base+'/');await page.goto(base+'/login');await page.getByLabel('Email',{exact:true}).fill(email);await page.getByLabel('Password',{exact:true}).fill(password);await page.locator('form button[type=submit]').click();await page.waitForURL('**/dashboard');
+  await page.goto(base+`/listings/${listing.id}`);await page.locator('[data-owner-actions]:not([hidden])').waitFor();await page.locator('[data-owner-edit]').click();await page.waitForURL(`**/listings/${listing.id}/edit`);await page.locator('[data-save-listing]:not([disabled])').waitFor();assert.equal(await page.locator('#listing-title').inputValue(),listing.title);
+  await page.goto(base+`/listings/${listing.id}`);await page.locator('[data-details-content]:not([hidden])').waitFor();await page.locator('[data-owner-delete]').click();await page.locator('#delete-listing-modal').getByRole('button',{name:'Cancel',exact:true}).click();await page.locator('#delete-listing-modal').waitFor({state:'hidden'});assert.ok(check(await admin.from('listings').select('id').eq('id',listing.id).single(),'Delete cancellation'));
+  await page.goto(base+'/my-listings');await page.locator('[data-my-listings-table]:not([hidden])').waitFor();await page.locator(`[data-listing-id="${listing.id}"]`).getByRole('link',{name:'View',exact:true}).click();await page.locator('#view-listing-modal [data-details-content]:not([hidden])').waitFor();assert.equal(await page.locator('#view-listing-modal [data-owner-email]').innerText(),email);
+  await page.locator('#view-listing-modal [data-owner-delete]').click();await page.locator('#delete-listing-modal').waitFor();await page.locator('#delete-listing-modal [data-confirm-delete]').click();await page.locator('#delete-listing-modal').waitFor({state:'hidden'});await page.getByText('You haven’t posted any listings yet.',{exact:false}).waitFor();
+  assert.equal(check(await admin.from('listings').select('id').eq('id',listing.id),'Deleted fixture').length,0);
+  listing=check(await admin.from('listings').insert({owner_id:owner.id,category_id:category.id,title:`Seller page deletion ${randomUUID()}`,price:1}).select().single(),'Second fixture listing');
+  await page.goto(base+`/listings/${listing.id}`);await page.locator('[data-details-content]:not([hidden])').waitFor();await page.locator('[data-owner-delete]').click();await page.locator('#delete-listing-modal [data-confirm-delete]').click();await page.waitForURL('**/my-listings');await page.getByText('You haven’t posted any listings yet.',{exact:false}).waitFor();
+  assert.equal(check(await admin.from('listings').select('id').eq('id',listing.id),'Canonical delete fixture').length,0);
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
+  console.log('PASS: guest Home CTA shown, authenticated Home CTA hidden, seller name/email public, other-user controls hidden, owner Edit and Delete/cancel, shared modal contact/deletion, refresh and mobile layout.');
+}finally{
+  await browser.close();if(listing)check(await admin.from('listings').delete().eq('id',listing.id),'Fixture listing cleanup');if(owner)check(await admin.auth.admin.deleteUser(owner.id),'Fixture user cleanup');
+}

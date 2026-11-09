@@ -6,15 +6,39 @@ import { showError } from '../../services/toast-service.js';
 import { mountListingAttachments } from '../listing-attachments/listing-attachments.js';
 import { mountFavoriteControls } from '../favorite-controls.js';
 
-export function mountListingDetails(container, { listingId, auth }) {
+export function mountListingDetails(container, { listingId, auth, onDelete }) {
   container.innerHTML = html;
   const events = new AbortController();
   let active = true;
   let loading = false;
   let attachments;
   let favorites;
+  let listingRecord, ownerLoading = false;
   const status = container.querySelector('[data-details-status]');
   const content = container.querySelector('[data-details-content]');
+  const ownerStatus = container.querySelector('[data-owner-status]');
+  const ownerRetry = container.querySelector('[data-owner-retry]');
+  async function loadOwner() {
+    if (ownerLoading || !active) return;
+    ownerLoading = true; ownerRetry.hidden = true;
+    ownerStatus.textContent = 'Loading seller contact details…';
+    try {
+      const { getListingOwner } = await import('../../services/listing-owner-service.js');
+      const owner = await getListingOwner(listingId);
+      if (!active) return;
+      const name = container.querySelector('[data-owner-name]'), email = container.querySelector('[data-owner-email]');
+      name.textContent = owner.name; name.hidden = false;
+      email.textContent = owner.email || ''; email.hidden = !owner.email;
+      if (owner.email) email.href = `mailto:${encodeURIComponent(owner.email)}`;
+      ownerStatus.textContent = owner.email ? '' : 'Email unavailable.';
+    } catch {
+      if (active) { ownerStatus.textContent = 'Seller contact details are unavailable. Please try again.'; ownerRetry.hidden = false; }
+    } finally { ownerLoading = false; }
+  }
+  ownerRetry.addEventListener('click', () => void loadOwner(), { signal: events.signal });
+  container.querySelector('[data-owner-delete]').addEventListener('click', event => {
+    if (listingRecord && auth?.getState().user?.id === listingRecord.owner_id) onDelete?.(listingRecord, event.currentTarget);
+  }, { signal: events.signal });
   async function load() {
     if (!active || loading) return;
     loading = true;
@@ -28,6 +52,10 @@ export function mountListingDetails(container, { listingId, auth }) {
       const listing = await getListingById(listingId);
       if (!active) return;
       if (!listing) { status.textContent = 'This listing is no longer available.'; return; }
+      listingRecord = listing;
+      const ownerRequest = loadOwner();
+      container.querySelector('[data-owner-actions]').hidden = auth?.getState().user?.id !== listing.owner_id;
+      container.querySelector('[data-owner-edit]').href = `/listings/${encodeURIComponent(listing.id)}/edit`;
       for (const [name, value] of Object.entries({ title: listing.title, category: listing.category?.name || 'Uncategorized', price: formatPrice(listing.price), description: listing.description || 'No description provided.' })) {
         container.querySelector(`[data-details-${name}]`).textContent = value;
       }
@@ -62,6 +90,8 @@ export function mountListingDetails(container, { listingId, auth }) {
         const primary = container.querySelector('[data-details-gallery] img:not([hidden])');
         if (primary) await primary.decode().catch(() => {});
       }
+      if (!active) return;
+      await ownerRequest;
       if (!active) return;
       status.hidden = true;
       content.hidden = false;
