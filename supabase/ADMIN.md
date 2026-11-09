@@ -1,6 +1,6 @@
 # MiniMarket administration
 
-The production frontend is `https://minimarketstore.netlify.app`. Both deployed Edge Functions explicitly allow that exact origin; `MINIMARKET_ALLOWED_ORIGINS` supplies additional trusted origins with localhost development defaults. Unknown origins are rejected. The production origin was verified for both preflights and actual private image signing; privileged endpoints still require their existing JWT and role checks.
+The production frontend is `https://minimarketstore.netlify.app`. All three deployed Edge Functions (`minimarket-admin`, `listing-attachment-urls`, `listing-owner`) explicitly allow that exact origin; `MINIMARKET_ALLOWED_ORIGINS` supplies additional trusted origins with localhost development defaults. Unknown origins are rejected. The production origin was verified for preflights and private image signing; privileged endpoints still require their existing JWT and role checks. The public seller-contact endpoint is separate from the admin user directory; see the root README for its scope.
 
 ## Adding users and clearing search
 
@@ -19,6 +19,8 @@ The confirmed project is `kkcfqkwkdcqvnurbdxus`. Applied migrations, in order:
 1. `20261108082659_initial_minimarket_schema.sql` — original marketplace schema.
 2. `20261108163728_admin_roles_panel.sql` — `app_role`, `user_roles`, backfill, trusted default role assignment, cleanup reservations, RPCs, Storage bucket/policies, and ownership/image integrity guards.
 3. `20261108164837_admin_rpc_hardening.sql` — moves elevated implementations into `private`, leaves public invoker wrappers, and explicitly denies client access to cleanup state.
+4. `20261108224311_listing_attachments.sql` — adds attachment metadata, private Storage and retryable attachment cleanup.
+5. `20261109085900_listing_attachment_total_limit.sql` — enforces five attachments total per listing, combining images and PDFs.
 
 The migrations are already applied and the local versions match hosted history. Do not rerun or modify applied files. For another clean database, apply the entire ordered migration history through the supported Supabase CLI. CLI 3 targets local databases by default; inspect `supabase db push --help` before intentionally selecting a hosted target. No Netlify deployment is part of this work.
 
@@ -46,7 +48,7 @@ Supabase supplies `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROL
 
 `MINIMARKET_ALLOWED_ORIGINS` is a comma-separated exact allowlist. Defaults cover `http://localhost:5173`, `http://127.0.0.1:5173`, and their port 5180 equivalents. Unknown origins receive 403. Authenticated non-browser clients without Origin still require a valid JWT and current database authorization. CORS does not replace authentication. There is no wildcard origin.
 
-For a future hosted frontend, put the real intended origin and any optional server key in ignored `.env.edge.local`, using only these required values. Do not invent a hosting URL. With a scoped CLI access token authorized for this project, reproducible CLI 3 commands are:
+For an additional hosted frontend origin or optional server key, put the intended server configuration in ignored `.env.edge.local`. The current Netlify origin is already explicitly allowed. With a scoped CLI access token authorized for this project, reproducible CLI 3 commands are:
 
 ```sh
 npm exec --yes --package=supabase@3.0.0 -- supabase secrets set --remote=kkcfqkwkdcqvnurbdxus --env-file .env.edge.local --yes
@@ -55,7 +57,7 @@ npm exec --yes --package=supabase@3.0.0 -- supabase functions deploy minimarket-
 
 These are explicit hosted mutations. Do not add `--no-verify-jwt`. The current function was deployed through the scoped MCP and verified live; no manual deployment is currently pending. CORS defaults support local development. Update secrets and redeploy before using a different frontend origin.
 
-The JSON POST API supports `users.list`, `users.view`, `users.update`, `users.impact`, `users.delete`, `listing.delete`, `images.attach`, `images.remove`, and `images.cleanup`. Inputs and allowed update fields are validated. Responses are whitelisted user ID/email/name/role/registration date/listing count/deletion-pending values; never raw Auth records, metadata, hashes, credentials, or tokens. Responses use `Cache-Control: no-store`. Unsupported fields/actions fail. Auth Admin listing is paginated; since it has no search parameter, searching name/email scans Auth pages server-side and then paginates matches. This is suitable for the classroom dataset; a larger deployment should add an indexed server-side directory.
+The JSON POST API supports `users.list`, `users.view`, `users.create`, `users.update`, `users.impact`, `users.delete`, `listing.delete`, `images.attach`, `images.remove`, and `images.cleanup`. The current admin listing UI has View/Edit/Delete actions; its former Image button was removed, while the legacy image service/endpoints remain. Inputs and allowed update fields are validated. Responses are whitelisted user ID/email/name/role/registration date/listing count/deletion-pending values; never raw Auth records, metadata, hashes, credentials, or tokens. Responses use `Cache-Control: no-store`. Unsupported fields/actions fail. Auth Admin listing is paginated; since it has no search parameter, searching name/email scans Auth pages server-side and then paginates matches. This is suitable for the classroom dataset; a larger deployment should add an indexed server-side directory.
 
 Approved user edits are profile display name, Auth email, and the authoritative `user`/`admin` application role. Role values are validated before any writes. Email uses Auth Admin `updateUserById({email})`, which changes it directly without a confirmation email flow. Passwords and arbitrary authentication metadata cannot be edited through this endpoint. Unchanged identity fields are skipped. Email is updated first, then display name, and role last through the guarded RPC. If a later step fails, the response reports that earlier identity changes may already be saved; retrying completes the allowed update. Role-only failures do not modify name/email. The safe response is assembled before role changes so a successful self-demotion needs no subsequent privileged read.
 

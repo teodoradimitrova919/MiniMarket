@@ -133,3 +133,4 @@ revoke all on function private.can_manage_listing_attachments(uuid),private.lock
   private.require_listing_attachment_cleanup(),private.begin_attachment_deletion(uuid),public.begin_attachment_deletion(uuid) from public,anon,authenticated;
 grant execute on function private.can_manage_listing_attachments(uuid),private.lock_attachment_listing(uuid),private.attachment_path_listing(text),
   private.can_remove_attachment_object(text),private.begin_attachment_deletion(uuid),public.begin_attachment_deletion(uuid) to authenticated;
+

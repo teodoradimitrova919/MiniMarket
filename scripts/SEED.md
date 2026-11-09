@@ -1,6 +1,6 @@
 # MiniMarket demo seed
 
-This server-only seed is pinned to the confirmed MiniMarket project `kkcfqkwkdcqvnurbdxus`. It uses the existing four tables and changes no schema or RLS policies. Do not import any seed file into the frontend.
+This server-only seed is pinned to the confirmed MiniMarket project `kkcfqkwkdcqvnurbdxus`. It uses Auth Admin and the existing `profiles`, `user_roles`, `categories`, `listings` and `favorites` tables; it changes no schema or RLS policies. Do not import any seed file into the frontend.
 
 ## Local setup
 
@@ -45,9 +45,9 @@ node scripts/seed.js --verify-only
 | admin@admin.com | Sofia | admin | 4 | 3 |
 | gogo@test.com | Gogo | user | 6 | 5 |
 
-New demo accounts use the classroom password specified in the task. The script never prints passwords, keys, tokens, or account emails. Accounts are created with the supported Auth Admin `createUser` API and `email_confirm: true`; no signup/invite/confirmation email is sent. It never writes to `auth.users` directly and never resets an existing password.
+New demo accounts use the classroom password `pass123`, as implemented in `seed.js`. These public demo credentials are for fictional classroom accounts, not real users. The script never prints passwords, keys, tokens, or account emails. Accounts are created with the supported Auth Admin `createUser` API and `email_confirm: true`; no signup/invite/confirmation email is sent. It never writes to `auth.users` directly and never resets an existing password.
 
-The existing signup trigger creates profiles. Only this seed's accounts, marked with `app_metadata.minimarket_seed = minimarket-demo-v1`, may have their profile username/role configured by the privileged script. Sofia receives the admin role through a server-side profile update. No client metadata role claim is trusted.
+The existing signup trigger creates profiles and regular authoritative role assignments. Only this seed's accounts, marked with `app_metadata.minimarket_seed = minimarket-demo-v1`, may have their username/role configured by the privileged script. Sofia receives the admin role through a server-side `user_roles` update; the existing role mirror trigger updates `profiles.role`. No client metadata role claim is trusted.
 
 Six categories cover Electronics, Fashion, Home & Garden, Sports, Books, and Toys & Games. Eighteen fictional listings have fixed dates, descriptions, EUR prices, and null image_url values. Twelve favorites reference those listings, with no duplicate pairs. No uploads or frontend changes are included.
 
@@ -73,6 +73,8 @@ Seed tests use a mock Auth Admin API and in-memory public tables. They verify th
 API reference: [Auth Admin createUser](https://supabase.com/docs/reference/javascript/auth-admin-createuser).
 
 ## Actual execution results
+
+The following is the historical initial run, not a claim that the current database still has untouched fixtures. Later user edits and product-image population changed some demo listings. `--verify-only` and seed reruns deliberately reject changed fixture content, including added covers; they do not reset it. Use the existing dataset normally and inspect any mismatch rather than rerunning to overwrite changes.
 
 Executed and verified against the confirmed MiniMarket project on 2026-11-08. The live dry run made no changes. The first live execution and its verification succeeded:
 

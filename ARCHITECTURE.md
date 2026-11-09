@@ -1,101 +1,79 @@
-# MiniMarket architecture plan
+# MiniMarket architecture
 
-## Scope and current phase
+This describes the implemented application, not a plan. The canonical feature/setup guide is [README.md](README.md); database relationships are in [supabase/README.md](supabase/README.md). The source uses one Vite SPA, a Supabase backend and three server-side Edge Functions.
 
-MiniMarket is a lightweight marketplace for classified advertisements. The shell, database/RLS, services, seed, Home, authentication, toasts, Dashboard, listing CRUD pages/modals, and Browse are complete. The Admin Panel adds authoritative roles, admin overview/listings/categories/users routes, image management, guarded RPCs, and server-side Auth operations. Shared forms and listing modals remain reusable. Public reads and ordinary ownership rules are preserved. Favorites UI and frontend deployment remain deferred. See [admin architecture/security](supabase/ADMIN.md), [listing modals](src/components/listing-modals/README.md), [Browse](src/pages/listings/README.md), [database design](supabase/README.md), and [authentication](src/services/AUTH.md).
+## Request flow
 
-Core features are browsing and searching listings, account registration and login, creating and managing owned listings, favorites, and administrator management of listings and categories. Carts, payments, messaging, shipping, and bidding are outside scope.
-
-## Application modules
-
-- **Entry point:** `src/main.js` initializes the shared layout and router.
-- **Router:** one History API router waits for session initialization on protected/auth pages, applies authentication/admin guards, passes navigate/auth to page mounts, and calls cleanup before navigation. Pages remove listeners and ignore stale responses on unmount. RLS enforces database authorization.
-- **Pages:** each page has its own JavaScript module and separate CSS and HTML fragments. Fragments contain no `html`, `head`, or `body` elements.
-- **Listing editor:** Add/Edit mount one shared form component. Page cleanup may expose canLeave; the router checks it for links/history and restores canceled traversals using indexed entries. Native beforeunload protection is active only for dirty forms. Auth changes still unmount immediately.
-- **Shared components:** header, navigation, footer, listing cards, and reusable status feedback. Substantial components keep HTML, CSS, and JavaScript separate.
-- **Notifications:** the shell initializes one toast service. Data mutation services publish curated outcome events through a small utility; they do not render Bootstrap UI. Validation/auth errors remain inline and successful reads/navigation stay quiet. Toast instances/listeners are disposed on removal or shell teardown.
-- **Services:** listing, category, favorite, and Auth services share one Supabase client and isolate backend details from pages. Home reads public data. A small Auth state module coordinates verified users/profiles and SDK subscriptions; storage operations remain deferred.
-- **Utilities:** form validation, price formatting, and safe rendering. Prefer DOM text APIs for user content; never interpolate untrusted values into HTML.
-- **Styles:** Bootstrap 5 and Bootstrap Icons, with a small shared stylesheet for consistent colors, typography, spacing, and responsive behavior.
-
-Pages call services rather than Supabase directly. Use simple modules and functions without a framework or unnecessary abstractions. Show loading, empty, success, and error states where appropriate; confirm destructive actions.
-
-## Pages and navigation
-
-| Route | Page | Access |
-| --- | --- | --- |
-| `/` | Home with advertisements | Public |
-| `/login` | Login | Public |
-| `/register` | Registration | Public |
-| `/dashboard` | Personal statistics and navigation | Authenticated |
-| `/listings` | Browse, search, and filter | Public |
-| `/listings/add` | Create advertisement | Authenticated |
-| `/listings/:id` | Advertisement details | Public |
-| `/listings/:id/edit` | Edit advertisement | Owner or administrator |
-| `/my-listings` | Manage own advertisements | Authenticated |
-| `/favorites` | Saved advertisements | Authenticated |
-| `/admin` | Marketplace statistics | Administrator |
-| `/admin/listings` | All listings, ownership, images, and shared CRUD modals | Administrator |
-| `/admin/categories` | Category CRUD and listing usage counts | Administrator |
-| `/admin/users` | Safe user directory, edits, deletion impact, and cleanup | Administrator |
-| Any unmatched URL | Not Found | Public |
-
-Match `/listings/add` before the dynamic listing detail route. Shared navigation exposes browsing, account actions, and relevant protected destinations. Preserve normal link behavior and browser back/forward navigation. Frontend guards improve navigation; database authorization remains authoritative.
-
-## Proposed folder structure
-
-```text
-MiniMarket/
-|-- AGENTS.md
-|-- .github/
-|   `-- codex-instructions.md
-|-- ARCHITECTURE.md
-|-- README.md
-|-- public/
-|-- src/
-|   |-- pages/                 # Separate page modules and HTML fragments
-|   |-- components/            # Header, navigation, footer, listing cards
-|   |-- services/              # Auth, profiles, listings, categories, favorites, storage
-|   |-- utils/                 # Validation, price formatting, safe rendering
-|   |-- styles.css             # Shared styles and design tokens
-|   |-- router.js              # History API router and route definitions
-|   `-- main.js
-|-- supabase/
-|   `-- migrations/            # Versioned SQL added in the backend phase
-|-- index.html
-|-- package.json
-|-- vite.config.js
-|-- netlify.toml
-|-- .env.example
-`-- .gitignore
+```mermaid
+flowchart LR
+    Browser[Browser: shared shell and routed page] --> Components[Shared components]
+    Components --> Services[Frontend service modules]
+    Services --> SDK[Single public Supabase SDK client]
+    SDK --> Auth[Supabase Auth]
+    SDK --> Data[Data API: grants, RLS and triggers]
+    SDK --> Storage[Storage API: bucket policies]
+    SDK --> Edge[Scoped Edge Function endpoints]
+    Edge --> Caller[Caller or anonymous client: authorization checks]
+    Edge --> Privileged[Server-only privileged SDK client]
+    Caller --> Data
+    Privileged --> AuthAdmin[Auth Admin API]
+    Privileged --> Storage
 ```
 
-Pages use separate HTML fragments, CSS, and JS modules within one Vite HTML shell. The router enforces existing account/admin guards and mount cleanup. Browse opts into a cleanup function's `updateLocation()` hook for query-only navigation, retaining fetched public data and control focus. Account-state changes still remount pages. Listing and admin modal hosts dispose on unmount, including guards/backdrops/focus listeners. Favorites retains placeholder content.
+The browser receives only the project URL and publishable key, plus SDK-managed session tokens after login. Normal table reads/writes go through RLS. Privileged credentials stay in server processes; they are never bundled with Vite. CORS limits browser origins but does not replace authorization.
 
-## Planned Supabase integration
+## Shell, navigation and state
 
-Use Supabase Auth for accounts, Postgres for application data, and Storage for listing images. Configure the public Supabase URL and publishable client key through Vite environment variables, documented in a future `.env.example`. Never commit secrets or expose a service-role key in frontend code. Vite client environment values are public.
+- `index.html` contains the app shell. `src/main.js` initializes Bootstrap/styles, toast feedback, header/footer, Auth state and router.
+- `src/router.js` is the single History API router. Static Add precedes dynamic details. It handles route guards, safe login return URLs, page titles/focus, Back/Forward, direct routes and unmount cleanup. Netlify's rewrite supports deep links.
+- Each `src/pages/<page>/` folder has JavaScript, an HTML fragment and CSS. HTML fragments do not include document-level elements. Page mounts return cleanup functions; optional `canLeave` and `updateLocation` hooks support dirty forms and query-only filtering.
+- `auth-state.js` stores the verified current user/profile in memory, initializes from the SDK session, and reacts to Auth events outside the SDK callback lock. Revision counters ignore stale responses. Current roles come from `user_roles`, not metadata or `profiles.role`.
+- The header uses the verified profile name, conditional visitor/member/admin links, active-route indication and hover/focus feedback. The responsive menu and component subscriptions are disposed on teardown.
 
-Plan these relationships without creating tables yet:
+## Reusable UI and service boundaries
 
-- `profiles`: UUID primary key referencing the Auth user, username, creation timestamp, and a compatibility role mirror.
-- `user_roles`: one authoritative enum role per Auth user, controlled by trusted signup/admin mechanisms and RLS.
-- `categories`: UUID primary key, category name, and appropriate timestamps; one category has many listings.
-- `listings`: UUID primary key; owner foreign key to `profiles`, category foreign key to `categories`, title, description, nonnegative price, image storage reference, and timestamps.
-- `favorites`: user and listing foreign keys, a UUID primary key, a creation timestamp, and a unique user/listing pair. This connects profiles and listings through a many-to-many relationship.
+| Module area | Responsibility |
+| --- | --- |
+| `listing-card`, `listing-thumbnail` | Public cards and table images, safe URLs, fallback placeholders, shared cover priority and illustrative-photo credits |
+| `listing-details` | Shared gallery, description, price, seller contacts, favorite button and owner edit/delete controls |
+| `listing-form` | Validated Add/Edit fields, pending/saved attachments, failed-save retention and dirty-state protection |
+| `listing-modals` | Reusable form/view/delete dialogs for listing-management views, focus handling and confirmations |
+| `listing-attachments` | File selection feedback, previews, signed delivery, removal, retry and the combined five-file limit |
+| `admin-shell`, `admin-dialog` | Admin navigation, tabular management, pagers and shared account/category dialogs |
+| `toast-service`, `operation-feedback` | Curated success/error/info feedback; mutation services publish events without rendering UI |
+| `listings-service`, `categories-service`, `favorites-service`, `dashboard-service` | Queries, pagination, caller scoping and ordinary marketplace mutations |
+| `auth-service`, `auth-state`, `service-helpers` | Auth API, verified identity/role, session lifecycle and shared caller/query helpers |
+| `attachment-service`, `listing-images-service`, `listing-owner-service`, `admin-service` | Existing Storage paths, signed URLs, seller endpoint and guarded admin APIs |
+| `utils/` | Validation, safe image URLs, formatting, filters, file upload helper, modal focus and unsaved-change guards |
 
-Choose explicit deletion behavior in the migration phase: remove related favorites when a listing is deleted; prevent category deletion while listings still reference it or require reassignment first. Keep SQL migrations in `supabase/migrations/` and synchronize them with the repository. Store image paths rather than image binaries in listing records.
+Dynamic user content is rendered with DOM text APIs. Bootstrap provides layout, forms, collapses and dialogs. Current public cards link to `/listings/:id`; they do not require a separate details implementation depending on the source page.
 
-## Authentication and authorization
+## Data loading and synchronization
 
-The future auth service exposes registration, login, logout, current session, and session changes. New accounts receive the regular user role. Users must never assign or update their own administrator role; administrator provisioning requires a trusted administrative process.
+Home independently loads categories and eight latest listings. Browse loads all public listings/categories once per mount, then applies case-insensitive title search on every character, category and sort locally. Query-only navigation preserves loaded data and input focus; live typing replaces the current query history entry. Clearing filters restores the full loaded set. Reloading/revisiting fetches current server data. Admin tables use server query pagination; user searches are handled by the server-only Auth directory path.
 
-Enable Row-Level Security as the authorization boundary. Plan policies allowing public reads of advertisements and categories, authenticated creation of listings owned by the caller, owner updates/deletion of listings, and administrator management of all listings and categories. Restrict favorites to their owning user and profile reads/updates to the fields and users that require them. Protect role fields separately from normal profile editing.
+Favorite controls make one caller-scoped ID read per mounted view and update matching buttons through a window-local `minimarket:favorites-changed` event. Successful listing/admin mutations reload their affected table. Dashboard reads personal counts when mounted; it does not subscribe to database changes.
 
-Storage policies must enforce ownership and administrator permissions for image upload, replacement, and deletion. Choose public image delivery or signed URLs deliberately during integration. Test policies with visitor, owner, other-user, and administrator sessions; frontend guards alone do not secure data.
+There are **no Supabase Realtime channels, `postgres_changes` listeners or published application tables** in the inspected implementation. SDK Auth state events support session/tab synchronization; local state listeners and DOM events are not a database subscription. Other sessions' edits and role changes are not pushed into the displayed page. RLS and each privileged request still validate current access. Adding database Realtime would be a separate feature with its own publication, access and cleanup design.
 
-## Development and deployment
+## Backend authorization and deletion
 
-Implement incrementally with Vanilla JavaScript ES modules, HTML5, CSS3, Vite, Bootstrap 5, and Bootstrap Icons. Add dependencies only when their implementation phase needs them. Develop locally in Visual Studio Code and maintain small, descriptive Git commits in GitHub.
+The six public tables and three private cleanup tables have RLS enabled. `auth.users` is managed by Supabase; `profiles.id` and `user_roles.user_id` each reference an Auth user. Listings and favorites also reference Auth users directly. `user_roles.role` is authoritative (`user`/`admin`), with a trigger-maintained profile mirror. New accounts start as users regardless of editable metadata.
 
-In the deployment phase, configure Netlify to run `npm run build` and publish Vite's `dist` folder. Add an SPA fallback rewrite to `/index.html` so direct links and refreshes resolve through the router. Configure public Supabase variables in Netlify and approved authentication redirect URLs in Supabase. Verify protected routes, unknown routes, and direct navigation before release. Do not deploy in this shell phase.
+Public wrappers such as `admin_set_role`, `admin_overview`, `admin_user_summaries`, `admin_user_impact`, `admin_begin_user_deletion`, `begin_listing_deletion` and `begin_attachment_deletion` delegate to existing private implementations. They are not permission-free bypasses: private code checks identity, ownership/current role and cleanup state, and uses fixed search paths. Last-admin protection is serialized in the database. Ordinary clients cannot edit private reservation rows.
+
+`minimarket-admin` verifies the token and current role before server-side Auth user operations. Its listing cleanup action also supports the verified owner. `listing-owner` derives an owner from a public listing and returns only name/email. `listing-attachment-urls` derives paths from publicly visible attachment metadata before signing; callers cannot ask it to sign an arbitrary path.
+
+Storage deletion precedes listing or Auth deletion. Private user/listing/attachment reservations block conflicting writes and let a failed cleanup be retried. The database cascade removes dependent application rows after successful cleanup. Storage files must be removed through the Storage API rather than SQL metadata deletion.
+
+## Image pipeline
+
+`listing-attachments` is private; user images and PDFs are associated through `listing_attachments`, with five combined attachments and 5 MB per file. Storage policies and metadata triggers enforce the server boundary. Signed read/download URLs expire after 300 seconds; clients batch and refresh them. The public `listing-images` bucket remains for legacy/populated covers stored in `listings.image_url`.
+
+Lists use the first image attachment by creation time/ID, then the public cover, then a category placeholder. The shared details component resolves attachments before revealing the content to avoid flashing a different cover. Galleries center their secondary images and preserve the main photo's proportions. The server-only product-image population script reuses upload validation, skips existing photos, pins reviewed source bytes and preserves attribution in a frontend manifest and Storage metadata.
+
+## Maintenance and deployment
+
+Schema changes are versioned in `supabase/migrations/`; Edge entrypoints/config are under `supabase/functions/` and `supabase/config.toml`. Node maintenance scripts use ignored server credentials, never `VITE_` secrets. The demo seed and maintenance/Edge guards target the confirmed project intentionally. Git tracks source, migrations, licensing records and the npm lockfile; local secrets, generated builds, downloaded photos and maintenance journals are ignored.
+
+Netlify builds the frontend with `npm run build` and publishes `dist/`. Supabase hosts the database, Auth, Storage and Edge Functions separately; deploying a frontend build does not deploy SQL or functions. See README for verified package commands and the explicit migration/deployment workflow. No deployment is required to generate or review documentation.

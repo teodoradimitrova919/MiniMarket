@@ -2,7 +2,7 @@
 
 `/listings` is public. The existing listings service paginates through all public rows, joins category names, and orders newest first. Categories load through the existing categories service. Neither query requests profile information.
 
-The page holds data only for its mount lifetime. Title search (case-insensitive, submitted with Search/Enter), category selection, and sorting run locally across the full result set. Search and category filters combine. No new requests run when filters, sorting, or same-page browser history change. A reload or leaving and returning to Browse fetches fresh data. This deliberately simple approach suits the initial marketplace; a larger dataset can later move filtering and pagination to the server.
+The page holds data only for its mount lifetime. Case-insensitive title search filters on every input character; Search/Enter remains available. Category selection and sorting run locally across the full result set. Search and category filters combine. Live typing replaces the current query history entry, preserves spaces/caret/focus and does not add an entry for each letter. No new data requests run when filters, sorting, or same-page browser history change. A reload or leaving and returning to Browse fetches fresh data. This deliberately simple approach suits the small marketplace; a larger dataset can later move filtering and pagination to the server.
 
 URL parameters:
 

@@ -1,50 +1,138 @@
-# MiniMarket database
+# MiniMarket database and security
 
-The scoped MCP project is `kkcfqkwkdcqvnurbdxus`, matching the repository's MiniMarket URL and prior confirmed connection. Initial inspection found no public tables, migration history, or Auth users. No other project was accessed.
+Schema and relationships below were checked against the connected MiniMarket project `kkcfqkwkdcqvnurbdxus` and the five SQL migrations on 9 November 2026. The project contains six public application tables and three private cleanup-reservation tables. Supabase manages Auth and Storage schemas separately.
 
-## Migration history
+## Entity relationship diagram
 
-The SQL files live in the committed [`migrations/` directory](migrations/):
+Names such as `public_listings` are diagram aliases for `public.listings`; they are not extra database tables. Only selected columns of Supabase-managed `auth.users` are shown. Every relationship line represents an actual foreign key. Optional profile/role cardinality describes the constraint; the signup trigger normally provisions both rows.
 
-| Version | SQL file | Contents |
-| --- | --- | --- |
-| `20261108082659` | [initial_minimarket_schema.sql](migrations/20261108082659_initial_minimarket_schema.sql) | Four tables, UUID/FK constraints, indexes, signup and updated_at triggers, grants, and 13 RLS policies |
-| `20261108163728` | [admin_roles_panel.sql](migrations/20261108163728_admin_roles_panel.sql) | Authoritative roles, backfill/defaults, safe cleanup reservations, Storage, RPCs, and ownership/image guards |
-| `20261108164837` | [admin_rpc_hardening.sql](migrations/20261108164837_admin_rpc_hardening.sql) | Private elevated implementations, public invoker wrappers, and explicit cleanup-state denial |
+```mermaid
+erDiagram
+    auth_users ||--o| public_profiles : "id / CASCADE"
+    auth_users ||--o| public_user_roles : "user_id / CASCADE"
+    auth_users ||--o{ public_listings : "owner_id / CASCADE"
+    auth_users ||--o{ public_favorites : "user_id / CASCADE"
+    auth_users |o--o{ public_listing_attachments : "uploaded_by / SET NULL"
+    public_categories ||--o{ public_listings : "category_id / RESTRICT"
+    public_listings ||--o{ public_favorites : "listing_id / CASCADE"
+    public_listings ||--o{ public_listing_attachments : "listing_id / CASCADE"
+    auth_users ||--o| private_user_deletions : "user_id / CASCADE"
+    public_listings ||--o| private_listing_deletions : "listing_id / CASCADE"
+    public_listing_attachments ||--o| private_attachment_deletions : "attachment_id / CASCADE"
 
-All three migrations were applied through the confirmed scoped MCP. Local filenames use the versions assigned by the remote migration runner and match hosted history. Do not reapply or edit applied migrations. See [Admin roles, Storage, Edge Functions, bootstrap, and cleanup](ADMIN.md) for the current authorization design and live verification; the original-schema notes below describe the initial foundation.
-
-## Tables and permissions
-
-| Table | Read | Write |
-| --- | --- | --- |
-| profiles | Own profile; admins can read all | Users may update only their own username |
-| categories | Public | Admins only |
-| listings | Public | Owner or admin; regular users can only create for themselves |
-| favorites | Own favorites only | Own insert/delete only; no update |
-| user_roles | Own assignment; admins may read all | Trusted trigger/SQL or authorized admin role RPC; no direct client writes |
-
-All five public tables use UUID primary keys, non-null creation timestamps, and RLS. Listing prices use `numeric(12,2)` (up to 9,999,999,999.99), allow zero, and reject negative values and NaN. Categories have unique, non-blank names. Usernames and listing titles cannot be blank. Usernames are not unique.
-
-Deleting an Auth user cascades to their profile, listings, and favorites. Deleting a listing cascades to its favorites. Categories with listings cannot be deleted until those listings are removed or reassigned. The `(user_id, listing_id)` unique constraint prevents duplicate favorites and indexes the user lookup; separate indexes cover the other foreign keys.
-
-The signup trigger creates a regular profile using a trimmed metadata username, or `user_` plus the user's UUID when absent/blank. Metadata roles are ignored. Clients have no profile INSERT/DELETE permission and only column-level UPDATE permission on username, so they cannot assign roles or change profile IDs. Admin provisioning is a trusted database administrator operation, outside the frontend; no admin account was created.
-
-Private, fixed-search-path functions implement the Auth trigger, administrator lookup, listing integrity, cleanup reservations, and automatic listing `updated_at`. Public admin RPCs are invoker wrappers around explicitly authorized private implementations. Trigger functions are not directly executable by client roles. Keep `private` outside exposed Data API schemas. The administrator helper now reads authoritative `user_roles`; the legacy profile role is mirrored for compatibility and metadata never authorizes access.
-
-## Verification
-
-`scripts/verify-database.sql` is historical verification for an empty disposable database at the initial migration only. It uses transaction-scoped fixtures and ends with ROLLBACK. Do not run it against the populated/current project or after the admin migrations. Current live verification uses `scripts/verify-admin.mjs` and the application browser suites, with supported Auth Admin fixture creation, production RLS/API checks, and marked fixture cleanup; see [current verification instructions](ADMIN.md#verification-and-current-limits).
-
-Initial verification passed. All four public tables and Auth users remained empty afterward. Security and performance advisors reported no findings. Direct anonymous Data API requests with the publishable key also confirmed categories/listings are readable and profiles/favorites are denied. These checks test the authorization boundary; they do not implement or test an end-user login flow.
-
-The frontend client is exported from `src/services/supabase-client.js` and used by application services. Configure the public URL/key from `.env.example` in `.env.local`, then restart Vite. Only a project base URL and `sb_publishable_` key are accepted; configuration errors never echo key values. Keep server-only seed/Edge configuration in their separate ignored local files.
-
-Run client configuration checks with:
-
-```sh
-node --experimental-vm-modules scripts/verify-supabase-client.mjs
-npm run build
+    auth_users {
+        uuid id PK
+        varchar email "varchar(255); Supabase-managed Auth account"
+    }
+    public_profiles {
+        uuid id PK,FK
+        text username
+        text role "compatibility mirror"
+        timestamptz created_at
+    }
+    public_user_roles {
+        uuid user_id PK,FK
+        app_role role "authoritative user or admin"
+        timestamptz created_at
+    }
+    public_categories {
+        uuid id PK
+        text name UK
+        timestamptz created_at
+    }
+    public_listings {
+        uuid id PK
+        uuid owner_id FK
+        uuid category_id FK
+        text title
+        text description "nullable"
+        numeric price "numeric(12,2)"
+        text image_url "nullable public cover URL"
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    public_favorites {
+        uuid id PK
+        uuid user_id FK "unique with listing_id"
+        uuid listing_id FK
+        timestamptz created_at
+    }
+    public_listing_attachments {
+        uuid id PK
+        uuid listing_id FK
+        uuid uploaded_by FK "nullable"
+        text storage_path UK
+        text original_filename
+        text mime_type
+        bigint size_bytes
+        timestamptz created_at
+    }
+    private_user_deletions {
+        uuid user_id PK,FK
+        timestamptz started_at
+    }
+    private_listing_deletions {
+        uuid listing_id PK,FK
+        timestamptz started_at
+    }
+    private_attachment_deletions {
+        uuid attachment_id PK,FK
+        timestamptz started_at
+    }
 ```
 
-Reference: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) and [Auth profile triggers](https://supabase.com/docs/guides/auth/managing-user-data).
+`profiles`, listing owners, favorite users and attachment uploaders are linked by the same Auth UUID; there is **no foreign key from a listing/favorite to `profiles`**. The administrator view joins profile names through service code. The `(user_id, listing_id)` unique constraint prevents duplicate favorites. Category names and attachment paths are unique. Prices are nonnegative `numeric(12,2)`; zero is allowed. Categories do not have descriptions, images, parent IDs or status fields.
+
+The nullable `uploaded_by` reference uses `ON DELETE SET NULL`; the remaining account-owned application rows use cascades. Category deletion is restricted while listings reference it. Cleanup reservations have one row at most per target and cascade away with that target.
+
+## Storage references are not foreign keys
+
+`listings.image_url` is a public cover URL into the existing `listing-images` bucket. `listing_attachments.storage_path` identifies an object in the existing private `listing-attachments` bucket. Neither column has a foreign key to `storage.objects`; integrity and cleanup are enforced by functions/triggers and Storage API operations. The ER diagram deliberately does not draw a nonexistent Storage FK.
+
+Both buckets enforce 5 MB per file. Public covers accept JPEG, PNG and WebP. Private attachments also accept PDF. A listing may have five attachment metadata rows total, combining images and PDFs. Public cover objects are a separate legacy/maintenance path; user uploads in the shared form use private attachments. Private listing attachments are delivered to visitors through the scoped `listing-attachment-urls` function, not unrestricted Storage SELECT.
+
+## Tables and access rules
+
+All nine application/private tables shown in the diagram have RLS enabled. Table/column grants work alongside these policies.
+
+| Table | Read boundary | Write boundary |
+| --- | --- | --- |
+| `public.profiles` | Own profile or admin | Own username only through client column grants; no direct client INSERT/DELETE or role updates |
+| `public.user_roles` | Own active assignment or admin | Trusted signup/server maintenance and authorized admin role RPC; no direct browser writes |
+| `public.categories` | Public | Admin only; FK blocks deletion when used |
+| `public.listings` | Public | Active owner/admin; owners cannot be reassigned; cleanup reservations block conflicting writes |
+| `public.favorites` | Saving user only, including for admins | Own INSERT/DELETE; no UPDATE |
+| `public.listing_attachments` | Metadata for publicly readable parent listings | Parent owner/admin INSERT/DELETE; no UPDATE; validated real file metadata and total count |
+| `private.user_deletions` | No ordinary client access | Guarded server cleanup workflow |
+| `private.listing_deletions` | No ordinary client access | Guarded server cleanup workflow |
+| `private.attachment_deletions` | No ordinary client access | Guarded server cleanup workflow |
+
+`public.app_role` is an enum with `user` and `admin`. Signup uses `private.handle_new_user` to create a profile and regular role, ignoring any metadata role claim. `private.is_admin` checks authoritative `user_roles` and pending user deletion state. `private.mirror_role` maintains `profiles.role`; `private.guard_role_change` protects the last active administrator. Application code also uses current role queries for admin actions, rather than trusting a stale role claim alone.
+
+## Existing RPC and trigger boundaries
+
+The following public functions exist: `admin_overview`, `admin_user_summaries`, `admin_user_impact`, `admin_begin_user_deletion`, `admin_set_role`, `begin_listing_deletion`, `begin_attachment_deletion`. They are invoker wrappers around private implementations with explicit current-user/admin/owner checks; the `private` schema must remain outside the exposed Data API schemas. Elevated private functions have fixed search paths and restricted grants. Frontend guards alone do not authorize access.
+
+Other existing private helpers include `set_listing_updated_at`, `guard_listing_integrity`, `validate_listing_attachment`, `lock_attachment_listing`, `can_manage_listing_attachments` and file-cleanup guards. They maintain timestamps, immutable owners, valid uploaded cover paths, authoritative attachment metadata, serialized attachment limits and deletion ordering. No new table or function is proposed by this documentation.
+
+Storage policies check bucket/path and parent listing management rights. A normal client cannot overwrite uploaded attachment objects. Cleanup uses Storage API removal before deleting metadata/listings/accounts; the database rejects premature deletion while related files remain. Server-only Auth operations live in [minimarket-admin](functions/minimarket-admin/), with per-request token and current-role checks. Seller contact disclosure and scoped attachment signing use separate public endpoints described in the [root README](../README.md).
+
+## Migration history and workflow
+
+| Version | File | Applied behavior |
+| --- | --- | --- |
+| `20261108082659` | [initial_minimarket_schema](migrations/20261108082659_initial_minimarket_schema.sql) | Profiles, categories, listings, favorites, constraints, initial grants/RLS and triggers |
+| `20261108163728` | [admin_roles_panel](migrations/20261108163728_admin_roles_panel.sql) | Authoritative roles, user/listing cleanup state, public cover bucket, admin RPCs and integrity guards |
+| `20261108164837` | [admin_rpc_hardening](migrations/20261108164837_admin_rpc_hardening.sql) | Moves elevated RPC implementations into private schema; restricted public wrappers and cleanup state |
+| `20261108224311` | [listing_attachments](migrations/20261108224311_listing_attachments.sql) | Attachment metadata, private bucket, attachment cleanup state, policies and validation |
+| `20261109085900` | [listing_attachment_total_limit](migrations/20261109085900_listing_attachment_total_limit.sql) | Combined maximum of five attachments per listing |
+
+All five are applied to the connected project and synchronized from `supabase_migrations.schema_migrations`. Do not rerun or alter them. Use a new CLI-created migration for a future schema change. Test against a disposable/local Supabase stack, review RLS/grants and cleanup behavior, then deliberately target the correct hosted project. CLI 3 defaults to local; the verified create/apply/list/fetch commands are in the [root workflow](../README.md#database-migration-workflow). Fetching history recovers stored SQL; it does not generate a schema diff or migrate the database.
+
+The original `scripts/verify-database.sql` only targets the initial disposable schema and should not be run against the current populated project. Current live verification scripts use supported Auth Admin temporary fixtures and Storage cleanup; check their individual setup requirements. [bootstrap-admin.sql](../scripts/bootstrap-admin.sql) promotes an explicitly selected existing account through a trusted SQL connection for initial setup; it is not a browser API.
+
+## Realtime status
+
+The inspected `pg_publication_tables` result contains no published tables, and frontend code creates no Supabase Realtime channels or Postgres-change subscriptions. Auth state events and current-window favorite events are implemented; database push synchronization is not. See [synchronization behavior](../README.md#synchronization-and-realtime) before planning any Realtime extension.
+
+Operational detail: [administration](ADMIN.md), [attachments](ATTACHMENTS.md), [seed](../scripts/SEED.md), [cover population/licensing](../scripts/IMAGE_POPULATION.md).

@@ -18,3 +18,4 @@ as $$ declare info jsonb; count_existing integer; begin
   end if;
   return new;
 end; $$;
+
