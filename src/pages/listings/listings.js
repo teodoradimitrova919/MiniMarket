@@ -3,7 +3,6 @@ import './listings.css';
 import { createListingCard } from '../../components/listing-card/listing-card.js';
 import { readListingFilters, resolveCategory, filterListings } from '../../utils/listing-filters.js';
 import { showError } from '../../services/toast-service.js';
-import { createListingModals, isPlainLinkClick } from '../../components/listing-modals/listing-modals.js';
 import { mountFavoriteControls } from '../../components/favorite-controls.js';
 import { bindFilterReset } from '../../utils/filter-reset.js';
 
@@ -25,17 +24,9 @@ export function mount(container, { navigate, auth }) {
   const favorites = mountFavoriteControls(grid, { auth });
   const count = container.querySelector('[data-browse-count]');
   const feedback = container.querySelector('[data-browse-feedback]');
-  const modals = createListingModals({ auth, focusFallback: () => container.querySelector('h1') });
-  grid.addEventListener('click', event => {
-    const link = event.target.closest('[data-listing-link]');
-    if (!link || !isPlainLinkClick(event, link)) return;
-    event.preventDefault();
-    modals.openView(link.dataset.listingId, link);
-  }, { signal: events.signal });
 
   function updateLocation() {
-    // Query-only history updates keep this page mounted, but close its old details.
-    if (modals.closeView()) container.querySelector('h1').focus({ preventScroll: true });
+    // Query-only history updates preserve loaded listings and filter focus.
     const filters = readListingFilters(location.search);
     search.value = filters.search;
     sort.value = filters.sort;
@@ -123,7 +114,7 @@ export function mount(container, { navigate, auth }) {
   bindFilterReset(form,{signal:events.signal,onClear:()=>{if(location.search||location.hash)navigate('/listings');else updateLocation();},onSearchCleared:()=>{if(readListingFilters(location.search).search)applyFilters();}});
   updateLocation();
   load();
-  const cleanup = () => { active = false; events.abort(); cards.abort(); favorites.dispose(); modals.dispose(); };
+  const cleanup = () => { active = false; events.abort(); cards.abort(); favorites.dispose(); };
   cleanup.updateLocation = updateLocation;
   return cleanup;
 }

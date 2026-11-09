@@ -7,5 +7,5 @@ const publicKey=Deno.env.get('SUPABASE_ANON_KEY');
 if(!key||!publicKey)throw new Error('Missing server configuration');
 const options={auth:{persistSession:false,autoRefreshToken:false}};
 const publicClient=createClient(url,publicKey,options),admin=createClient(url,key,options);
-const origins=(Deno.env.get('MINIMARKET_ALLOWED_ORIGINS')||'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5180,http://127.0.0.1:5180').split(',').map(value=>value.trim()).filter(Boolean);
+const origins=['https://minimarketstore.netlify.app',...(Deno.env.get('MINIMARKET_ALLOWED_ORIGINS')||'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5180,http://127.0.0.1:5180').split(',').map(value=>value.trim()).filter(Boolean)];
 Deno.serve(createAttachmentUrlHandler({publicClient,admin,origins}));

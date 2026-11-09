@@ -61,10 +61,11 @@ try{
   await page.goto(base+'/favorites');await page.locator('[data-favorites-grid][aria-busy=false]').waitFor();await page.locator('[data-favorite-id]').click();
   await page.getByText("You haven't saved any listings yet.",{exact:true}).waitFor();await page.locator('[data-favorites-feedback]').getByRole('link',{name:'Browse Listings',exact:true}).click();await page.waitForURL('**/listings');
   const browseHeart=page.locator(`[data-browse-grid] [data-favorite-id="${first.id}"]`);await browseHeart.waitFor();await browseHeart.click();await page.waitForFunction(id=>document.querySelector(`[data-favorite-id="${id}"]`)?.getAttribute('aria-pressed')==='true',first.id);
-  // Check modal state and underlying browse heart synchronization.
+  // Browse opens the canonical details route; Back reloads the updated heart state.
   await page.locator(`[data-listing-link][href="/listings/${first.id}"]`).click();
-  await page.locator('.modal.show [data-favorite-id][aria-pressed=true]').waitFor();
-  await page.locator('.modal.show [data-favorite-id]').click();await page.locator('.modal.show [data-favorite-id][aria-pressed=false]').waitFor();await page.keyboard.press('Escape');
+  await page.waitForURL(`**/listings/${first.id}`);
+  await page.locator('[data-favorite-id][aria-pressed=true]').waitFor();
+  await page.locator('[data-favorite-id]').click();await page.locator('[data-favorite-id][aria-pressed=false]').waitFor();await page.goBack();await browseHeart.waitFor();
   assert.equal(await browseHeart.getAttribute('aria-pressed'),'false');
   const visual=check(await anon.from('listing_attachments').select('listing_id').eq('mime_type','image/jpeg').limit(1),'Existing listing photo')[0];
   if(visual){
@@ -92,7 +93,7 @@ try{
   await page.getByLabel('Email',{exact:true}).fill(other.email);await page.getByLabel('Password',{exact:true}).fill(other.password);await page.locator('form button[type=submit]').click();await page.waitForURL('**/favorites');await page.locator('[data-favorites-grid][aria-busy=false]').waitFor();
   assert.equal(await page.locator('[data-favorite-listing]').count(),1,'Account switch has no previous-user cache');
   assert.deepEqual(errors,[]);
-  console.log('PASS: protected route, guest heart/login return, own favorites/RLS, duplicate prevention, failed mutation retention, details/browse/modal hearts, refresh/history, newest-first cards, removal/empty state, dashboard counts, deleted listings, error/retry, account switching, desktop/tablet/mobile.');
+  console.log('PASS: protected route, guest heart/login return, own favorites/RLS, duplicate prevention, failed mutation retention, details/browse hearts, refresh/history, newest-first cards, removal/empty state, dashboard counts, deleted listings, error/retry, account switching, desktop/tablet/mobile.');
 }finally{
   await browser.close();
   for(const listing of listings)check(await admin.from('listings').delete().eq('id',listing.id),'Fixture listing cleanup');

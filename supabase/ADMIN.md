@@ -1,5 +1,7 @@
 # MiniMarket administration
 
+The production frontend is `https://minimarketstore.netlify.app`. Both deployed Edge Functions explicitly allow that exact origin; `MINIMARKET_ALLOWED_ORIGINS` supplies additional trusted origins with localhost development defaults. Unknown origins are rejected. The production origin was verified for both preflights and actual private image signing; privileged endpoints still require their existing JWT and role checks.
+
 ## Adding users and clearing search
 
 Users Management includes **Clear filters** to reset the search and pagination. Clearing the search input (including its native clear control) also reloads all users; stale filtered responses cannot overwrite newer results.

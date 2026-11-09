@@ -55,11 +55,11 @@ try {
   assert.equal(await page.evaluate(() => window.browseMarker), true);
   assert.equal(requests.length, baseline, 'Filters, sorting, and history do not refetch');
   await page.locator('[data-view-details]').first().click();
-  await page.locator('#view-listing-modal [data-details-content]:not([hidden])').waitFor();
+  await page.locator('[data-details-content]:not([hidden])').waitFor();
   await page.goBack();
-  assert.equal(await page.locator('#view-listing-modal').isVisible(), false, 'Query history closes the old View modal');
+  await ready();
+  assert.equal(new URL(page.url()).pathname, '/listings');
   assert.equal(await page.locator('.modal-backdrop').count(), 0);
-  await page.goForward();
   await page.getByRole('button', { name: 'Clear filters' }).click();
   assert.deepEqual(await titles(), live.map(row => row.title));
   await submit('no-such-product-19028');
@@ -68,9 +68,7 @@ try {
   await page.getByRole('button', { name: 'Clear filters' }).click();
   const details = await page.locator('[data-listing-link]').first().getAttribute('href');
   await page.locator('[data-view-details]').first().click();
-  await page.locator('#view-listing-modal [data-details-content]:not([hidden])').waitFor();
-  assert.equal(new URL(page.url()).pathname, '/listings');
-  await page.getByRole('link', { name: 'Open details page' }).click();
+  await page.locator('[data-details-content]:not([hidden])').waitFor();
   assert.equal(new URL(page.url()).pathname, details);
   assert.equal(await page.locator('h1').textContent(), 'Listing Details');
   await page.goBack(); await ready();

@@ -34,7 +34,7 @@ try{
   assert.equal(await page.locator('[data-details-content]').isVisible(),false);assert.equal(await page.locator('[data-details-status]').isVisible(),true);assert.equal(legacyRequests,0);
   release();await ready();await fitted('[data-details-gallery] img');assert.equal(await page.locator('.listing-details-media').isVisible(),false);assert.equal(legacyRequests,0);
   await page.setViewportSize({width:1440,height:1000});await fitted('[data-details-gallery] img');
-  await page.goto(base+'/listings');await page.locator(`[data-listing-link][href="/listings/${bee}"]`).waitFor();await page.locator(`[data-listing-link][href="/listings/${bee}"]`).click();await ready();await fitted('#view-listing-modal [data-details-image]');
+  await page.goto(base+'/listings');await page.locator(`[data-listing-link][href="/listings/${bee}"]`).waitFor();await page.locator(`[data-listing-link][href="/listings/${bee}"]`).click();await page.waitForURL(`**/listings/${bee}`);await ready();await fitted('[data-details-image]');
   assert.deepEqual(errors,[]);
-  console.log('PASS: Favorites/direct/modal legacy photos share fitted sizing; attachment image loads before content reveal; no legacy-first flash, no double fetch during session restoration, desktop/mobile fit, no page errors. No records changed.');
+  console.log('PASS: Favorites/direct/Browse legacy photos share fitted sizing; attachment image loads before content reveal; no legacy-first flash, no double fetch during session restoration, desktop/mobile fit, no page errors. No records changed.');
 }finally{await browser.close();}

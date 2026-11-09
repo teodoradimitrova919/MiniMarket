@@ -80,7 +80,7 @@ try {
     }
     return route.continue();
   });
-  // Public View preserves Browse filters and supports loading, escape, and focus return.
+  // Public details use their canonical URL; management tables retain their modals.
   await page.goto(`${base}/listings?category=electronics&sort=price-asc`);
   await page.locator('[data-listing-link]').first().waitFor();
   const firstTitle = await page.locator('[data-listing-title]').first().textContent();
@@ -88,34 +88,32 @@ try {
   detailMode = 'loading'; readGate = new Promise(resolve => { releaseRead = resolve; });
   await page.locator('[data-listing-link]').first().click();
   await page.getByText('Loading listing…', { exact:true }).waitFor();
-  assert.equal(new URL(page.url()).searchParams.get('category'), 'electronics');
+  assert.equal(new URL(page.url()).pathname, href);
   detailMode = 'normal'; releaseRead();
-  await page.locator('#view-listing-modal [data-details-content]:not([hidden])').waitFor();
+  await page.locator('[data-details-content]:not([hidden])').waitFor();
   assert.equal(await page.locator('[data-details-title]').textContent(), firstTitle);
-  await page.keyboard.press('Escape');
+  await page.goBack(); await page.locator('[data-listing-link]').first().waitFor();
   await noBackdrop();
-  assert.equal(await page.locator('[data-listing-link]').first().evaluate(node => node === document.activeElement), true);
+  assert.equal(new URL(page.url()).searchParams.get('category'), 'electronics');
   const secondTitle = await page.locator('[data-listing-title]').nth(1).textContent();
   detailMode = 'loading'; readGate = new Promise(resolve => { releaseRead=resolve; });
   await page.locator('[data-listing-link]').first().click();
   await page.getByText('Loading listing…', { exact:true }).waitFor();
-  await page.keyboard.press('Escape');
+  await page.goBack(); await page.locator('[data-listing-link]').first().waitFor();
   detailMode = 'normal';
   await page.locator('[data-listing-link]').nth(1).click();
   await page.locator('[data-details-content]:not([hidden])').waitFor();
   releaseRead(); await page.waitForTimeout(150);
   assert.equal(await page.locator('[data-details-title]').textContent(), secondTitle, 'Late previous read cannot replace another listing');
-  for (let i=0;i<8;i++) await page.keyboard.press('Tab');
-  assert.equal(await page.locator('#view-listing-modal').evaluate(node => node.contains(document.activeElement)),true);
-  await page.keyboard.press('Escape');
+  await noBackdrop();
+  await page.goBack(); await page.locator('[data-listing-link]').first().waitFor();
   detailMode = 'missing'; await page.locator('[data-listing-link]').first().click();
   await page.getByText('This listing is no longer available.', { exact:true }).waitFor();
-  await page.getByRole('button', { name:'Close', exact:true }).click();
+  await page.goBack(); await page.locator('[data-listing-link]').first().waitFor();
   detailMode = 'error'; await page.locator('[data-listing-link]').first().click();
   await page.getByRole('button', { name:'Try again', exact:true }).waitFor();
   detailMode = 'normal'; await page.getByRole('button', { name:'Try again', exact:true }).click();
   await page.locator('[data-details-content]:not([hidden])').waitFor();
-  await page.getByRole('link', { name:'Open details page' }).click();
   await page.waitForURL(url => url.pathname === href);
   await page.locator('[data-details-content]:not([hidden])').waitFor();
   await noBackdrop();
@@ -123,7 +121,7 @@ try {
   assert.equal(await page.locator('[data-details-title]').textContent(), firstTitle);
   await page.goto(`${base}/listings/not-a-uuid`);
   await page.getByText('This listing is no longer available.', { exact:true }).waitFor();
-  console.log('PASS: anonymous View, loading/missing/error/retry, safe direct details route/refresh, filter preservation, escape, and focus restoration.');
+  console.log('PASS: anonymous View, loading/missing/error/retry, safe direct details route/refresh, canonical listing URLs and filter preservation.');
 
   await login(owner); await page.goto(`${base}/my-listings`);
   await page.getByText('You haven’t posted any listings yet.', { exact:false }).waitFor();

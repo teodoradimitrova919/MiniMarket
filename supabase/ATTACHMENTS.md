@@ -1,5 +1,9 @@
 # Listing attachments
 
+## Production origin
+
+Both `listing-attachment-urls` and `minimarket-admin` explicitly allow `https://minimarketstore.netlify.app`, in addition to the configured extra origins (localhost defaults). This exact production origin must remain allowed for the deployed frontend to invoke the private-image signer. A missing origin causes a 403 preflight even when listing data and stored files are intact. Unrelated origins remain denied; the bucket remains private and signed URLs remain short-lived. Verified live against the production listing thumbnails and details modal after deploying the function configuration fix. No frontend redeployment or file re-upload was required.
+
 The private `listing-attachments` bucket accepts JPEG, PNG, WebP and PDF files up to 5 MB. The database serializes registration per listing and allows up to five images and five PDFs. Original names are display/download metadata only. Paths are `<listing UUID>/<attachment UUID>.<extension>`; uploads never overwrite.
 
 Migration `20261108224311_listing_attachments.sql` is applied to MiniMarket project `kkcfqkwkdcqvnurbdxus`. It adds attachment metadata, RLS, bucket-specific Storage policies, private authorization/cleanup helpers and deletion guards. Existing listing visibility, roles and unrelated policies are preserved. The uploader, timestamp, size and MIME are derived from the authenticated request and stored object rather than trusted insert values. Storage enforces declared MIME and size; this is not an antivirus or binary-content scanning service.
